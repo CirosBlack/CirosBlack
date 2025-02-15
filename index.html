@@ -147,13 +147,14 @@
       margin-bottom: 20px;
     }
 
-    /* Adicionando padding lateral para evitar corte do neon */
+    /* Container dos cards */
     .movie-row {
       display: flex;
       gap: 20px;
-      overflow-x: auto;
       scroll-behavior: smooth;
       padding: 20px 30px;
+      /* Remove o scroll horizontal */
+      overflow-x: hidden;
     }
 
     .movie-row::-webkit-scrollbar {
@@ -250,6 +251,19 @@
         font-size: 10px;
       }
     }
+
+    /* ====== MODO RETRATO (apenas 4 colunas na horizontal) ====== */
+    @media (orientation: portrait) {
+      .movie-row {
+        flex-wrap: wrap;
+        overflow-x: hidden; /* Garante que não haja scroll horizontal */
+        justify-content: space-between;
+      }
+      .movie-card {
+        flex: 0 0 calc(25% - 20px);
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -271,10 +285,19 @@
     </nav>
   </header>
 
+  <!-- ====== HERO BANNER ====== -->
+  <div class="hero">
+    <div class="hero-content">
+      <h1>Bem-vindo ao CirosBlack</h1>
+      <p>Confira nossas novidades e explore o melhor do entretenimento!</p>
+      <button>Saiba Mais</button>
+    </div>
+  </div>
+
   <!-- ====== MAIN CONTENT ====== -->
   <main>
     <div class="section">
-      <h2 class="section-title"></h2>
+      <h2 class="section-title">Destaques</h2>
       <div class="movie-row">
         <!-- Card 1 (com link) -->
         <div class="movie-card">
