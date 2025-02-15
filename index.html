@@ -1,111 +1,409 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CirosBlack</title>
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    background-color: #040714;
-    color: white;
-    overflow-x: hidden;
-  }
+  <meta charset="UTF-8" />
+  <title>CirosBlack</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
 
-  .navbar {
-    background-color: #090b13;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+    body {
+      background-color: #141414;
+      color: #fff;
+      overflow-x: hidden;
+    }
 
-  .navbar img {
-    width: 90px;
-  }
+    /* ====== HEADER / NAVBAR ====== */
+    header {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      background-color: rgba(0, 0, 0, 0.9);
+      padding: 10px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-  .hero-section {
-    background-image: url('hero-image.jpg');
-    background-size: cover;
-    height: 400px;
-    position: relative;
-  }
+    /* Agrupamento do logo e campo de pesquisa */
+    .left-header {
+      display: flex;
+      align-items: center;
+    }
 
-  .category-section {
-    display: flex;
-    justify-content: space-around;
-    padding: 20px 0;
-  }
+    header .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #e50914;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+    }
 
-  .category-section img {
-    width: 100px;
-    cursor: pointer;
-  }
+    /* Campo de pesquisa */
+    #searchInput {
+      margin-left: 20px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: none;
+      outline: none;
+    }
 
-  .content-section {
-    padding: 20px;
-  }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
 
-  .content-section h2 {
-    margin: 10px 0;
-  }
+    nav ul li {
+      cursor: pointer;
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
 
-  .movie-list {
-    display: flex;
-    overflow-x: auto;
-  }
+    nav ul li:hover {
+      color: #e50914;
+    }
 
-  .movie-list img {
-    width: 150px;
-    margin-right: 10px;
-    cursor: pointer;
-  }
-</style>
+    /* ====== HERO BANNER ====== */
+    .hero {
+      width: 100%;
+      height: 500px;
+      background: url("https://via.placeholder.com/1600x600?text=Assassino+a+Pre%C3%A7o+Fixo") center center no-repeat;
+      background-size: cover;
+      position: relative;
+      margin-top: 60px; /* Compensar o header fixo */
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding-left: 60px;
+      animation: fadeIn 1.5s ease;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.7), transparent 60%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+    }
+
+    .hero-content h1 {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+
+    .hero-content p {
+      font-size: 18px;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .hero-content button {
+      padding: 12px 24px;
+      background-color: #e50914;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .hero-content button:hover {
+      background-color: #f6121d;
+    }
+
+    @keyframes fadeIn {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    /* ====== SECTIONS (CARDS) ====== */
+    main {
+      width: 100%;
+      padding: 40px 40px 80px;
+      margin-top: 60px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .movie-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding-bottom: 10px;
+    }
+
+    .movie-row::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .movie-row::-webkit-scrollbar-thumb {
+      background-color: #555;
+      border-radius: 4px;
+    }
+
+    .movie-row::-webkit-scrollbar-track {
+      background-color: #222;
+    }
+
+    .movie-card {
+      flex: 0 0 auto;
+      width: 150px;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #222;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .movie-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+    }
+
+    .movie-card img {
+      width: 100%;
+      display: block;
+    }
+
+    .movie-card-info {
+      padding: 8px;
+    }
+
+    .movie-card-info h4 {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .movie-card-info p {
+      font-size: 12px;
+      color: #bbb;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 768px) {
+      .hero {
+        height: 300px;
+        padding-left: 20px;
+      }
+
+      .hero-content h1 {
+        font-size: 28px;
+      }
+
+      .hero-content p {
+        font-size: 14px;
+      }
+
+      .hero-content button {
+        font-size: 14px;
+      }
+
+      header .logo {
+        font-size: 18px;
+      }
+
+      nav ul li {
+        font-size: 14px;
+      }
+
+      .section-title {
+        font-size: 18px;
+      }
+
+      .movie-card {
+        width: 120px;
+      }
+
+      .movie-card-info h4 {
+        font-size: 12px;
+      }
+
+      .movie-card-info p {
+        font-size: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<div class="navbar">
-    <img src="https://static.vecteezy.com/system/resources/previews/023/654/784/non_2x/golden-logo-template-free-png.png" alt="Disney Plus Logo">
-</div>
-
-<div class="hero-section">
-    <!-- Normalmente, o conteúdo do banner principal seria adicionado aqui, como uma imagem ou vídeo promocional -->
-</div>
-
-<div class="category-section">
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIiWCDqOq-1p85SFFW_ToOY7qDz6XM9x_WJA&usqp=CAU" alt="Disney">
-    <img src="pixar-logo.png" alt="Pixar">
-    <img src="marvel-logo.png" alt="Marvel">
-    <img src="starwars-logo.png" alt="Star Wars">
-    <img src="natgeo-logo.png" alt="National Geographic">
-</div>
-
-<div class="content-section">
-    <h2>TOKUSATSU</h2>
-    <div class="movie-list">
-        <a href="https://cirosblack.github.io/jaspion">
-        <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/Jaspion%20poster.png" alt="Jaspion"></a>
-        <a href="https://cirosblack.github.io/changeman">
-        <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/ChangemanPoster.png" alt="Yu Yu Changeman"></a>
-        <a href="https://cirosblack.github.io/flashman">
-        <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/FlashmanPoster.png" alt="Flashman"></a>
-        
-        <!-- Mais imagens de filmes aqui -->
+  <!-- ====== HEADER / NAVBAR ====== -->
+  <header>
+    <div class="left-header">
+      <div class="logo">CirosBlack</div>
+      <input type="text" id="searchInput" placeholder="Pesquisar..." />
     </div>
-    
-    <h2>ANIMES</h2>
-    <div class="movie-list">
-        <a href="https://cirosblack.github.io/YuYuHakusho">
-        <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/YuYuHakusho%20poster.png" alt="Yu Yu Hakusho"></a>
-        <a href="https://cirosblack.github.io/Bleach">
-        <img src="https://raw.githubusercontent.com/CirosBlack/Bleach/main/Poster.Bleach.png" alt="Bleach"></a>
-        <!-- Mais imagens de novidades aqui -->
+    <nav>
+      <ul>
+        <li>Início</li>
+        <li>Animes</li>
+        <li>Filmes</li>
+        <li>Séries</li>
+        <li>Cursos</li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ====== MAIN CONTENT ====== -->
+  <main>
+    <!-- Seção "Continue Assistindo" -->
+    <div class="section">
+      <h2 class="section-title"></h2>
+      <div class="movie-row">
+        <!-- Card 1 (com link) -->
+        <div class="movie-card">
+          <a href="https://cirosblack.github.io/YuYuHakusho" target="_self" style="text-decoration: none; color: inherit; display: block;">
+            <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
+            <div class="movie-card-info">
+              <h4>Yu Yu Hakusho</h4>
+              <p>Animes</p>
+            </div>
+          </a>
+        </div>
+        <!-- Card 2 (segunda capa) -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/SmFzcGlvbg.jpg" alt="Jaspion" />
+          <div class="movie-card-info">
+            <h4>Jaspion</h4>
+            <p>Tokusatsu</p>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Ant-Man and the Wasp" />
+          <div class="movie-card-info">
+            <h4>Ant-Man and the Wasp</h4>
+            <p>Aventura/Marvel</p>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Doctor Strange" />
+          <div class="movie-card-info">
+            <h4>Doctor Strange</h4>
+            <p>Marvel</p>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Wonka" />
+          <div class="movie-card-info">
+            <h4>Wonka</h4>
+            <p>Fantasia</p>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Mais seções de conteúdo conforme necessário -->
-</div>
+    <!-- Seção "Populares - Filme" -->
+    <div class="section">
+      <h2 class="section-title">Populares - Filme</h2>
+      <div class="movie-row">
+        <!-- Card 1 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Duna: Parte 2" />
+          <div class="movie-card-info">
+            <h4>Duna: Parte 2</h4>
+            <p>Ficção Científica</p>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Immaculate" />
+          <div class="movie-card-info">
+            <h4>Immaculate</h4>
+            <p>Terror</p>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Monkey Man" />
+          <div class="movie-card-info">
+            <h4>Monkey Man</h4>
+            <p>Ação</p>
+          </div>
+        </div>
+        <!-- Card 4 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Road House" />
+          <div class="movie-card-info">
+            <h4>Road House</h4>
+            <p>Ação/Clássico</p>
+          </div>
+        </div>
+        <!-- Card 5 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Poor Things" />
+          <div class="movie-card-info">
+            <h4>Poor Things</h4>
+            <p>Drama/Fantasia</p>
+          </div>
+        </div>
+        <!-- Card 6 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Late Night with the Devil" />
+          <div class="movie-card-info">
+            <h4>Late Night with the Devil</h4>
+            <p>Terror/Suspense</p>
+          </div>
+        </div>
+        <!-- Card 7 -->
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="The Ten Commandments" />
+          <div class="movie-card-info">
+            <h4>The Ten Commandments</h4>
+            <p>Clássico/Épico</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
+  <!-- ====== SCRIPT DE PESQUISA ====== -->
+  <script>
+    const searchInput = document.getElementById('searchInput');
+
+    searchInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.movie-card');
+
+      cards.forEach(card => {
+        // Obtém o título e a categoria da capa
+        const title = card.querySelector('.movie-card-info h4').textContent.toLowerCase();
+        const category = card.querySelector('.movie-card-info p').textContent.toLowerCase();
+
+        // Se a query for encontrada em título ou categoria, exibe o card; senão, oculta.
+        if (title.includes(query) || category.includes(query)) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  </script>
 </body>
 </html>
