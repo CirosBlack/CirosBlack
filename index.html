@@ -38,6 +38,7 @@
       align-items: center;
     }
 
+    /* O logo agora é um link que redireciona para a página inicial */
     header .logo {
       font-size: 24px;
       font-weight: bold;
@@ -45,6 +46,7 @@
       text-transform: uppercase;
       letter-spacing: 2px;
       cursor: pointer;
+      text-decoration: none;
     }
 
     #searchInput {
@@ -169,7 +171,7 @@
 
     .movie-card {
       flex: 0 0 auto;
-      width: 250px;
+      width: 200px;
       border-radius: 6px;
       overflow: visible;
       background-color: #222;
@@ -254,7 +256,8 @@
   <!-- ====== HEADER / NAVBAR ====== -->
   <header>
     <div class="left-header">
-      <div class="logo">CirosBlack</div>
+      <!-- Logo clicável que redireciona para a página inicial -->
+      <a href="index.html" class="logo">CirosBlack</a>
       <input type="text" id="searchInput" placeholder="Pesquisar..." />
     </div>
     <nav>
