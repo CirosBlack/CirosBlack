@@ -33,7 +33,6 @@
       justify-content: space-between;
     }
 
-    /* Agrupamento do logo e campo de pesquisa */
     .left-header {
       display: flex;
       align-items: center;
@@ -48,7 +47,6 @@
       cursor: pointer;
     }
 
-    /* Campo de pesquisa */
     #searchInput {
       margin-left: 20px;
       padding: 5px 10px;
@@ -80,7 +78,7 @@
       background: url("https://via.placeholder.com/1600x600?text=Assassino+a+Pre%C3%A7o+Fixo") center center no-repeat;
       background-size: cover;
       position: relative;
-      margin-top: 60px; /* Compensar o header fixo */
+      margin-top: 60px;
       display: flex;
       align-items: center;
       justify-content: flex-start;
@@ -130,12 +128,8 @@
     }
 
     @keyframes fadeIn {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
+      0% { opacity: 0; }
+      100% { opacity: 1; }
     }
 
     /* ====== SECTIONS (CARDS) ====== */
@@ -151,12 +145,13 @@
       margin-bottom: 20px;
     }
 
+    /* Adicionando padding lateral para evitar corte do neon */
     .movie-row {
       display: flex;
-      gap: 10px;
+      gap: 20px;
       overflow-x: auto;
       scroll-behavior: smooth;
-      padding-bottom: 10px;
+      padding: 20px 30px;
     }
 
     .movie-row::-webkit-scrollbar {
@@ -174,26 +169,26 @@
 
     .movie-card {
       flex: 0 0 auto;
-      width: 150px;
+      width: 250px;
       border-radius: 6px;
-      /* Alterado para permitir que o box-shadow não seja cortado */
       overflow: visible;
       background-color: #222;
       position: relative;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin: 10px 0;
     }
 
-    /* Efeito Neon Azul ao passar o mouse */
+    /* Efeito Neon Azul com intensidade reduzida */
     .movie-card:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 15px #00f, 0 0 30px #00f, 0 0 45px #00f;
+      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
     }
 
     .movie-card img {
       width: 100%;
       display: block;
-      border-radius: 6px; /* Mantém as bordas arredondadas na imagem */
+      border-radius: 6px;
     }
 
     .movie-card-info {
@@ -275,7 +270,6 @@
 
   <!-- ====== MAIN CONTENT ====== -->
   <main>
-    <!-- Seção "Continue Assistindo" -->
     <div class="section">
       <h2 class="section-title"></h2>
       <div class="movie-row">
@@ -330,22 +324,13 @@
   <!-- ====== SCRIPT DE PESQUISA ====== -->
   <script>
     const searchInput = document.getElementById('searchInput');
-
     searchInput.addEventListener('input', function() {
       const query = this.value.toLowerCase().trim();
       const cards = document.querySelectorAll('.movie-card');
-
       cards.forEach(card => {
-        // Obtém o título e a categoria da capa
         const title = card.querySelector('.movie-card-info h4').textContent.toLowerCase();
         const category = card.querySelector('.movie-card-info p').textContent.toLowerCase();
-
-        // Se a query for encontrada em título ou categoria, exibe o card; senão, oculta.
-        if (title.includes(query) || category.includes(query)) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
+        card.style.display = (title.includes(query) || category.includes(query)) ? '' : 'none';
       });
     });
   </script>
