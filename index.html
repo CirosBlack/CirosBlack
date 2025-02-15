@@ -176,7 +176,8 @@
       flex: 0 0 auto;
       width: 150px;
       border-radius: 6px;
-      overflow: hidden;
+      /* Alterado para permitir que o box-shadow não seja cortado */
+      overflow: visible;
       background-color: #222;
       position: relative;
       cursor: pointer;
@@ -192,6 +193,7 @@
     .movie-card img {
       width: 100%;
       display: block;
+      border-radius: 6px; /* Mantém as bordas arredondadas na imagem */
     }
 
     .movie-card-info {
