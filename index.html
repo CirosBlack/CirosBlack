@@ -134,11 +134,11 @@
       100% { opacity: 1; }
     }
 
-    /* ====== SECTIONS (CARDS) ====== */
+    /* ====== MAIN CONTENT ====== */
     main {
       width: 100%;
-      padding: 20px 40px 80px; /* Padding superior reduzido */
-      margin-top: 20px; /* Espaço reduzido entre o Hero e os Destaques */
+      padding: 20px 40px 80px; /* Padding inferior para dar espaço */
+      margin-top: 20px;
     }
 
     .section-title {
@@ -147,42 +147,23 @@
       margin-bottom: 20px;
     }
 
-    /* Container dos cards */
+    /* ====== CARDS (GRID) ====== */
     .movie-row {
-      display: flex;
+      display: grid;
       gap: 20px;
-      scroll-behavior: smooth;
       padding: 20px 30px;
-      /* Remove o scroll horizontal */
-      overflow-x: hidden;
     }
 
-    .movie-row::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    .movie-row::-webkit-scrollbar-thumb {
-      background-color: #555;
-      border-radius: 4px;
-    }
-
-    .movie-row::-webkit-scrollbar-track {
-      background-color: #222;
-    }
-
+    /* Ajuste nos cards para ocuparem 100% da célula do grid */
     .movie-card {
-      flex: 0 0 auto;
-      width: 280px;
-      border-radius: 6px;
-      overflow: visible;
       background-color: #222;
+      border-radius: 6px;
+      overflow: hidden;
       position: relative;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
-      margin: 10px 0;
     }
 
-    /* Efeito Neon Azul com intensidade reduzida */
     .movie-card:hover {
       transform: scale(1.05);
       box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
@@ -191,7 +172,6 @@
     .movie-card img {
       width: 100%;
       display: block;
-      border-radius: 6px;
     }
 
     .movie-card-info {
@@ -208,10 +188,10 @@
       color: #bbb;
     }
 
-    /* ====== RESPONSIVE ====== */
+    /* ====== RESPONSIVO ====== */
     @media (max-width: 768px) {
       .hero {
-        height: 250px; /* Altura reduzida para telas menores */
+        height: 250px;
         padding-left: 20px;
       }
 
@@ -238,30 +218,29 @@
       .section-title {
         font-size: 18px;
       }
+    }
 
-      .movie-card {
-        width: 120px;
-      }
-
-      .movie-card-info h4 {
-        font-size: 12px;
-      }
-
-      .movie-card-info p {
-        font-size: 10px;
+    /* ====== MODO RETRATO ====== */
+    @media (orientation: portrait) {
+      /* 4 colunas na retrato */
+      .movie-row {
+        grid-template-columns: repeat(4, 1fr);
       }
     }
 
-    /* ====== MODO RETRATO (apenas 4 colunas na horizontal) ====== */
-    @media (orientation: portrait) {
-      .movie-row {
-        flex-wrap: wrap;
-        overflow-x: hidden; /* Garante que não haja scroll horizontal */
-        justify-content: space-between;
+    /* ====== MODO PAISAGEM ====== */
+    @media (orientation: landscape) {
+      /* Se o viewport for largo o suficiente, exibe 6 colunas */
+      @media (min-width: 1780px) {
+        .movie-row {
+          grid-template-columns: repeat(6, 1fr);
+        }
       }
-      .movie-card {
-        flex: 0 0 calc(25% - 20px);
-        margin-bottom: 20px;
+      /* Caso contrário, exibe 5 colunas */
+      @media (max-width: 1779px) {
+        .movie-row {
+          grid-template-columns: repeat(5, 1fr);
+        }
       }
     }
   </style>
@@ -289,30 +268,29 @@
   <div class="hero">
     <div class="hero-content">
       <h1>Bem-vindo CirosBlack</h1>
-      <p>Todos os seus conteudos em um só lugar!</p>
-      
+      <p>Todos os seus conteúdos em um só lugar!</p>
     </div>
   </div>
 
   <!-- ====== MAIN CONTENT ====== -->
   <main>
     <div class="section">
-      <h2 class="section-title"></h2>
+      <h2 class="section-title">Destaques</h2>
       <div class="movie-row">
-        <!-- Card 1 (com redirecionamento via onclick) -->
-        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/YuYuHakusho'" style="cursor: pointer;">
+        <!-- Card 1 -->
+        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/YuYuHakusho'">
           <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
           <div class="movie-card-info">
             <h4>Yu Yu Hakusho</h4>
             <p>Animes</p>
           </div>
         </div>
-        <!-- Card 2 (segunda capa com redirecionamento via onclick) -->
-        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/jaspion'" style="cursor: pointer;">
+        <!-- Card 2 -->
+        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/jaspion'">
           <img src="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/SmFzcGlvbg.jpg" alt="Jaspion" />
           <div class="movie-card-info">
             <h4>Jaspion</h4>
-            <p>Séries - Tukusatsu</p>
+            <p>Séries - Tokusatsu</p>
           </div>
         </div>
         <!-- Card 3 -->
@@ -339,12 +317,12 @@
             <p>Fantasia</p>
           </div>
         </div>
-         <!-- Card 5 -->
+        <!-- Card 6 -->
         <div class="movie-card">
-          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Wonka" />
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Exemplo" />
           <div class="movie-card-info">
-            <h4>Wonka</h4>
-            <p>Fantasia</p>
+            <h4>Exemplo</h4>
+            <p>Categoria</p>
           </div>
         </div>
       </div>
