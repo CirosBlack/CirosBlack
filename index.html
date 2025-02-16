@@ -6,18 +6,20 @@
   <!-- Favicon -->
   <link rel="icon" href="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/favicon.png" type="image/png">
   <style>
-    /* [seu CSS existente] */
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
+
     body {
       background-color: #141414;
       color: #fff;
       overflow-x: hidden;
     }
+
+    /* ====== HEADER / NAVBAR ====== */
     header {
       width: 100%;
       position: fixed;
@@ -30,10 +32,13 @@
       align-items: center;
       justify-content: space-between;
     }
+
     .left-header {
       display: flex;
       align-items: center;
     }
+
+    /* O logo agora é um link que redireciona para a página inicial */
     header .logo {
       font-size: 24px;
       font-weight: bold;
@@ -43,6 +48,7 @@
       cursor: pointer;
       text-decoration: none;
     }
+
     #searchInput {
       margin-left: 20px;
       padding: 5px 10px;
@@ -50,22 +56,27 @@
       border: none;
       outline: none;
     }
+
     nav ul {
       list-style: none;
       display: flex;
       gap: 20px;
     }
+
     nav ul li {
       cursor: pointer;
       font-weight: 500;
       transition: color 0.3s ease;
     }
+
     nav ul li:hover {
       color: #e50914;
     }
+
+    /* ====== HERO BANNER ====== */
     .hero {
       width: 100%;
-      height: 200px;
+      height: 200px; /* Altura reduzida */
       background: url("https://via.placeholder.com/1600x600?text=Assassino+a+Pre%C3%A7o+Fixo") center center no-repeat;
       background-size: cover;
       position: relative;
@@ -76,6 +87,7 @@
       padding-left: 60px;
       animation: fadeIn 1.5s ease;
     }
+
     .hero::after {
       content: "";
       position: absolute;
@@ -85,20 +97,24 @@
       height: 100%;
       background: linear-gradient(to right, rgba(0, 0, 0, 0.7), transparent 60%);
     }
+
     .hero-content {
       position: relative;
       z-index: 1;
       max-width: 600px;
     }
+
     .hero-content h1 {
       font-size: 48px;
       margin-bottom: 20px;
     }
+
     .hero-content p {
       font-size: 18px;
       line-height: 1.4;
       margin-bottom: 20px;
     }
+
     .hero-content button {
       padding: 12px 24px;
       background-color: #e50914;
@@ -108,28 +124,37 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+
     .hero-content button:hover {
       background-color: #f6121d;
     }
+
     @keyframes fadeIn {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
+
+    /* ====== MAIN CONTENT ====== */
     main {
       width: 100%;
-      padding: 20px 40px 80px;
+      padding: 20px 40px 80px; /* Padding inferior para dar espaço */
       margin-top: 20px;
     }
+
     .section-title {
       font-size: 24px;
       font-weight: 600;
       margin-bottom: 20px;
     }
+
+    /* ====== CARDS (GRID) ====== */
     .movie-row {
       display: grid;
       gap: 20px;
       padding: 20px 30px;
     }
+
+    /* Ajuste nos cards para ocuparem 100% da célula do grid */
     .movie-card {
       background-color: #222;
       border-radius: 6px;
@@ -138,60 +163,80 @@
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
     .movie-card:hover {
       transform: scale(1.05);
       box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
     }
+
     .movie-card img {
       width: 100%;
       display: block;
     }
+
     .movie-card-info {
       padding: 8px;
     }
+
     .movie-card-info h4 {
       font-size: 14px;
       margin-bottom: 6px;
     }
+
     .movie-card-info p {
       font-size: 12px;
       color: #bbb;
     }
+
+    /* ====== RESPONSIVO ====== */
     @media (max-width: 768px) {
       .hero {
         height: 250px;
         padding-left: 20px;
       }
+
       .hero-content h1 {
         font-size: 28px;
       }
+
       .hero-content p {
         font-size: 14px;
       }
+
       .hero-content button {
         font-size: 14px;
       }
+
       header .logo {
         font-size: 18px;
       }
+
       nav ul li {
         font-size: 14px;
       }
+
       .section-title {
         font-size: 18px;
       }
     }
+
+    /* ====== MODO RETRATO ====== */
     @media (orientation: portrait) {
+      /* 4 colunas na retrato */
       .movie-row {
         grid-template-columns: repeat(4, 1fr);
       }
     }
+
+    /* ====== MODO PAISAGEM ====== */
     @media (orientation: landscape) {
+      /* Se o viewport for largo o suficiente, exibe 6 colunas */
       @media (min-width: 1780px) {
         .movie-row {
           grid-template-columns: repeat(6, 1fr);
         }
       }
+      /* Caso contrário, exibe 5 colunas */
       @media (max-width: 1779px) {
         .movie-row {
           grid-template-columns: repeat(5, 1fr);
@@ -201,8 +246,10 @@
   </style>
 </head>
 <body>
+  <!-- ====== HEADER / NAVBAR ====== -->
   <header>
     <div class="left-header">
+      <!-- Logo clicável que redireciona para a página inicial -->
       <a href="https://cirosblack.github.io/CirosBlack" class="logo">CirosBlack</a>
       <input type="text" id="searchInput" placeholder="Pesquisar..." />
     </div>
@@ -217,6 +264,7 @@
     </nav>
   </header>
 
+  <!-- ====== HERO BANNER ====== -->
   <div class="hero">
     <div class="hero-content">
       <h1>Bem-vindo CirosBlack</h1>
@@ -224,6 +272,7 @@
     </div>
   </div>
 
+  <!-- ====== MAIN CONTENT ====== -->
   <main>
     <div class="section">
       <h2 class="section-title">Destaques</h2>
@@ -244,7 +293,7 @@
             <p>Séries - Tokusatsu</p>
           </div>
         </div>
-        <!-- Cards com conteúdo do Hugging Face -->
+        <!-- Card 3 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Ant-Man and the Wasp" />
           <div class="movie-card-info">
@@ -252,6 +301,7 @@
             <p>Aventura/Marvel</p>
           </div>
         </div>
+        <!-- Card 4 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Doctor Strange" />
           <div class="movie-card-info">
@@ -259,6 +309,7 @@
             <p>Marvel</p>
           </div>
         </div>
+        <!-- Card 5 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Wonka" />
           <div class="movie-card-info">
@@ -266,6 +317,7 @@
             <p>Fantasia</p>
           </div>
         </div>
+        <!-- Card 6 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Exemplo" />
           <div class="movie-card-info">
@@ -277,7 +329,7 @@
     </div>
   </main>
 
-  <!-- Script de Pesquisa -->
+  <!-- ====== SCRIPT DE PESQUISA ====== -->
   <script>
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', function() {
@@ -287,22 +339,6 @@
         const title = card.querySelector('.movie-card-info h4').textContent.toLowerCase();
         const category = card.querySelector('.movie-card-info p').textContent.toLowerCase();
         card.style.display = (title.includes(query) || category.includes(query)) ? '' : 'none';
-      });
-    });
-  </script>
-
-  <!-- Script para adicionar o token aos recursos do Hugging Face -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const hfToken = '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';
-      document.querySelectorAll('img').forEach(img => {
-        // Verifica se o src pertence ao domínio do Hugging Face
-        if (img.src.startsWith('https://huggingface.co/')) {
-          // Cria um objeto URL para manipular os parâmetros
-          const url = new URL(img.src);
-          url.searchParams.set('token', hfToken);
-          img.src = url.toString();
-        }
       });
     });
   </script>
