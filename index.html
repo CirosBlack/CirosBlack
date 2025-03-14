@@ -38,7 +38,6 @@
       align-items: center;
     }
 
-    /* O logo agora é um link que redireciona para a página inicial */
     header .logo {
       font-size: 24px;
       font-weight: bold;
@@ -63,20 +62,66 @@
       gap: 20px;
     }
 
-    nav ul li {
-      cursor: pointer;
-      font-weight: 500;
-      transition: color 0.3s ease;
+    /* 
+      ========== INÍCIO: Estilo dos botões com efeito neon ==========
+      Você pode ajustar as cores e a animação conforme desejar
+    */
+    nav ul li a {
+      display: inline-block;
+      padding: 10px 20px;
+      position: relative;
+      color: #fff;
+      text-decoration: none;
+      text-transform: uppercase;
+      font-weight: bold;
+      letter-spacing: 1px;
+      border: 2px solid #e50914; /* Borda para destacar o botão */
+      border-radius: 4px;
+      transition: 0.3s ease;
     }
 
-    nav ul li:hover {
+    nav ul li a:hover {
+      /* Efeito de hover: muda a cor de fundo e adiciona brilho neon */
+      background-color: #111;
+      box-shadow:
+        0 0 5px #e50914,
+        0 0 10px #e50914,
+        0 0 20px #e50914,
+        0 0 30px #e50914;
       color: #e50914;
+      transition: 0.3s ease;
     }
+
+    /* Se quiser um efeito de "piscar" neon continuo, use uma animação: */
+    @keyframes neonPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 5px #e50914,
+          0 0 10px #e50914,
+          0 0 20px #e50914,
+          0 0 30px #e50914;
+      }
+      50% {
+        box-shadow:
+          0 0 10px #e50914,
+          0 0 15px #e50914,
+          0 0 25px #e50914,
+          0 0 40px #e50914;
+      }
+    }
+
+    /* Se quiser aplicar o efeito de pulsar continuamente, descomente esta regra */
+    /*
+    nav ul li a:hover {
+      animation: neonPulse 1.5s ease-in-out infinite;
+    }
+    */
+    /* ========== FIM: Estilo dos botões com efeito neon ========== */
 
     /* ====== HERO BANNER ====== */
     .hero {
       width: 100%;
-      height: 200px; /* Altura reduzida */
+      height: 200px;
       background: url("https://via.placeholder.com/1600x600?text=Assassino+a+Pre%C3%A7o+Fixo") center center no-repeat;
       background-size: cover;
       position: relative;
@@ -147,14 +192,12 @@
       margin-bottom: 20px;
     }
 
-    /* ====== CARDS (GRID) ====== */
     .movie-row {
       display: grid;
       gap: 20px;
       padding: 20px 30px;
     }
 
-    /* Ajuste nos cards para ocuparem 100% da célula do grid */
     .movie-card {
       background-color: #222;
       border-radius: 6px;
@@ -166,7 +209,7 @@
 
     .movie-card:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
+      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f; /* Efeito neon azulado para o card */
     }
 
     .movie-card img {
@@ -211,7 +254,7 @@
         font-size: 18px;
       }
 
-      nav ul li {
+      nav ul li a {
         font-size: 14px;
       }
 
@@ -220,23 +263,20 @@
       }
     }
 
-    /* ====== MODO RETRATO ====== */
+    /* MODO RETRATO */
     @media (orientation: portrait) {
-      /* 4 colunas na retrato */
       .movie-row {
         grid-template-columns: repeat(4, 1fr);
       }
     }
 
-    /* ====== MODO PAISAGEM ====== */
+    /* MODO PAISAGEM */
     @media (orientation: landscape) {
-      /* Se o viewport for largo o suficiente, exibe 6 colunas */
       @media (min-width: 1780px) {
         .movie-row {
           grid-template-columns: repeat(6, 1fr);
         }
       }
-      /* Caso contrário, exibe 5 colunas */
       @media (max-width: 1779px) {
         .movie-row {
           grid-template-columns: repeat(5, 1fr);
@@ -249,16 +289,16 @@
   <!-- ====== HEADER / NAVBAR ====== -->
   <header>
     <div class="left-header">
-      <!-- Logo clicável que redireciona para a página inicial -->
       <a href="https://cirosblack.github.io/CirosBlack" class="logo">CirosBlack</a>
       <input type="text" id="searchInput" placeholder="Pesquisar..." />
     </div>
     <nav>
       <ul>
-        <li><a href="https://cirosblack.github.io/CirosBlack/">Inicio</a></li>
-        <li>Animes</li>
+        <!-- Links transformados em “botões” com neon -->
+        <li><a href="https://cirosblack.github.io/CirosBlack/">Início</a></li>
+        <li><a href="#">Animes</a></li>
         <li><a href="https://cirosblack.github.io/Filmes/">Filmes</a></li>
-        <li>Séries</li>
+        <li><a href="#">Séries</a></li>
         <li><a href="https://cirosblack.github.io/CirosBlack/Courses/Carros_3D.html">Cursos</a></li>
       </ul>
     </nav>
@@ -277,7 +317,7 @@
     <div class="section">
       <h2 class="section-title">Destaques</h2>
       <div class="movie-row">
-        <!-- Card 1 -->
+        <!-- Exemplo de Cards -->
         <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/YuYuHakusho'">
           <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
           <div class="movie-card-info">
@@ -285,7 +325,6 @@
             <p>Animes</p>
           </div>
         </div>
-        <!-- Card 2 -->
         <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/jaspion'">
           <img src="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/SmFzcGlvbg.jpg" alt="Jaspion" />
           <div class="movie-card-info">
@@ -293,15 +332,13 @@
             <p>Séries - Tokusatsu</p>
           </div>
         </div>
-        <!-- Card 3 -->
         <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/changeman'">
-          <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Changeman.jpg" alt="Jaspion" />
+          <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Changeman.jpg" alt="Changeman" />
           <div class="movie-card-info">
             <h4>Changeman</h4>
             <p>Séries - Tokusatsu</p>
           </div>
         </div>
-        <!-- Card 4 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Doctor Strange" />
           <div class="movie-card-info">
@@ -309,7 +346,6 @@
             <p>Marvel</p>
           </div>
         </div>
-        <!-- Card 5 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Wonka" />
           <div class="movie-card-info">
@@ -317,7 +353,6 @@
             <p>Fantasia</p>
           </div>
         </div>
-        <!-- Card 6 -->
         <div class="movie-card">
           <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Exemplo" />
           <div class="movie-card-info">
@@ -343,9 +378,9 @@
     });
   </script>
   <script>
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
-</script>
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+  </script>
 </body>
 </html>
