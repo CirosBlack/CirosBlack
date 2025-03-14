@@ -102,7 +102,7 @@
       font-size: 1rem;
       border-radius: 10px;
       position: relative;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s, transform 0.3s;
     }
     
     .controls-container button:hover {
@@ -112,7 +112,6 @@
     
     /* Ajuste das imagens dentro dos botões */
     .controls-container button img {
-      margin-bottom: 0;
       width: 35px;
       height: 35px;
       transition: transform 0.2s ease;
@@ -174,37 +173,62 @@
     }
     
     /* -------------------------
-       PLAYLIST
+       PLAYLIST & MÓDULOS
        ------------------------- */
     .playlist-container {
       width: 100%;
-      background-color: #111;
-      padding: 15px;
-      border-radius: 5px;
-      margin-top: 10px;
+      background-color: #1c1c1c;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
       scroll-behavior: smooth;
       overflow-y: auto;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
     
     #videoTitle {
-      font-size: 1.2rem;
-      margin-bottom: 10px;
+      font-size: 1.5rem;
+      margin-bottom: 15px;
       color: #fff;
+      border-bottom: 2px solid #444;
+      padding-bottom: 10px;
     }
     
-    .playlist-container ul {
+    .module-container {
+      margin-bottom: 20px;
+    }
+    
+    .module-container h3 {
+      background-color: #292929;
+      padding: 12px 15px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    
+    .module-container h3:hover {
+      background-color: #3a3a3a;
+      transform: scale(1.02);
+    }
+    
+    .module-container h3.active {
+      background-color: #555;
+    }
+    
+    .module-container ul {
       list-style: none;
-      width: 100%;
+      margin-bottom: 0;
     }
     
-    /* Cada item da playlist é um flex container para alinhar o título à esquerda e o botão à direita */
     .playlist-container li {
-      padding: 10px;
-      margin-bottom: 5px;
+      padding: 12px 15px;
+      margin-bottom: 8px;
       background-color: #222;
       cursor: pointer;
-      border-radius: 3px;
-      transition: background-color 0.3s;
+      border-radius: 5px;
+      transition: background-color 0.3s, transform 0.3s;
       color: #fff;
       display: flex;
       align-items: center;
@@ -213,26 +237,27 @@
     
     .playlist-container li:hover {
       background-color: #333;
+      transform: translateX(5px);
     }
     
     .playlist-container li.playing {
       background-color: #444;
+      font-weight: bold;
     }
     
-    /* Botões de download inicialmente ocultos */
     .download-btn {
       display: none;
       color: #fff;
       text-decoration: none;
       background-color: #444;
-      padding: 5px 10px;
-      border-radius: 3px;
+      padding: 6px 12px;
+      border-radius: 5px;
       font-size: 0.8rem;
       transition: background-color 0.3s;
     }
     
     .download-btn:hover {
-      background-color: red; /* Muda para vermelho ao passar o mouse */
+      background-color: #ff3333;
     }
     
     /* Exibe os botões de download quando a playlist tem a classe .show-downloads */
@@ -252,7 +277,7 @@
       justify-content: center;
     }
     
-    /* Em tela cheia, exibe os controles (ao invés de ocultar) */
+    /* Em tela cheia, exibe os controles */
     :fullscreen .controls-overlay {
       display: flex;
     }
@@ -367,7 +392,7 @@
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
             </button>
-            <!-- Botão para alternar a exibição dos downloads com a imagem informada -->
+            <!-- Botão para alternar a exibição dos downloads -->
             <button id="toggleDownloadsBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
             </button>
@@ -387,7 +412,7 @@
   <!-- PLAYLIST -->
   <div class="playlist-container" id="playlistContainer">
     <h2 id="videoTitle">Carregando...</h2>
-    <ul id="playlist"></ul>
+    <div id="playlist"></div>
   </div>
   
   <script>
@@ -411,80 +436,543 @@
     const playImage = 'https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png';
     const pauseImage = 'https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png';
     
-    // Playlist com apenas os 5 primeiros episódios
-    const videos = [
-  
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/001.mp4", title: "O planeta de Edin" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/002.mp4", title: "O triste fim de Sakura" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/003.mp4", title: "O sonho do menino galáctico" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/004.mp4", title: "A fúria do pântano" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/005.mp4", title: "O enigma da flauta" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/006.mp4", title: "Gordon em busca da mãe" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/007.mp4", title: "O demônio da montanha" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/008.mp4", title: "O casal fugitivo" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/009.mp4", title: "A história de uma árvore" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/010.mp4", title: "O ataque do Pyrossauro" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/011.mp4", title: "Perigo em Tsukuba" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/012.mp4", title: "A profecia" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/013.mp4", title: "A investida dos aliados espaciais" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/014.mp4", title: "Perigo na lagoa dos noivos" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/015.mp4", title: "Sonho ou ilusão? A imagem dourada" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/016.mp4", title: "Qual o destino da humanidade?" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/017.mp4", title: "O mistério do Pássaro Dourado" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/018.mp4", title: "O inimigo imortal" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/019.mp4", title: "Alerta no oceano" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/020.mp4", title: "A última chance" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/021.mp4", title: "O valente garoto jogador" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/022.mp4", title: "O feitiço de Titânia" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/023.mp4", title: "O monstro do século" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/024.mp4", title: "Ambição perigosa" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/025.mp4", title: "Tókio em perigo" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/026.mp4", title: "Contra ataque de Daileon" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/027.mp4", title: "Juventude ameaçadora" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/028.mp4", title: "Dados mortais do monstro eletrônico" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/029.mp4", title: "A morte de Macgaren" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/030.mp4", title: "O pânico do balão" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/031.mp4", title: "Golpe na TV" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/032.mp4", title: "A conspiração do robô" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/033.mp4", title: "Batalha da magia negra" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/034.mp4", title: "A fortaleza indestrutível" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/035.mp4", title: "A descoberta do pergaminho" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/036.mp4", title: "O milagre das novas vidas" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/037.mp4", title: "Cardápio infernal" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/038.mp4", title: "Trama miraculosa" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/039.mp4", title: "O poderoso beijo de Myio" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/040.mp4", title: "O enigma do meteoro" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/041.mp4", title: "O atirador da justiça" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/042.mp4", title: "A história de Pep e Hiroshi" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/043.mp4", title: "O misterioso mundo de Satã Goss" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/044.mp4", title: "Retorno satânico" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/045.mp4", title: "Sou o filho de Satã Goss!" },
-{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/046.mp4", title: "A união dos povos da Via Láctea" }
-];
+     // Nova estrutura da playlist organizada por módulos (seções)
+    const modulesPlaylist = [
+      {
+        section: "Seção 01 – Introdução",
+        videos: [
+          { title: "01 – Bem-vindo à aula", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2001%20-%20Introduction/001.mp4" },
+          { title: "02 – Introdução", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2001%20-%20Introduction/002.mp4" }
+        ]
+      },
+      {
+        section: "Seção 02 – Preparação para a aula",
+        videos: [
+          { title: "01 – Mudanças essenciais de preferência", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2002%20-%20Preparing%20for%20Class/001.mp4" },
+          { title: "02 – Mudanças recomendadas de preferência", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2002%20-%20Preparing%20for%20Class/002.mp4" },
+          { title: "03 – Matcaps personalizados", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2002%20-%20Preparing%20for%20Class/003.mp4" },
+          { title: "04 – Guia completo para a malha de guia – Fundamentos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2002%20-%20Preparing%20for%20Class/004.mp4" },
+          { title: "05 – Guia completo para a malha de guia – Dicas e truques", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2002%20-%20Preparing%20for%20Class/005.mp4" },
+          { title: "06 – Guia completo para a malha de guia – Novidades", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2002%20-%20Preparing%20for%20Class/006.mp4" }
+        ]
+      },
+      {
+        section: "Seção 03 – Modelagem – Exterior – Malhas de guia",
+        videos: [
+          { title: "01 – Configurando plantas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/001.mp4" },
+          { title: "02 – Contornos da área do capô", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/002.mp4" },
+          { title: "03 – Contornos do poço da roda", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/003.mp4" },
+          { title: "04 – Contornos do para-choque dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/004.mp4" },
+          { title: "05 – Contornos da grade", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/005.mp4" },
+          { title: "06 – Frente do para-lama dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/006.mp4" },
+          { title: "07 – Para-choque dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/007.mp4" },
+          { title: "08 – Área do capô", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/008.mp4" },
+          { title: "09 – Parte traseira do para-lama dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/009.mp4" },
+          { title: "10 – Loops de controle – Capô", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/010.mp4" },
+          { title: "11 – Ventilação do para-choque dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/011.mp4" },
+          { title: "12 – Trilho lateral", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/012.mp4" },
+          { title: "13 – Área da porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/013.mp4" },
+          { title: "14 – Contornos da área do porta-malas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/014.mp4" },
+          { title: "15 – Área do porta-malas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/015.mp4" },
+          { title: "16 – Parte traseira Para-lama", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/016.mp4" },
+          { title: "17 – Loops de controle – Área da porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/017.mp4" },
+          { title: "18 – Para-choque traseiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/018.mp4" },
+          { title: "19 – Saídas de ar traseiras", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/019.mp4" },
+          { title: "20 – Área da placa", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/020.mp4" },
+          { title: "21 – Teto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/021.mp4" },
+          { title: "22 – Janelas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/022.mp4" },
+          { title: "23 – Toques finais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/023.mp4" },
+          { title: "24 – Dividindo", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2003%20-%20Modeling%20-%20Exterior%20-%20Guide%20Meshes/024.mp4" }
+        ]
+      },
+      {
+        section: "Seção 04 – Modelagem – Exterior – Painéis finais",
+videos: [
+  { title: "01 – Capô", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/001.mp4" },
+  { title: "02 – Parte dianteira e para-lamas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/002.mp4" },
+  { title: "03 – Saídas de ar dianteiras", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/003.mp4" },
+  { title: "04 – Painéis dos faróis", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/004.mp4" },
+  { title: "05 – Para-choque dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/005.mp4" },
+  { title: "06 – Painéis de inclinação lateral", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/006.mp4" },
+  { title: "07 – Trilhos inferiores laterais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/007.mp4" },
+  { title: "08 – Portas laterais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/008.mp4" },
+  { title: "09 – Maçanetas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/009.mp4" },
+  { title: "10 – Para-lamas traseiros", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/010.mp4" },
+  { title: "11 – Parte traseira", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/011.mp4" },
+  { title: "12 – Para-choque traseiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/012.mp4" },
+  { title: "13 – Recortes do para-choque traseiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/013.mp4" },
+  { title: "14 – Painel do pisca-pisca traseiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/014.mp4" },
+  { title: "15 – Porta-malas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/015.mp4" },
+  { title: "16 – Teto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/016.mp4" },
+  { title: "17 – Parte superior das portas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/017.mp4" },
+  { title: "18 – Adicionando espessura", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2004%20-%20Modeling%20-%20Exterior%20-%20Final%20Panels/018.mp4" }
+]
+
+      },
+      {
+        section: "Seção 05 – Modelagem – Exterior – Janelas",
+videos: [
+  { title: "01 – Para-brisa", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2005%20-%20Modeling%20-%20Exterior%20-%20Windows/001.mp4" },
+  { title: "02 – Vidro da porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2005%20-%20Modeling%20-%20Exterior%20-%20Windows/002.mp4" },
+  { title: "03 – Vidro de um quarto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2005%20-%20Modeling%20-%20Exterior%20-%20Windows/003.mp4" },
+  { title: "04 – Vidro superior", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2005%20-%20Modeling%20-%20Exterior%20-%20Windows/004.mp4" }
+]
+
+      },
+      {
+        section: "Seção 06 – Modelagem – Exterior – Plásticos",
+videos: [
+  { title: "01 – Body Kit – Parte Inferior – Frente", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/001.mp4" },
+  { title: "02 – Body Kit – Parte Inferior – Traseira", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/002.mp4" },
+  { title: "03 – Body Kit – Parte Inferior – Toques Finais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/003.mp4" },
+  { title: "04 – Body Kit – Painel Flutuante", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/004.mp4" },
+  { title: "05 – Body Kit – Nervuras", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/005.mp4" },
+  { title: "06 – Cavidades das Rodas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/006.mp4" },
+  { title: "07 – Ventilação Lateral Dianteira", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/007.mp4" },
+  { title: "08 – Ventilação Lateral Traseira", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/008.mp4" },
+  { title: "09 – Ventilação do Para-choque Dianteiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/009.mp4" },
+  { title: "10 – Ventilação do Capô", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/010.mp4" },
+  { title: "11 – Ventilação do Porta-malas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/011.mp4" },
+  { title: "12 – Entrada de Combustível", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/012.mp4" },
+  { title: "13 – Acabamento do Teto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/013.mp4" },
+  { title: "14 – Calha do Para-brisa", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2006%20-%20Modeling%20-%20Exterior%20-%20Plastics/014.mp4" }
+]
+
+      },
+      {
+        section: "Seção 07 – Modelagem – Exterior – Espelho Retrovisor Lateral",
+videos: [
+  { title: "01 – Carcaça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2007%20-%20Modeling%20-%20Exterior%20-%20Side%20View%20Mirror/001.mp4" },
+  { title: "02 – Inserção", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2007%20-%20Modeling%20-%20Exterior%20-%20Side%20View%20Mirror/002.mp4" },
+  { title: "03 – Espelho", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2007%20-%20Modeling%20-%20Exterior%20-%20Side%20View%20Mirror/003.mp4" },
+  { title: "04 – Braço", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2007%20-%20Modeling%20-%20Exterior%20-%20Side%20View%20Mirror/004.mp4" }
+]
+
+      },
+      {
+        section: "Seção 08 – Modelagem – Exterior – Grade Frontal",
+videos: [
+  { title: "01 – Borda", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2008%20-%20Modeling%20-%20Exterior%20-%20Front%20Grill/001.mp4" },
+  { title: "02 – Grade", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2008%20-%20Modeling%20-%20Exterior%20-%20Front%20Grill/002.mp4" },
+  { title: "03 – Carcaça do Anel", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2008%20-%20Modeling%20-%20Exterior%20-%20Front%20Grill/003.mp4" },
+  { title: "04 – Anéis", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2008%20-%20Modeling%20-%20Exterior%20-%20Front%20Grill/004.mp4" }
+]
+
+      },
+      {
+        section: "Seção 09 – Modelagem – Exterior – Grade Traseira",
+        videos: [
+          { title: "01 – Borda", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2009%20-%20Modeling%20-%20Exterior%20-%20Back%20Grill/001.mp4" },
+          { title: "02 – Grade", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2009%20-%20Modeling%20-%20Exterior%20-%20Back%20Grill/002.mp4" }
+        ]
+      },
+      {
+        section: "Seção 10 – Modelagem – Exterior – Área da Placa",
+        videos: [
+          { title: "01 – Plástico Acabamento", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2010%20-%20Modeling%20-%20Exterior%20-%20License%20Plate%20Area/001.mp4" },
+          { title: "02 – Caixa de Luz", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2010%20-%20Modeling%20-%20Exterior%20-%20License%20Plate%20Area/002.mp4" },
+          { title: "03 – Placa", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2010%20-%20Modeling%20-%20Exterior%20-%20License%20Plate%20Area/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 11 – Modelagem – Exterior – Boosters",
+        videos: [
+          { title: "01 – Carcaça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2011%20-%20Modeling%20-%20Exterior%20-%20Boosters/001.mp4" },
+          { title: "02 – Boosters", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2011%20-%20Modeling%20-%20Exterior%20-%20Boosters/002.mp4" }
+        ]
+      },
+      {
+        section: "Seção 12 – Modelagem – Exterior – Faróis",
+videos: [
+  { title: "01 – Carcaça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2012%20-%20Modeling%20-%20Exterior%20-%20Headlights/001.mp4" },
+  { title: "02 – Botões", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2012%20-%20Modeling%20-%20Exterior%20-%20Headlights/002.mp4" },
+  { title: "03 – Luz Principal", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2012%20-%20Modeling%20-%20Exterior%20-%20Headlights/003.mp4" },
+  { title: "04 – Luzes de Loop", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2012%20-%20Modeling%20-%20Exterior%20-%20Headlights/004.mp4" },
+  { title: "05 – Placa Traseira", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2012%20-%20Modeling%20-%20Exterior%20-%20Headlights/005.mp4" },
+  { title: "06 – Lente", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2012%20-%20Modeling%20-%20Exterior%20-%20Headlights/006.mp4" }
+]
+
+      },
+      {
+        section: "Seção 13 – Modelagem – Exterior – Luzes Traseiras",
+        videos: [
+          { title: "01 – Carcaça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2013%20-%20Modeling%20-%20Exterior%20-%20Tail%20Lights/001.mp4" },
+          { title: "02 – Luz", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2013%20-%20Modeling%20-%20Exterior%20-%20Tail%20Lights/002.mp4" },
+          { title: "03 – Lente", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2013%20-%20Modeling%20-%20Exterior%20-%20Tail%20Lights/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 14 – Modelagem – Exterior – Piscas",
+        videos: [
+          { title: "01 – Lente", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2014%20-%20Modeling%20-%20Exterior%20-%20Blinkers/001.mp4" },
+          { title: "02 – Carcaça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2014%20-%20Modeling%20-%20Exterior%20-%20Blinkers/002.mp4" },
+          { title: "03 – Luz", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2014%20-%20Modeling%20-%20Exterior%20-%20Blinkers/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 15 – Modelagem – Exterior – Limpadores de Para-brisa",
+videos: [
+  { title: "01 – Braço Longo", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2015%20-%20Modeling%20-%20Exterior%20-%20Limpadores%20de%20Para-brisa/001.mp4" },
+  { title: "02 – Braço Curto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2015%20-%20Modeling%20-%20Exterior%20-%20Limpadores%20de%20Para-brisa/002.mp4" },
+  { title: "03 – Carcaça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2015%20-%20Modeling%20-%20Exterior%20-%20Limpadores%20de%20Para-brisa/003.mp4" },
+  { title: "04 – Lâmina", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2015%20-%20Modeling%20-%20Exterior%20-%20Limpadores%20de%20Para-brisa/004.mp4" },
+  { title: "05 – Parafusos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2015%20-%20Modeling%20-%20Exterior%20-%20Limpadores%20de%20Para-brisa/005.mp4" }
+]
+
+      },
+      {
+        section: "Seção 16 – Modelagem – Exterior – Outros Detalhes",
+videos: [
+  { title: "01 – Logotipo – H6", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/001.mp4" },
+  { title: "02 – Logotipo – Anéis", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/002.mp4" },
+  { title: "03 – Logotipo – Julietta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/003.mp4" },
+  { title: "04 – Combustível Inserção de área", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/004.mp4" },
+  { title: "05 – Tampa de combustível", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/005.mp4" },
+  { title: "06 – Vedações de borracha", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/006.mp4" },
+  { title: "07 – Malhas hexagonais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/007.mp4" },
+  { title: "08 – Malhas de sombra", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2016%20-%20Modeling%20-%20Exterior%20-%20Other%20Details/008.mp4" }
+]
+
+      },
+      {
+        section: "Seção 17 – Modelagem – Exterior – Rodas",
+videos: [
+  { title: "01 – Aros", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/001.mp4" },
+  { title: "02 – Tampa central", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/002.mp4" },
+  { title: "03 – Pneus", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/003.mp4" },
+  { title: "04 – Pneus – Toques finais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/004.mp4" },
+  { title: "05 – Cubo", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/005.mp4" },
+  { title: "06 – Porcas e parafusos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/006.mp4" },
+  { title: "07 – Disco de freio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/007.mp4" },
+  { title: "08 – Pinça de freio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/008.mp4" },
+  { title: "09 – Detalhes da pinça de freio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/009.mp4" },
+  { title: "10 – Haste de ar", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/010.mp4" },
+  { title: "11 – Jatos de ventilação", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/011.mp4" },
+  { title: "12 – Amortecedores", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/012.mp4" },
+  { title: "13 – Equipamento básico de rodas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/013.mp4" },
+  { title: "14 – Todas as outras rodas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/014.mp4" },
+  { title: "15 – Finalizando o equipamento", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/015.mp4" },
+  { title: "16 – Toques finais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2017%20-%20Modeling%20-%20Exterior%20-%20Wheels/016.mp4" }
+]
+
+      },
+      {
+        section: "Seção 18 – Modelagem – Interior – Portas",
+videos: [
+  { title: "01 – Estrutura da porta – Parte 1", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/001.mp4" },
+  { title: "02 – Estrutura da porta – Parte 2", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/002.mp4" },
+  { title: "03 – Painel lateral", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/003.mp4" },
+  { title: "04 – Painel lateral – Faixa de luz", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/004.mp4" },
+  { title: "05 – Alto-falante", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/005.mp4" },
+  { title: "06 – Trava", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/006.mp4" },
+  { title: "07 – Bolso lateral", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/007.mp4" },
+  { title: "08 – Alça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/008.mp4" },
+  { title: "09 – Final Toques", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2018%20-%20Modeling%20-%20Interior%20-%20Doors/009.mp4" }
+]
+
+      },
+      {
+        section: "Seção 19 – Modelagem – Interior – Full Shell",
+videos: [
+  { title: "01 – Side Shell", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/001.mp4" },
+  { title: "02 – Front End Shell", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/002.mp4" },
+  { title: "03 – Dashboard Shell", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/003.mp4" },
+  { title: "04 – Middle Console Shell", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/004.mp4" },
+  { title: "05 – Dashboard Column", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/005.mp4" },
+  { title: "06 – Middle Console Column", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/006.mp4" },
+  { title: "07 – Engine Shell – Part 1", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/007.mp4" },
+  { title: "08 – Engine Shell – Part 2", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/008.mp4" },
+  { title: "09 – Engine Platform", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/009.mp4" },
+  { title: "10 – Roof Shell", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/010.mp4" },
+  { title: "11 – Front Roof Supports", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/011.mp4" },
+  { title: "12 – Back Roof Supports", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/012.mp4" },
+  { title: "13 – Final Touches", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2019%20-%20Modeling%20-%20Interior%20-%20Full%20Shell/013.mp4" }
+]
+
+      },
+      {
+        section: "Seção 20 – Modelagem – Interior – Dashboard",
+videos: [
+  { title: "01 – Adicionando Geometria Extra", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/001.mp4" },
+  { title: "02 – Vent Cutouts", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/002.mp4" },
+  { title: "03 – Vent Border", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/003.mp4" },
+  { title: "04 – Vent Blades", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/004.mp4" },
+  { title: "05 – Vent Hex Meshes", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/005.mp4" },
+  { title: "06 – Gauge Cutout", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/006.mp4" },
+  { title: "07 – Gauge Border", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/007.mp4" },
+  { title: "08 – Gauge Housing", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/008.mp4" },
+  { title: "09 – Gauge Screen", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/009.mp4" },
+  { title: "10 – Gauge Glass", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/010.mp4" },
+  { title: "11 – Air Bag", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/011.mp4" },
+  { title: "12 – Glove Compartment", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/012.mp4" },
+  { title: "13 – Final Touches", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2020%20-%20Modeling%20-%20Interior%20-%20Dashboard/013.mp4" }
+]
+
+      },
+      {
+        section: "Seção 21 – Modelagem – Interior – Direção",
+videos: [
+  { title: "01 – Steering Column", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/001.mp4" },
+  { title: "02 – Recorte da coluna de direção", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/002.mp4" },
+  { title: "03 – Cubo do volante – Parte 1", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/003.mp4" },
+  { title: "04 – Cubo do volante – Parte 2", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/004.mp4" },
+  { title: "05 – Airbag", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/005.mp4" },
+  { title: "06 – Alça do volante – Parte 1", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/006.mp4" },
+  { title: "07 – Alça do volante – Parte 2", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/007.mp4" },
+  { title: "08 – Almofadas do volante", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/008.mp4" },
+  { title: "09 – Faixa de luz do volante", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/009.mp4" },
+  { title: "10 – Botões – Parte 1", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/010.mp4" },
+  { title: "11 – Botões – Parte 2", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/011.mp4" },
+  { title: "12 – Pás", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/012.mp4" },
+  { title: "13 – Toques finais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2021%20-%20Modeling%20-%20Interior%20-%20Steering/013.mp4" }
+]
+
+      },
+      {
+        section: "Seção 22 – Modelagem – Interior – Console central",
+videos: [
+  { title: "01 – Recorte da tela", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/001.mp4" },
+  { title: "02 – Carcaça da tela e tela", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/002.mp4" },
+  { title: "03 – Tampa da tela", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/003.mp4" },
+  { title: "04 – Recorte do mostrador", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/004.mp4" },
+  { title: "05 – Carcaça do mostrador", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/005.mp4" },
+  { title: "06 – Mostrador", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/006.mp4" },
+  { title: "07 – Recorte do compartimento do meio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/007.mp4" },
+  { title: "08 – Painel do compartimento do meio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2022%20-%20Modeling%20-%20Interior%20-%20Middle%20Console/008.mp4" }
+]
+
+      },
+      {
+        section: "Seção 23 – Modelagem – Interior – Cadeiras",
+videos: [
+  { title: "01 – Forma básica", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/001.mp4" },
+  { title: "02 – Concha principal", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/002.mp4" },
+  { title: "03 – Almofada para as costas", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/003.mp4" },
+  { title: "04 – Almofada para a cabeça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/004.mp4" },
+  { title: "05 – Logotipo da almofada para a cabeça", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/005.mp4" },
+  { title: "06 – Almofadas inferiores", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/006.mp4" },
+  { title: "07 – Base", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2023%20-%20Modeling%20-%20Interior%20-%20Chairs/007.mp4" }
+]
+
+      },
+      {
+        section: "Seção 24 – Modelagem – Interior – Cintos de segurança",
+        videos: [
+          { title: "01 – Retrator", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2024%20-%20Modeling%20-%20Interior%20-%20Seatbelts/001.mp4" },
+          { title: "02 – Cinta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2024%20-%20Modeling%20-%20Interior%20-%20Seatbelts/002.mp4" },
+          { title: "03 – Trava", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2024%20-%20Modeling%20-%20Interior%20-%20Seatbelts/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 25 – Modelagem – Interior – Tampa do motor",
+videos: [
+  { title: "01 – Recorte da plataforma", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/001.mp4" },
+  { title: "02 – Concha principal", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/002.mp4" },
+  { title: "03 – Inserções laterais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/003.mp4" },
+  { title: "04 – Logotipos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/004.mp4" },
+  { title: "05 – Inserção do meio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/005.mp4" },
+  { title: "06 – Faixas de luz", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/006.mp4" },
+  { title: "07 – Borda", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/007.mp4" },
+  { title: "08 – Toques finais", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2025%20-%20Modeling%20-%20Interior%20-%20Engine%20Cover/008.mp4" }
+]
+
+      },
+      {
+        section: "Seção 26 – Modelagem – Interior – Tapetes",
+        videos: [
+          { title: "01 – Tapetes dianteiros", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2026%20-%20Modeling%20-%20Interior%20-%20Floor%20Mats/001.mp4" },
+          { title: "02 – Tapetes dianteiros – Logotipos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2026%20-%20Modeling%20-%20Interior%20-%20Floor%20Mats/002.mp4" },
+          { title: "03 – Tapete traseiro", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2026%20-%20Modeling%20-%20Interior%20-%20Floor%20Mats/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 27 – Modelagem – Interior – Pedais",
+        videos: [
+          { title: "01 – Pedal de freio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2027%20-%20Modeling%20-%20Interior%20-%20Pedals/001.mp4" },
+          { title: "02 – Pedal do acelerador", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2027%20-%20Modeling%20-%20Interior%20-%20Pedals/002.mp4" },
+          { title: "03 – Descanso para os pés", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2027%20-%20Modeling%20-%20Interior%20-%20Pedals/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 28 – Modelagem – Interior – Outros detalhes",
+        videos: [
+          { title: "01 – Vedações – Teto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/001.mp4" },
+          { title: "02 – Vedações – Porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/002.mp4" },
+          { title: "03 – Faixas de luz – Teto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/003.mp4" },
+          { title: "04 – Faixas de luz – Concha inferior", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/004.mp4" },
+          { title: "05 – Faixas de luz – Concha superior", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/005.mp4" },
+          { title: "06 – Borda do para-brisa", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/006.mp4" },
+          { title: "07 – Borda da janela de um quarto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2028%20-%20Modeling%20-%20Interior%20-%20Other%20Details/007.mp4" }
+        ]
+
+      },
+      {
+        section: "Seção 29 – Modelagem – Interior – Dobradiças da porta",
+        videos: [
+          { title: "01 – Equipamento básico da porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2029%20-%20Modeling%20-%20Interior%20-%20Door%20Hinges/001.mp4" },
+          { title: "02 – Porta Dobradiças", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2029%20-%20Modeling%20-%20Interior%20-%20Door%20Hinges/002.mp4" },
+          { title: "03 – Slot da estrutura da porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2029%20-%20Modeling%20-%20Interior%20-%20Door%20Hinges/003.mp4" },
+          { title: "04 – Placa da porta", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2029%20-%20Modeling%20-%20Interior%20-%20Door%20Hinges/004.mp4" }
+        ]
+
+      },
+      {
+        section: "Seção 30 – Renderização – Shaders – Configuração e shaders básicos",
+        videos: [
+          { title: "01 – Visualização da iluminação", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2030%20-%20Rendering%20-%20Shaders%20-%20Setup%20and%20Basic%20Shaders/001.mp4" },
+          { title: "02 – Visão geral dos shaders básicos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2030%20-%20Rendering%20-%20Shaders%20-%20Setup%20and%20Basic%20Shaders/002.mp4" },
+          { title: "03 – Aplicando shaders básicos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2030%20-%20Rendering%20-%20Shaders%20-%20Setup%20and%20Basic%20Shaders/003.mp4" }
+        ]
+      },
+      {
+        section: "Seção 31 – Renderização – Shaders – Shaders complexos",
+        videos: [
+          { title: "01 – Pintura do carro – Vermelho", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/001.mp4" },
+          { title: "02 – Pintura do carro – Preto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/002.mp4" },
+          { title: "03 – Pintura do carro – Prata", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/003.mp4" },
+          { title: "04 – Pintura do carro – Azul", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/004.mp4" },
+          { title: "05 – Fibra de carbono", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/005.mp4" },
+          { title: "06 – Aplicando fibra de carbono", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/006.mp4" },
+          { title: "07 – Disco de freio", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/007.mp4" },
+          { title: "08 – Mapa UV do pneu", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/008.mp4" },
+          { title: "09 – Shaders do pneu", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/009.mp4" },
+          { title: "10 – Couro – Preto", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/010.mp4" },
+          { title: "11 – Couro – Preto – Áspero", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/011.mp4" },
+          { title: "12 – Couro – Branco", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/012.mp4" },
+          { title: "13 – Couro – Branco – Áspero", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/013.mp4" },
+          { title: "14 – Piso", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/014.mp4" },
+          { title: "15 – Tapetes", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/015.mp4" },
+          { title: "16 – Cinto de segurança", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/016.mp4" },
+          { title: "17 – Botões de discagem", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/017.mp4" },
+          { title: "18 – Botões de direção", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/018.mp4" },
+          { title: "19 – Visor do medidor", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/019.mp4" },
+          { title: "20 – Visor do console", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/020.mp4" },
+          { title: "21 – Malha hexagonal", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2031%20-%20Rendering%20-%20Shaders%20-%20Complex%20Shaders/021.mp4" }
+        ]
+
+      },
+      {
+        section: "Seção 32 – Renderização – Configuração",
+        videos: [
+          { title: "01 – Configurações de renderização", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2032%20-%20Rendering%20-%20Setup/001.mp4" },
+          { title: "02 – Revisão do modelo final", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2032%20-%20Rendering%20-%20Setup/002.mp4" },
+          { title: "03 – Visão geral do ambiente", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2032%20-%20Rendering%20-%20Setup/003.mp4" },
+          { title: "04 – Anexando os ambientes", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2032%20-%20Rendering%20-%20Setup/004.mp4" }
+        ]
+
+      },
+      {
+        section: "Seção 33 – Renderização – Vista da montanha – Traseira",
+        videos: [
+          { title: "01 – Renderização final", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2033%20-%20Rendering%20-%20Mountain%20View%20-%20Back/001.mp4" },
+          { title: "02 – Pós-processamento", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2033%20-%20Rendering%20-%20Mountain%20View%20-%20Back/002.mp4" }
+        ]
+      },
+      {
+        section: "Seção 34 – Renderização – Vista da montanha – Frente",
+        videos: [
+          { title: "01 – Renderização final", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2034%20-%20Rendering%20-%20Mountain%20View%20-%20Front/001.mp4" },
+          { title: "02 – Pós-processamento", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2034%20-%20Rendering%20-%20Mountain%20View%20-%20Front/002.mp4" }
+        ]
+      },
+      {
+        section: "Seção 35 – Renderização – Vista da montanha – Interior",
+        videos: [
+          { title: "01 – Renderização final", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2035%20-%20Rendering%20-%20Mountain%20View%20-%20Interior/001.mp4" }
+        ]
+      },
+      {
+        section: "Seção 36 – Renderização – Pôr do sol em Veneza",
+        videos: [
+          { title: "01 – Renderização final", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2036%20-%20Rendering%20-%20Venice%20Sunset/001.mp4" },
+          { title: "02 – Pós-processamento", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2036%20-%20Rendering%20-%20Venice%20Sunset/002.mp4" }
+        ]
+      },
+      {
+        section: "Seção 37 – Renderização – Rua da cidade",
+        videos: [
+          { title: "01 – Renderização final", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2037%20-%20Rendering%20-%20City%20Street/001.mp4" },
+          { title: "02 – Pós-processamento", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2037%20-%20Rendering%20-%20City%20Street/002.mp4" }
+        ]
+      },
+	  {
+        section: "Seção 38 – Renderização – Rua da cidade",
+        videos: [
+          { title: "Download dos Aquivos", src: "https://huggingface.co/datasets/CirosW/Q3Vyc29z/resolve/main/car3d/Section%2038%20-%20Resourses/Section%2038%20-%20Resourses.rar?download=true" }
+        ]
+      }
+    ];
     
-    let currentIndex = 0;
-    videoPlayer.removeAttribute('controls');
+    // Array "achatado" para facilitar o controle de reprodução
+    const videos = modulesPlaylist.flatMap(module => module.videos);
     
+    // Gera a playlist com módulos e torna os cabeçalhos clicáveis
     function generatePlaylist() {
       playlist.innerHTML = "";
-      videos.forEach((video, index) => {
-        const li = document.createElement('li');
-        li.dataset.src = video.src;
-        li.dataset.index = index;
-        li.dataset.title = video.title;
-        li.innerHTML = `<span class="episode-title">${video.title}</span>
+      let globalIndex = 0;
+      modulesPlaylist.forEach((module, moduleIndex) => {
+        // Cria um container para o módulo
+        const moduleContainer = document.createElement('div');
+        moduleContainer.className = 'module-container';
+        
+        // Cria o cabeçalho clicável do módulo
+        const sectionHeader = document.createElement('h3');
+        sectionHeader.textContent = module.section;
+        // Exibe o primeiro módulo por padrão
+        sectionHeader.style.cursor = "pointer";
+        
+        // Cria a lista dos vídeos do módulo
+        const ul = document.createElement('ul');
+        ul.style.display = moduleIndex === 0 ? "block" : "none";
+        
+        // Adiciona evento para alternar visibilidade manualmente
+        sectionHeader.addEventListener('click', () => {
+          if (!sectionHeader.classList.contains('active')) {
+            ul.style.display = ul.style.display === "none" ? "block" : "none";
+          }
+        });
+        
+        module.videos.forEach(video => {
+          const li = document.createElement('li');
+          li.dataset.src = video.src;
+          li.dataset.index = globalIndex;
+          li.dataset.title = video.title;
+          li.innerHTML = `<span class="episode-title">${video.title}</span>
                           <a href="${video.src}?download=true" class="download-btn" download>Download</a>`;
-        playlist.appendChild(li);
+          ul.appendChild(li);
+          globalIndex++;
+        });
+        
+        moduleContainer.appendChild(sectionHeader);
+        moduleContainer.appendChild(ul);
+        playlist.appendChild(moduleContainer);
       });
     }
     
-    // Função para prevenir que o clique no botão de download propague para o LI
-    function addDownloadClickPrevention() {
-      const downloadButtons = document.querySelectorAll('.download-btn');
-      downloadButtons.forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-        });
+    // Atualiza a visibilidade dos módulos de acordo com o vídeo em reprodução
+    function updateModuleVisibility() {
+      let count = 0;
+      let activeModuleIndex = 0;
+      for (let i = 0; i < modulesPlaylist.length; i++) {
+        let moduleVideosCount = modulesPlaylist[i].videos.length;
+        if (currentIndex < count + moduleVideosCount) {
+          activeModuleIndex = i;
+          break;
+        }
+        count += moduleVideosCount;
+      }
+      // Atualiza os containers: apenas o módulo ativo terá sua lista visível
+      const moduleContainers = document.querySelectorAll('.module-container');
+      moduleContainers.forEach((container, index) => {
+        const ul = container.querySelector('ul');
+        const header = container.querySelector('h3');
+        if (index === activeModuleIndex) {
+          ul.style.display = "block";
+          header.classList.add('active');
+        } else {
+          ul.style.display = "none";
+          header.classList.remove('active');
+        }
       });
     }
     
@@ -497,6 +985,7 @@
       updatePlayPauseButton();
       highlightCurrentItem();
       scrollPlaylistToCurrent();
+      updateModuleVisibility();
     }
     
     function updateVideoTitle(index) {
@@ -550,6 +1039,9 @@
       }
     }
     
+    let currentIndex = 0;
+    videoPlayer.removeAttribute('controls');
+    
     window.addEventListener('load', () => {
       generatePlaylist();
       addDownloadClickPrevention();
@@ -575,15 +1067,29 @@
       }
     });
     
-    // Evento na playlist para carregar o vídeo, exceto se for no botão de download
+    // Evento na playlist para carregar o vídeo
     playlist.addEventListener('click', e => {
-      if ((e.target && e.target.tagName.toLowerCase() === 'li') || 
-          (e.target.parentElement && e.target.parentElement.tagName.toLowerCase() === 'li')) {
-        const li = e.target.tagName.toLowerCase() === 'li' ? e.target : e.target.parentElement;
+      let li = null;
+      if (e.target && e.target.tagName.toLowerCase() === 'li') {
+        li = e.target;
+      } else if (e.target.parentElement && e.target.parentElement.tagName.toLowerCase() === 'li') {
+        li = e.target.parentElement;
+      }
+      if (li) {
         const index = parseInt(li.getAttribute('data-index'), 10);
         loadVideoByIndex(index);
       }
     });
+    
+    // Previna o clique do download propagar para o LI
+    function addDownloadClickPrevention() {
+      const downloadButtons = document.querySelectorAll('.download-btn');
+      downloadButtons.forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+        });
+      });
+    }
     
     let isDragging = false;
     function getOffsetX(e) {
@@ -668,7 +1174,6 @@
       }
     });
     
-    // Botão para alternar a exibição dos downloads
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
       if (playlistContainer.classList.contains('show-downloads')) {
@@ -678,7 +1183,6 @@
       }
     });
     
-    // Lógica para exibir os controles e ocultá-los após 2 segundos (incluindo em tela cheia)
     videoContainer.addEventListener('mouseenter', () => {
       controlsOverlay.classList.remove('hidden');
       clearTimeout(hideControlsTimeout);
@@ -692,11 +1196,10 @@
         controlsOverlay.classList.add('hidden');
       }, 2000);
     });
+    
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
   </script>
-  <script>
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
-</script>
 </body>
 </html>
