@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Jaspion</title>
+  <style>
+    /* Reset e estilos gerais */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: #000;
+      color: #fff;
+      overflow: auto;
+    }
+    
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    
+    /* -------------------------
+       CONTAINER E VÍDEO
+       ------------------------- */
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-top: 75%; /* proporção 4:3 */
+      background-color: #111;
+      overflow: hidden;
+    }
+    
+    #videoPlayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-color: #000;
+      outline: none;
+    }
+    
+    /* -------------------------
+       CONTROLES
+       ------------------------- */
+    .controls-overlay {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.4s;
+      pointer-events: auto;
+    }
+    
+    .controls-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .bottom-controls {
+      position: relative;
+      width: 100%;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    }
+    
+    /* Estrutura dos botões */
+    .controls-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 0;
+    }
+    
+    .left-buttons,
+    .right-buttons {
+      display: flex;
+      align-items: center;
+    }
+    
+    .controls-container button {
+      background-color: transparent;
+      color: #fff;
+      border: none;
+      padding: 2px 2px;
+      margin: 0;
+      cursor: pointer;
+      font-size: 1rem;
+      border-radius: 10px;
+      position: relative;
+      transition: background-color 0.3s;
+    }
+    
+    .controls-container button:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+    
+    /* Ajuste das imagens dentro dos botões */
+    .controls-container button img {
+      margin-bottom: 0;
+      width: 35px;
+      height: 35px;
+      transition: transform 0.2s ease;
+    }
+    
+    .controls-container button:hover img {
+      transform: scale(1.2);
+    }
+    
+    .progress-wrapper {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 5px;
+      padding: 0 10px;
+    }
+    
+    .progress-container {
+      position: relative;
+      flex: 1;
+      height: 10px;
+      background-color: #444;
+      border-radius: 4px;
+      margin-right: 10px;
+      cursor: pointer;
+    }
+    
+    .progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background-color: red;
+      transition: width 0.1s linear;
+    }
+    
+    .progress-handle {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      background-color: #fff;
+      border-radius: 50%;
+      pointer-events: auto;
+      cursor: pointer;
+      left: 0%;
+    }
+    
+    #timeRemaining {
+      display: inline-block;
+      font-size: 0.9rem;
+      color: #ccc;
+      min-width: 45px;
+      text-align: right;
+      font-weight: bold;
+    }
+    
+    /* -------------------------
+       PLAYLIST
+       ------------------------- */
+    .playlist-container {
+      width: 100%;
+      background-color: #111;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 10px;
+      scroll-behavior: smooth;
+      overflow-y: auto;
+    }
+    
+    #videoTitle {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    
+    .playlist-container ul {
+      list-style: none;
+      width: 100%;
+    }
+    
+    /* Cada item da playlist é um flex container para alinhar o título à esquerda e o botão à direita */
+    .playlist-container li {
+      padding: 10px;
+      margin-bottom: 5px;
+      background-color: #222;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: background-color 0.3s;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .playlist-container li:hover {
+      background-color: #333;
+    }
+    
+    .playlist-container li.playing {
+      background-color: #444;
+    }
+    
+    /* Botões de download inicialmente ocultos */
+    .download-btn {
+      display: none;
+      color: #fff;
+      text-decoration: none;
+      background-color: #444;
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      transition: background-color 0.3s;
+    }
+    
+    .download-btn:hover {
+      background-color: red; /* Muda para vermelho ao passar o mouse */
+    }
+    
+    /* Exibe os botões de download quando a playlist tem a classe .show-downloads */
+    .playlist-container.show-downloads .download-btn {
+      display: inline-block;
+    }
+    
+    /* FULLSCREEN em 16:9 */
+    :fullscreen .video-container {
+      width: 100%;
+      height: 0;
+      padding-top: 56.25%;
+      background-color: #000;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    /* Em tela cheia, exibe os controles (ao invés de ocultar) */
+    :fullscreen .controls-overlay {
+      display: flex;
+    }
+    
+    :fullscreen #videoPlayer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background-color: #000;
+    }
+    
+    /* MODO PAISAGEM */
+    @media (orientation: landscape) {
+      html, body {
+        overflow: hidden;
+      }
+      body {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .video-container {
+        width: 70%;
+        height: 100%;
+        padding-top: 0;
+      }
+      #videoPlayer {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .playlist-container {
+        width: 30%;
+        margin-top: 0;
+        margin-left: 0;
+        height: 100%;
+        overflow-y: auto;
+      }
+    }
+    
+    /* MODO RETRATO */
+    @media (orientation: portrait) {
+      .playlist-container {
+        height: 100%;
+        overflow-y: auto;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
+      }
+    }
+    
+    /* AJUSTES PARA TELAS PEQUENAS */
+    @media (max-width: 600px) {
+      #timeRemaining {
+        font-size: 0.8rem;
+      }
+      .controls-container {
+        flex-wrap: wrap;
+      }
+      .controls-container button {
+        margin-top: 5px;
+      }
+    }
+    
+    /* Barra de rolagem personalizada na playlist */
+    .playlist-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .playlist-container::-webkit-scrollbar-track {
+      background: #000;
+    }
+    
+    .playlist-container::-webkit-scrollbar-thumb {
+      background: #0000;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container" id="videoContainer">
+    <video 
+      id="videoPlayer"
+      preload="metadata"
+      playsinline
+      webkit-playsinline
+      x-webkit-airplay="allow"
+      disablepictureinpicture
+      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+      muted
+    ></video>
+    
+    <!-- CONTROLES SOBRE O VÍDEO -->
+    <div class="controls-overlay" id="controlsOverlay">
+      <div class="bottom-controls">
+        <div class="controls-container">
+          <div class="left-buttons">
+            <button id="prevBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
+            </button>
+            <button id="playPauseBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play" />
+            </button>
+            <button id="nextBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
+            </button>
+          </div>
+          <div class="right-buttons">
+            <button id="fullscreenBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
+            </button>
+            <!-- Botão para alternar a exibição dos downloads com a imagem informada -->
+            <button id="toggleDownloadsBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
+            </button>
+          </div>
+        </div>
+        <div class="progress-wrapper">
+          <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-handle" id="progressHandle"></div>
+          </div>
+          <span id="timeRemaining">00:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- PLAYLIST -->
+  <div class="playlist-container" id="playlistContainer">
+    <h2 id="videoTitle">Carregando...</h2>
+    <ul id="playlist"></ul>
+  </div>
+  
+  <script>
+    const videoContainer = document.getElementById('videoContainer');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const controlsOverlay = document.getElementById('controlsOverlay');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressHandle = document.getElementById('progressHandle');
+    const timeRemaining = document.getElementById('timeRemaining');
+    const videoTitle = document.getElementById('videoTitle');
+    const playlist = document.getElementById('playlist');
+    const playlistContainer = document.getElementById('playlistContainer');
+    
+    const prevBtn = document.getElementById('prevBtn');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
+    
+    const playImage = 'https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png';
+    const pauseImage = 'https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png';
+    
+    // Playlist com apenas os 5 primeiros episódios
+    const videos = [
+  
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/001.mp4", title: "O planeta de Edin" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/002.mp4", title: "O triste fim de Sakura" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/003.mp4", title: "O sonho do menino galáctico" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/004.mp4", title: "A fúria do pântano" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/005.mp4", title: "O enigma da flauta" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/006.mp4", title: "Gordon em busca da mãe" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/007.mp4", title: "O demônio da montanha" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/008.mp4", title: "O casal fugitivo" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/009.mp4", title: "A história de uma árvore" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/010.mp4", title: "O ataque do Pyrossauro" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/011.mp4", title: "Perigo em Tsukuba" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/012.mp4", title: "A profecia" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/013.mp4", title: "A investida dos aliados espaciais" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/014.mp4", title: "Perigo na lagoa dos noivos" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/015.mp4", title: "Sonho ou ilusão? A imagem dourada" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/016.mp4", title: "Qual o destino da humanidade?" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/017.mp4", title: "O mistério do Pássaro Dourado" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/018.mp4", title: "O inimigo imortal" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/019.mp4", title: "Alerta no oceano" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/020.mp4", title: "A última chance" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/021.mp4", title: "O valente garoto jogador" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/022.mp4", title: "O feitiço de Titânia" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/023.mp4", title: "O monstro do século" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/024.mp4", title: "Ambição perigosa" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/025.mp4", title: "Tókio em perigo" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/026.mp4", title: "Contra ataque de Daileon" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/027.mp4", title: "Juventude ameaçadora" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/028.mp4", title: "Dados mortais do monstro eletrônico" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/029.mp4", title: "A morte de Macgaren" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/030.mp4", title: "O pânico do balão" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/031.mp4", title: "Golpe na TV" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/032.mp4", title: "A conspiração do robô" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/033.mp4", title: "Batalha da magia negra" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/034.mp4", title: "A fortaleza indestrutível" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/035.mp4", title: "A descoberta do pergaminho" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/036.mp4", title: "O milagre das novas vidas" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/037.mp4", title: "Cardápio infernal" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/038.mp4", title: "Trama miraculosa" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/039.mp4", title: "O poderoso beijo de Myio" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/040.mp4", title: "O enigma do meteoro" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/041.mp4", title: "O atirador da justiça" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/042.mp4", title: "A história de Pep e Hiroshi" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/043.mp4", title: "O misterioso mundo de Satã Goss" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/044.mp4", title: "Retorno satânico" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/045.mp4", title: "Sou o filho de Satã Goss!" },
+{ src: "https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/046.mp4", title: "A união dos povos da Via Láctea" }
+];
+    
+    let currentIndex = 0;
+    videoPlayer.removeAttribute('controls');
+    
+    function generatePlaylist() {
+      playlist.innerHTML = "";
+      videos.forEach((video, index) => {
+        const li = document.createElement('li');
+        li.dataset.src = video.src;
+        li.dataset.index = index;
+        li.dataset.title = video.title;
+        li.innerHTML = `<span class="episode-title">${video.title}</span>
+                          <a href="${video.src}?download=true" class="download-btn" download>Download</a>`;
+        playlist.appendChild(li);
+      });
+    }
+    
+    // Função para prevenir que o clique no botão de download propague para o LI
+    function addDownloadClickPrevention() {
+      const downloadButtons = document.querySelectorAll('.download-btn');
+      downloadButtons.forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+        });
+      });
+    }
+    
+    function loadVideoByIndex(index) {
+      if (index < 0 || index >= videos.length) return;
+      currentIndex = index;
+      videoPlayer.src = videos[currentIndex].src;
+      updateVideoTitle(currentIndex);
+      videoPlayer.play().catch(() => {});
+      updatePlayPauseButton();
+      highlightCurrentItem();
+      scrollPlaylistToCurrent();
+    }
+    
+    function updateVideoTitle(index) {
+      videoTitle.textContent = videos[index].title || "Sem título";
+    }
+    
+    function highlightCurrentItem() {
+      const items = playlist.querySelectorAll('li');
+      items.forEach(li => li.classList.remove('playing'));
+      const currentLi = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (currentLi) currentLi.classList.add('playing');
+    }
+    
+    function scrollPlaylistToCurrent() {
+      const currentLi = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (currentLi) {
+        currentLi.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    function formatTime(seconds) {
+      if (isNaN(seconds) || seconds < 0) return "00:00";
+      let min = Math.floor(seconds / 60);
+      let sec = Math.floor(seconds % 60);
+      if (min < 10) min = "0" + min;
+      if (sec < 10) sec = "0" + sec;
+      return `${min}:${sec}`;
+    }
+    
+    function updateProgress() {
+      const duration = videoPlayer.duration;
+      const currentTime = videoPlayer.currentTime;
+      if (!duration || isNaN(duration)) {
+        progressBar.style.width = '0%';
+        progressHandle.style.left = '0%';
+        timeRemaining.textContent = "00:00";
+        return;
+      }
+      const progressPercent = (currentTime / duration) * 100;
+      progressBar.style.width = progressPercent + '%';
+      progressHandle.style.left = `calc(${progressPercent}% - 7px)`;
+      const remainingTime = duration - currentTime;
+      timeRemaining.textContent = formatTime(remainingTime);
+    }
+    
+    function updatePlayPauseButton() {
+      if (videoPlayer.paused) {
+        playPauseBtn.innerHTML = `<img src="${playImage}" alt="Play" />`;
+      } else {
+        playPauseBtn.innerHTML = `<img src="${pauseImage}" alt="Pause" />`;
+      }
+    }
+    
+    window.addEventListener('load', () => {
+      generatePlaylist();
+      addDownloadClickPrevention();
+      loadVideoByIndex(0);
+      videoPlayer.play().then(() => {
+        videoPlayer.muted = false;
+        videoPlayer.volume = 1.0;
+      }).catch((err) => {
+        console.log("Erro ao tentar reproduzir o vídeo:", err);
+      });
+      setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 2000);
+    });
+    
+    videoPlayer.addEventListener('timeupdate', updateProgress);
+    videoPlayer.addEventListener('loadedmetadata', updateProgress);
+    
+    videoPlayer.addEventListener('ended', () => {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < videos.length) {
+        loadVideoByIndex(nextIndex);
+      }
+    });
+    
+    // Evento na playlist para carregar o vídeo, exceto se for no botão de download
+    playlist.addEventListener('click', e => {
+      if ((e.target && e.target.tagName.toLowerCase() === 'li') || 
+          (e.target.parentElement && e.target.parentElement.tagName.toLowerCase() === 'li')) {
+        const li = e.target.tagName.toLowerCase() === 'li' ? e.target : e.target.parentElement;
+        const index = parseInt(li.getAttribute('data-index'), 10);
+        loadVideoByIndex(index);
+      }
+    });
+    
+    let isDragging = false;
+    function getOffsetX(e) {
+      if (e.type.startsWith('touch')) {
+        return e.touches[0].clientX;
+      }
+      return e.clientX;
+    }
+    
+    function scrub(e) {
+      const rect = progressContainer.getBoundingClientRect();
+      const offsetX = getOffsetX(e) - rect.left;
+      let ratio = offsetX / rect.width;
+      ratio = Math.min(Math.max(ratio, 0), 1);
+      const newTime = ratio * videoPlayer.duration;
+      videoPlayer.currentTime = newTime;
+      const progressPercent = ratio * 100;
+      progressBar.style.width = progressPercent + '%';
+      progressHandle.style.left = `calc(${progressPercent}% - 7px)`;
+      timeRemaining.textContent = formatTime(videoPlayer.duration - newTime);
+    }
+    
+    progressContainer.addEventListener('mousedown', e => {
+      isDragging = true;
+      scrub(e);
+    });
+    progressContainer.addEventListener('touchstart', e => {
+      isDragging = true;
+      scrub(e);
+    }, { passive: false });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      scrub(e);
+    });
+    window.addEventListener('touchmove', e => {
+      if (!isDragging) return;
+      scrub(e);
+    }, { passive: false });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+    window.addEventListener('touchend', () => { isDragging = false; });
+    
+    prevBtn.addEventListener('click', () => {
+      const prevIndex = currentIndex - 1;
+      if (prevIndex >= 0) loadVideoByIndex(prevIndex);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < videos.length) loadVideoByIndex(nextIndex);
+    });
+    
+    playPauseBtn.addEventListener('click', () => {
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+      } else {
+        videoPlayer.pause();
+      }
+      updatePlayPauseButton();
+    });
+    
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.msRequestFullscreen) {
+          videoContainer.msRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      }
+    });
+    
+    // Botão para alternar a exibição dos downloads
+    toggleDownloadsBtn.addEventListener('click', () => {
+      playlistContainer.classList.toggle('show-downloads');
+      if (playlistContainer.classList.contains('show-downloads')) {
+        toggleDownloadsBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Ocultar Downloads" style="width:35px; height:35px; transform: rotate(180deg);">`;
+      } else {
+        toggleDownloadsBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">`;
+      }
+    });
+    
+    // Lógica para exibir os controles e ocultá-los após 2 segundos (incluindo em tela cheia)
+    videoContainer.addEventListener('mouseenter', () => {
+      controlsOverlay.classList.remove('hidden');
+      clearTimeout(hideControlsTimeout);
+    });
+    
+    let hideControlsTimeout;
+    videoContainer.addEventListener('mousemove', () => {
+      controlsOverlay.classList.remove('hidden');
+      clearTimeout(hideControlsTimeout);
+      hideControlsTimeout = setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 2000);
+    });
+  </script>
+  <script>
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+</script>
+</body>
+</html>
