@@ -63,8 +63,7 @@
     }
 
     /* 
-      ========== INÍCIO: Estilo dos botões com efeito neon ==========
-      Você pode ajustar as cores e a animação conforme desejar
+      ========== BOTÕES NO MENU COM EFEITO NEON ==========
     */
     nav ul li a {
       display: inline-block;
@@ -75,13 +74,13 @@
       text-transform: uppercase;
       font-weight: bold;
       letter-spacing: 1px;
-      border: 2px solid #e50914; /* Borda para destacar o botão */
-      border-radius: 4px;
+      border: 2px solid #e50914;
+      /* Ajuste o valor do border-radius para deixar mais ou menos arredondado */
+      border-radius: 20px;
       transition: 0.3s ease;
     }
 
     nav ul li a:hover {
-      /* Efeito de hover: muda a cor de fundo e adiciona brilho neon */
       background-color: #111;
       box-shadow:
         0 0 5px #e50914,
@@ -92,7 +91,7 @@
       transition: 0.3s ease;
     }
 
-    /* Se quiser um efeito de "piscar" neon continuo, use uma animação: */
+    /* Animação opcional de pulsar (descomente se quiser um efeito contínuo) 
     @keyframes neonPulse {
       0%, 100% {
         box-shadow:
@@ -109,14 +108,7 @@
           0 0 40px #e50914;
       }
     }
-
-    /* Se quiser aplicar o efeito de pulsar continuamente, descomente esta regra */
-    /*
-    nav ul li a:hover {
-      animation: neonPulse 1.5s ease-in-out infinite;
-    }
     */
-    /* ========== FIM: Estilo dos botões com efeito neon ========== */
 
     /* ====== HERO BANNER ====== */
     .hero {
@@ -209,7 +201,7 @@
 
     .movie-card:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f; /* Efeito neon azulado para o card */
+      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
     }
 
     .movie-card img {
