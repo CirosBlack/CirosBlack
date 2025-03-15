@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jaspion com Playlist</title>
-  <!-- Video.js e estilos do playlist UI -->
+  <!-- Estilos do Video.js -->
   <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
+  <!-- Estilos do videojs-playlist-ui -->
   <link href="videojs-playlist-ui.css" rel="stylesheet">
+  <!-- Estilos customizados -->
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
@@ -18,7 +20,7 @@
   <div class="main-content">
     <div class="container">
       <div class="video-container">
-        <!-- O player -->
+        <!-- Elemento de vídeo do Video.js -->
         <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup="{}">
           <p class="vjs-no-js">
             Para ver este vídeo, ative o JavaScript e considere atualizar para um navegador que suporte vídeo HTML5.
@@ -26,16 +28,19 @@
         </video>
       </div>
       <div class="playlist-container">
-        <!-- A interface da playlist será renderizada aqui -->
+        <!-- Interface da playlist renderizada automaticamente pelo plugin -->
         <div class="vjs-playlist"></div>
       </div>
     </div>
   </div>
-  <!-- Inclusão do jQuery, Video.js, videojs-playlist e videojs-playlist-ui -->
+  <!-- Inclusão do jQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Inclusão do Video.js -->
   <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+  <!-- Inclusão dos plugins videojs-playlist e videojs-playlist-ui -->
   <script src="path/to/videojs-playlist/dist/videojs-playlist.js"></script>
   <script src="path/to/videojs-playlist-ui/dist/videojs-playlist-ui.js"></script>
+  <!-- Script customizado -->
   <script src="script.js"></script>
 </body>
 </html>
