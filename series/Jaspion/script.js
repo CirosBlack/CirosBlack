@@ -24,6 +24,8 @@ function updateActiveStates(clickedItem) {
   clickedItem.classList.add('active');
   const videoTitle = clickedItem.querySelector('.video-title').textContent;
   updateTitle(videoTitle);
+  // Rolagem suave para o topo do item ativo dentro da playlist
+  clickedItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 videoItems.forEach((item, index) => {
