@@ -24,13 +24,13 @@ body {
 }
 
 .nav-content {
-  /* Ajustes internos da navbar, se necessário */
+  /* Ajustes internos se precisar */
 }
 
 .nav-title {
   margin: 0;
   font-size: 1rem;
-  line-height: 60px; /* Alinha verticalmente o título */
+  line-height: 60px; /* Alinha verticalmente o texto */
   padding-left: 1rem;
   text-transform: uppercase;
 }
@@ -53,8 +53,11 @@ body {
   color: #888;
 }
 
-/* ===== CONTAINER PRINCIPAL =====
-   (Layout Desktop/Padrão: Player + Playlist lado a lado) */
+/* ===== CONTAINER PRINCIPAL (Desktop/Paisagem) =====
+   Por padrão, no modo "normal" ou paisagem, usamos
+   layout fixo com duas colunas:
+   1) Coluna do vídeo
+   2) Coluna da playlist */
 .container {
   position: fixed;
   top: 60px;    /* abaixo da navbar */
@@ -63,7 +66,7 @@ body {
   right: 0;
 
   display: grid;
-  grid-template-columns: 1fr 400px; /* primeira coluna (vídeo) + segunda coluna (playlist) */
+  grid-template-columns: 1fr 400px;
   overflow: hidden; 
 }
 
@@ -79,15 +82,14 @@ body {
   justify-content: center;
 }
 
-/* Ajustes do player Video.js */
+/* Player Video.js sempre ajustado ao container */
 .video-js {
   width: 100% !important;
   height: 100% !important;
   max-height: 100% !important;
 }
 
-/* ===== PLAYLIST =====
-   (barra lateral com rolagem, 400px de largura em telas grandes) */
+/* ===== PLAYLIST ===== */
 .playlist-container {
   background-color: #2a2a2a;
   overflow-y: auto;
@@ -119,7 +121,6 @@ body {
   position: relative;
 }
 
-/* Indicador de expandir (+) */
 .module-title:after {
   content: '+';
   font-size: 1.2em;
@@ -130,6 +131,7 @@ body {
   transform: rotate(45deg);
 }
 
+/* Lista de vídeos (fica oculta inicialmente) */
 .video-list {
   display: none;
 }
@@ -181,47 +183,43 @@ body {
   background: #555;
 }
 
-/* ===== RESPONSIVIDADE =====
-   Quando a largura da tela for menor que 768px,
-   convertemos o layout para 1 coluna:
-   - Player com 100% de largura (acima)
-   - Playlist também com 100% (abaixo)
-*/
-@media (max-width: 768px) {
-  /* Redefinimos o container para ocupar 
-     verticalmente o espaço. */
+/* ===== MODO RETRATO =====
+   Assim que o dispositivo estiver em orientação portrait,
+   a página sai do layout fixo e vira um fluxo vertical:
+   - Player 100% no topo
+   - Playlist 100% abaixo */
+@media screen and (orientation: portrait) {
   .container {
-    position: static; /* remove o "fixed" */
+    position: static; /* remove o fixo */
     top: auto;
     bottom: auto;
-    left: 0;
-    right: 0;
-    margin-top: 60px;   /* espaço para a navbar */
-    margin-bottom: 40px;/* espaço para o footer */
-    display: block;     /* vira um bloco */
-    height: auto;       /* se expande conforme conteúdo */
-    overflow: visible;  /* libera rolagem se necessário */
+    left: auto;
+    right: auto;
+
+    display: block;   /* vira bloco normal */
+    width: 100%;
+    height: auto;     /* cresce conforme conteúdo */
+    margin-top: 60px;   /* deixa espaço para a navbar */
+    margin-bottom: 40px;/* deixa espaço para o footer */
+    overflow: visible;  /* habilita scroll total da página */
   }
 
-  /* O player fica em 100% da tela na largura */
   .video-container {
-    width: 100%;
-    height: auto;       /* cresce conforme o vídeo */
+    position: relative; 
+    width: 100%; 
+    height: auto; 
     display: block;
   }
 
-  /* Ajustes no player para altura variável (ex.: 16:9) */
   .video-js {
     width: 100% !important;
     height: auto !important;
-    max-height: none !important;
+    max-height: none !important; /* permite crescimento no vertical */
   }
 
-  /* A playlist também fica 100% abaixo do player */
   .playlist-container {
     width: 100%;
     height: auto;
-    /* Caso queira margem entre player e playlist:
-       margin-top: 10px; */
+    overflow-y: visible; /* ou auto, se quiser rolagem só da playlist */
   }
 }
