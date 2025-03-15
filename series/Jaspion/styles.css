@@ -62,7 +62,7 @@ body {
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: 1fr 600px; /* Alterado de 400px para 600px */
+    grid-template-columns: 1fr 600px;
     gap: 0;
     position: fixed;
     top: 60px;
@@ -77,7 +77,6 @@ body {
     justify-content: center;
     position: relative;
 }
-
 
 .video-js {
     width: 100% !important;
