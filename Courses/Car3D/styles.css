@@ -166,7 +166,7 @@ body {
 }
 
 /* ======================================= */
-/*       SCROLLBAR PERSONALIZADA (opc)    */
+/*       SCROLLBAR PERSONALIZADA (opc)     */
 /* ======================================= */
 ::-webkit-scrollbar {
   width: 8px;
@@ -187,36 +187,43 @@ body {
 /* ======================================= */
 @media screen and (max-aspect-ratio: 1/1) {
   /*
-     Aqui, mantemos o layout "fixo", mas empilhamos o vídeo
-     em cima e a playlist embaixo, com scroll apenas na playlist.
+     No modo retrato, empilhamos (coluna):
+       - Player em cima (com altura proporcional)
+       - Playlist embaixo (também 100% de largura)
   */
   .container {
-    position: fixed;
-    top: 60px;       /* espaço para a navbar fixa */
-    bottom: 40px;    /* espaço para o footer fixo */
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column; /* empilha vídeo em cima, playlist embaixo */
-    overflow: hidden;       /* sem overflow lateral, só vertical na playlist */
+    position: static;
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 60px;   /* espaço para navbar */
+    margin-bottom: 40px;/* espaço para footer */
+    overflow: visible;
   }
 
+  /*
+    Implementamos o “ratio box”:
+    A .video-container permanece relative, mas
+    não terá height fixo. Vamos usar ::before
+    para criar espaço vertical (16:9).
+  */
   .video-container {
-    flex: 0 0 auto;         /* não crescer nem encolher */
-    position: relative;
     width: 100%;
     height: auto;
     background-color: #000;
-    display: block;         /* remove o flex para uso do ratio-box */
+    position: relative;
+    display: block; /* sem flex, já que usaremos ratio box */
   }
 
-  /* Mantemos a proporção 16:9 usando ratio-box */
+  /* O pseudo-elemento ::before cria a altura de 16:9 */
   .video-container::before {
     content: "";
     display: block;
-    padding-top: 56.25%; /* 16:9 = 9/16 = 0.5625 = 56.25% */
+    padding-top: 56.25%; /* 56.25% = 9/16 (16:9 ratio) */
   }
 
+  /* O player (video-js) fica “absoluto” dentro do .video-container,
+     ocupando a área que o ::before deixou reservada */
   .video-js {
     position: absolute;
     top: 0;
@@ -226,9 +233,10 @@ body {
     max-height: none !important;
   }
 
-  /* A playlist fica abaixo do vídeo e faz scroll vertical */
+  /* Playlist fica abaixo do vídeo, 100% largura */
   .playlist-container {
-    flex: 1 1 auto;
-    overflow-y: auto;
+    width: 100%;
+    height: auto;
+    overflow-y: visible;
   }
 }
