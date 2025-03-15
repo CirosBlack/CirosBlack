@@ -1,4 +1,4 @@
-/* Resete básico de CSS */
+/* Resete básico */
 * {
   margin: 0;
   padding: 0;
@@ -24,13 +24,13 @@ body {
 }
 
 .nav-content {
-  /* Ajustes internos se precisar */
+  /* Ajustes internos se quiser */
 }
 
 .nav-title {
   margin: 0;
   font-size: 1rem;
-  line-height: 60px; /* Alinha verticalmente */
+  line-height: 60px;
   padding-left: 1rem;
   text-transform: uppercase;
 }
@@ -53,18 +53,18 @@ body {
   color: #888;
 }
 
-/* ===== CONTAINER (Layout Padrão: Player + Playlist lado a lado) =====
-   Em modo paisagem ou se a orientação não for identificada, 
-   utilizamos duas colunas: vídeo e playlist */
+/* ===== LAYOUT PADRÃO (lado a lado) =====
+   Player e playlist em duas colunas, ocupando
+   o espaço entre navbar (60px) e footer (40px). */
 .container {
   position: fixed;
-  top: 60px;    /* abaixo da navbar */
-  bottom: 40px; /* acima do footer */
+  top: 60px;   
+  bottom: 40px; 
   left: 0;
   right: 0;
 
   display: grid;
-  grid-template-columns: 1fr 400px;
+  grid-template-columns: 1fr 400px;  /* player (1fr) | playlist (400px) */
   overflow: hidden;
 }
 
@@ -80,7 +80,6 @@ body {
   justify-content: center;
 }
 
-/* Player Video.js */
 .video-js {
   width: 100% !important;
   height: 100% !important;
@@ -94,12 +93,12 @@ body {
   scroll-behavior: smooth;
 }
 
-/* ===== MÓDULOS / VÍDEOS ===== */
+/* ===== MÓDULOS / LISTA DE VÍDEOS ===== */
 .module {
   margin-bottom: 10px;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
 }
 
@@ -129,7 +128,7 @@ body {
   transform: rotate(45deg);
 }
 
-/* Lista de vídeos (fica oculta inicialmente) */
+/* Lista de vídeos (invisível até abrir) */
 .video-list {
   display: none;
 }
@@ -163,7 +162,7 @@ body {
   font-size: 0.9em;
 }
 
-/* ===== SCROLLBAR CUSTOM ===== */
+/* Scrollbar customizado (opcional) */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -178,22 +177,18 @@ body {
   background: #555;
 }
 
-/* ===== LAYOUT EM MODO RETRATO =====
-   Sempre que a orientação for 'portrait', 
-   empilhamos o player e a playlist em uma coluna.
-   Assim, mesmo que a tela seja grande (ex.: tablet),
-   se estiver em pé (vertical), o layout fica:
-   - Player 100% no topo
-   - Playlist 100% abaixo
-*/
-@media screen and (orientation: portrait) {
+/* ===== LAYOUT EM TELA VERTICAL =====
+   Se a largura for <= altura, consideramos "modo retrato".
+   Então, empilhamos o player (100% em cima) e playlist (100% embaixo). */
+@media screen and (max-aspect-ratio: 1/1) {
+  /* Removemos layout fixo e em grid */
   .container {
-    position: static;   /* remove fixo */
-    display: block;     /* vira bloco vertical */
+    position: static;
+    display: block;
     width: 100%;
     height: auto;
-    margin-top: 60px;   /* espaço para navbar */
-    margin-bottom: 40px;/* espaço para footer */
+    margin-top: 60px;   /* espaço para a navbar */
+    margin-bottom: 40px;/* espaço para o footer */
     overflow: visible;
   }
 
@@ -212,6 +207,6 @@ body {
   .playlist-container {
     width: 100%;
     height: auto;
-    overflow-y: visible; 
+    overflow-y: visible;
   }
 }
