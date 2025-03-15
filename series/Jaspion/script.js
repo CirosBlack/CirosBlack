@@ -1,73 +1,50 @@
 $(document).ready(function() {
-  // Prevenir o menu de contexto
-  $(document).on('contextmenu', function(e) {
-    e.preventDefault();
-  });
+  // Inicializa o player Video.js
+  var player = videojs('my-video');
 
-  function updateTitle(videoTitle) {
-    $('.nav-title').text(videoTitle);
-  }
-
-  // Inicializar o player video.js
-  var player = videojs('my-video', {
-    controls: true,
-    autoplay: true,
-    preload: 'auto'
-  });
-
-  var videoItems = $('.video-item');
-  var currentVideoIndex = 0;
-
-  function playVideo(url) {
-    player.src({ type: 'video/mp4', src: url });
-    player.play();
-  }
-
-  function updateActiveStates(clickedItem) {
-    videoItems.removeClass('active');
-    clickedItem.addClass('active');
-    var videoTitle = clickedItem.find('.video-title').text();
-    updateTitle(videoTitle);
-    // Rolagem suave para o item ativo dentro da playlist
-    $('.playlist-container').animate({
-      scrollTop: clickedItem.offset().top - $('.playlist-container').offset().top + $('.playlist-container').scrollTop()
-    }, 500);
-  }
-
-  // Configura o primeiro vídeo como ativo
-  videoItems.each(function(index) {
-    if (index === 0) {
-      $(this).addClass('active');
-      var videoTitle = $(this).find('.video-title').text();
-      updateTitle(videoTitle);
-      playVideo($(this).data('url'));
+  // Define a playlist – cada objeto deve conter pelo menos 'sources' (com src e type) e 'name' (título)
+  var myPlaylist = [
+    {
+      sources: [{ src: 'https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/001.mp4', type: 'video/mp4' }],
+      name: "O planeta de Edin"
+    },
+    {
+      sources: [{ src: 'https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/002.mp4', type: 'video/mp4' }],
+      name: "O triste fim de Sakura"
+    },
+    {
+      sources: [{ src: 'https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/003.mp4', type: 'video/mp4' }],
+      name: "O sonho do menino galáctico"
+    },
+    {
+      sources: [{ src: 'https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/004.mp4', type: 'video/mp4' }],
+      name: "A fúria do pântano"
     }
+    // Adicione os demais vídeos conforme necessário...
+  ];
+
+  // Configura a playlist no player e inicializa a interface de playlist
+  player.playlist(myPlaylist);
+  player.playlistUi();
+
+  // Atualiza o título na navbar sempre que houver mudança na playlist
+  player.on('playlistchange', function() {
+    var currentIndex = player.playlist.currentItem();
+    $('.nav-title').text(myPlaylist[currentIndex].name);
   });
 
-  // Clique em um item da playlist
-  videoItems.on('click', function() {
-    currentVideoIndex = videoItems.index(this);
-    updateActiveStates($(this));
-    playVideo($(this).data('url'));
-  });
-
-  // Criação de botões customizados para a barra de controles usando video.js
+  // Criação de botões customizados usando os componentes do Video.js
   var Button = videojs.getComponent('Button');
 
   var PrevButton = videojs.extend(Button, {
     constructor: function(player, options) {
       Button.call(this, player, options);
       this.controlText('Anterior');
-      // Definindo o ícone (seta para a esquerda)
+      // Ícone: seta para a esquerda
       this.el().innerHTML = '&#9664;';
     },
     handleClick: function() {
-      if (currentVideoIndex > 0) {
-        currentVideoIndex--;
-        var prevItem = videoItems.eq(currentVideoIndex);
-        updateActiveStates(prevItem);
-        playVideo(prevItem.data('url'));
-      }
+      player.playlist.previous();
     }
   });
 
@@ -75,31 +52,25 @@ $(document).ready(function() {
     constructor: function(player, options) {
       Button.call(this, player, options);
       this.controlText('Próximo');
-      // Definindo o ícone (seta para a direita)
+      // Ícone: seta para a direita
       this.el().innerHTML = '&#9654;';
     },
     handleClick: function() {
-      if (currentVideoIndex < videoItems.length - 1) {
-        currentVideoIndex++;
-        var nextItem = videoItems.eq(currentVideoIndex);
-        updateActiveStates(nextItem);
-        playVideo(nextItem.data('url'));
-      }
+      player.playlist.next();
     }
   });
 
-  // Registrar os componentes customizados
+  // Registra os componentes customizados
   videojs.registerComponent('PrevButton', PrevButton);
   videojs.registerComponent('NextButton', NextButton);
 
-  // Adicionar os botões customizados na barra de controles, antes do botão "PlayToggle"
+  // Adiciona os botões customizados na control bar, posicionando-os antes do botão "PlayToggle"
   player.ready(function() {
     var controlBar = player.getChild('controlBar');
-    // Procurar o índice do componente PlayToggle
+    // Procura o índice do componente PlayToggle
     var playToggleIndex = controlBar.children().findIndex(function(child) {
       return child.name() === 'PlayToggle';
     });
-    // Adiciona os botões antes do PlayToggle
     if (playToggleIndex === -1) {
       controlBar.addChild('PrevButton');
       controlBar.addChild('NextButton');
@@ -109,13 +80,8 @@ $(document).ready(function() {
     }
   });
 
-  // Ao finalizar o vídeo, passa automaticamente para o próximo
+  // Quando o vídeo termina, passa para o próximo
   player.on('ended', function() {
-    currentVideoIndex++;
-    if (currentVideoIndex < videoItems.length) {
-      var nextItem = videoItems.eq(currentVideoIndex);
-      updateActiveStates(nextItem);
-      playVideo(nextItem.data('url'));
-    }
+    player.playlist.next();
   });
 });
