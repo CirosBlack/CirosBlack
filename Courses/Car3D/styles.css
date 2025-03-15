@@ -195,7 +195,7 @@ body {
     position: static;
     display: block;
     width: 100%;
-    height: 720px;
+    height: 680px;
     margin-top: 60px;   /* espaço para navbar */
     margin-bottom: 40px;/* espaço para footer */
     overflow: visible;
@@ -209,7 +209,7 @@ body {
   */
   .video-container {
     width: 100%;
-    height: 720px;
+    height: auto;
     background-color: #000;
     position: relative;
     display: block; /* sem flex, já que usaremos ratio box */
