@@ -11,6 +11,9 @@ body {
   background-color: #1a1a1a;
   color: #ffffff;
   font-family: Arial, sans-serif;
+  /* Evita “scroll” duplo no corpo; deixamos
+     a rolagem para a playlist-container */
+  overflow: hidden;
 }
 
 /* ======================================= */
@@ -55,15 +58,16 @@ body {
 }
 
 /* ======================================= */
-/*        LAYOUT PADRÃO (LADO A LADO)     */
+/*      LAYOUT PADRÃO (MODO PAISAGEM)     */
 /* ======================================= */
 /*
    Quando não estiver em retrato (ou seja, width > height),
-   mantemos duas colunas:
+   usamos duas colunas:
      - Player (à esquerda)
      - Playlist (à direita)
 */
 .container {
+  /* Ocupa tudo entre navbar e footer */
   position: fixed;
   top: 60px;    /* abaixo da navbar */
   bottom: 40px; /* acima do footer */
@@ -187,48 +191,55 @@ body {
 /* ======================================= */
 @media screen and (max-aspect-ratio: 1/1) {
   /*
-     Aqui, mantemos o layout "fixo", mas empilhamos o vídeo
-     em cima e a playlist embaixo, com scroll apenas na playlist.
+    —————————————————————————————————————————
+    REMOVEMOS o "grid" da .container no retrato
+    e controlamos manualmente para o vídeo ficar
+    FIXO logo abaixo da navbar, sem rolagem.
+    —————————————————————————————————————————
   */
   .container {
+    display: none; /* Não usar layout side-by-side no retrato */
+  }
+
+  /*
+    Colocamos o .video-container em posição fixa,
+    imediatamente após a navbar (top: 60px).
+    A altura é calculada (aproximada 16:9) com base
+    na largura do viewport (100vw), para manter 
+    algo próximo da proporção 16:9. 
+  */
+  .video-container {
     position: fixed;
-    top: 60px;       /* espaço para a navbar fixa */
-    bottom: 40px;    /* espaço para o footer fixo */
+    top: 60px;
     left: 0;
     right: 0;
-    display: flex;
-    flex-direction: column; /* empilha vídeo em cima, playlist embaixo */
-    overflow: hidden;       /* sem overflow lateral, só vertical na playlist */
-  }
-
-  .video-container {
-    flex: 0 0 auto;         /* não crescer nem encolher */
-    position: relative;
-    width: 100%;
-    height: auto;
+    /* altura calculada: 100vw * (9/16) -> 56.25% da largura */
+    height: calc(100vw * 9/16);
     background-color: #000;
-    display: block;         /* remove o flex para uso do ratio-box */
-  }
-
-  /* Mantemos a proporção 16:9 usando ratio-box */
-  .video-container::before {
-    content: "";
+    z-index: 999;
+    /* Remover "flex" do modo paisagem */
     display: block;
-    padding-top: 56.25%; /* 16:9 = 9/16 = 0.5625 = 56.25% */
   }
 
+  /* Faz o player (video.js) preencher essa altura */
   .video-js {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100% !important;
     height: 100% !important;
     max-height: none !important;
   }
 
-  /* A playlist fica abaixo do vídeo e faz scroll vertical */
+  /*
+    Agora, a playlist-container fica FIXA abaixo do vídeo,
+    mas ainda entre a navbar (60px + altura do vídeo) e o footer (40px).
+  */
   .playlist-container {
-    flex: 1 1 auto;
+    position: fixed;
+    top: calc(60px + (100vw * 9/16)); /* começa logo abaixo do vídeo */
+    bottom: 40px;    /* até antes do footer */
+    left: 0;
+    right: 0;
+    background-color: #2a2a2a;
     overflow-y: auto;
+    z-index: 998;
   }
 }
