@@ -186,37 +186,33 @@ body {
 /*       MODO RETRATO (width <= height)    */
 /* ======================================= */
 @media screen and (max-aspect-ratio: 1/1) {
-  /*
-     Aqui, mantemos o layout "fixo", mas empilhamos o vídeo
-     em cima e a playlist embaixo, com scroll apenas na playlist.
+  /* 
+     Em modo retrato, sobrepomos totalmente as regras anteriores,
+     para manter o player fixo no topo e a playlist abaixo dele.
   */
   .container {
+    display: block; /* ou poderíamos dar display: none, se preferir sumir com .container */
+  }
+
+  /* Player fixo logo abaixo da navbar. 
+     Usamos altura calculada em vw para manter o aspecto 16:9. */
+  .video-container {
     position: fixed;
-    top: 60px;       /* espaço para a navbar fixa */
-    bottom: 40px;    /* espaço para o footer fixo */
+    top: 60px;          /* logo abaixo da navbar */
     left: 0;
     right: 0;
-    display: flex;
-    flex-direction: column; /* empilha vídeo em cima, playlist embaixo */
-    overflow: hidden;       /* sem overflow lateral, só vertical na playlist */
-  }
-
-  .video-container {
-    flex: 0 0 auto;         /* não crescer nem encolher */
-    position: relative;
-    width: 100%;
-    height: auto;
+    width: 100vw;
+    height: 56.25vw;    /* 16:9 se a largura for 100vw */
     background-color: #000;
-    display: block;         /* remove o flex para uso do ratio-box */
+    z-index: 999;       /* fica acima da playlist */
+    display: block;     /* remove o display flex */
   }
-
-  /* Mantemos a proporção 16:9 usando ratio-box */
   .video-container::before {
-    content: "";
-    display: block;
-    padding-top: 56.25%; /* 16:9 = 9/16 = 0.5625 = 56.25% */
+    /* Remove a approach de ratio-box usando ::before, pois já temos altura fixa acima */
+    content: none;
   }
 
+  /* Ajuste para o player video.js ocupar 100% da área fixa */
   .video-js {
     position: absolute;
     top: 0;
@@ -226,13 +222,15 @@ body {
     max-height: none !important;
   }
 
-  /* A playlist fica abaixo do vídeo e faz scroll vertical.
-     Adicionamos scroll-padding-top para que, ao dar scroll animado
-     no item ativo, ele apareça totalmente abaixo do player. */
+  /* Playlist fixa abaixo do player, até o footer */
   .playlist-container {
-    flex: 1 1 auto;
+    position: fixed;
+    top: calc(60px + 56.25vw); /* altura total = navbar + player */
+    left: 0;
+    right: 0;
+    bottom: 40px;              /* acima do footer */
     overflow-y: auto;
     scroll-behavior: smooth;
-    scroll-padding-top: 16px; /* Ajuste conforme necessidade */
+    z-index: 998;
   }
 }
