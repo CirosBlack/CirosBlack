@@ -42,6 +42,29 @@ videoItems.forEach((item, index) => {
   });
 });
 
+// Botões de navegação para o vídeo
+const prevButton = document.querySelector('.nav-button.prev');
+const nextButton = document.querySelector('.nav-button.next');
+
+prevButton.addEventListener('click', () => {
+  if (currentVideoIndex > 0) {
+    currentVideoIndex--;
+    const prevItem = videoItems[currentVideoIndex];
+    updateActiveStates(prevItem);
+    playVideo(prevItem.dataset.url);
+  }
+});
+
+nextButton.addEventListener('click', () => {
+  if (currentVideoIndex < videoItems.length - 1) {
+    currentVideoIndex++;
+    const nextItem = videoItems[currentVideoIndex];
+    updateActiveStates(nextItem);
+    playVideo(nextItem.dataset.url);
+  }
+});
+
+// Ao finalizar o vídeo, passa para o próximo automaticamente
 player.on('ended', () => {
   currentVideoIndex++;
   if (currentVideoIndex < videoItems.length) {
