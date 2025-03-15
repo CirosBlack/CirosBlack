@@ -62,7 +62,7 @@ body {
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 600px; /* A largura da playlist foi aumentada para 600px */
     gap: 0;
     position: fixed;
     top: 60px;
