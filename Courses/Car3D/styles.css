@@ -226,9 +226,13 @@ body {
     max-height: none !important;
   }
 
-  /* A playlist fica abaixo do vídeo e faz scroll vertical */
+  /* A playlist fica abaixo do vídeo e faz scroll vertical.
+     Adicionamos scroll-padding-top para que, ao dar scroll animado
+     no item ativo, ele apareça totalmente abaixo do player. */
   .playlist-container {
     flex: 1 1 auto;
     overflow-y: auto;
+    scroll-behavior: smooth;
+    scroll-padding-top: 16px; /* Ajuste conforme necessidade */
   }
 }
