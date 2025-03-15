@@ -187,36 +187,32 @@ body {
 /* ======================================= */
 @media screen and (max-aspect-ratio: 1/1) {
   /*
-     Aqui, mantemos o layout "fixo", mas empilhamos o vídeo
-     em cima e a playlist embaixo, com scroll apenas na playlist.
+     Aqui, em vez de usar flex para empilhar,
+     usamos posicionamento para "fixar" a playlist
+     logo abaixo do player.
   */
   .container {
-    position: fixed;
-    top: 60px;       /* espaço para a navbar fixa */
-    bottom: 40px;    /* espaço para o footer fixo */
+    position: relative;  /* para conter pos. absolutas */
+    top: 60px;           /* abaixo da navbar fixa */
+    bottom: 40px;        /* acima do footer fixo */
     left: 0;
     right: 0;
-    display: flex;
-    flex-direction: column; /* empilha vídeo em cima, playlist embaixo */
-    overflow: hidden;       /* sem overflow lateral, só vertical na playlist */
+    overflow: hidden;    /* sem overflow lateral */
   }
 
+  /* Mantemos o 'ratio-box' no player para 16:9 */
   .video-container {
-    flex: 0 0 auto;         /* não crescer nem encolher */
     position: relative;
     width: 100%;
     height: auto;
     background-color: #000;
-    display: block;         /* remove o flex para uso do ratio-box */
+    display: block;
   }
-
-  /* Mantemos a proporção 16:9 usando ratio-box */
   .video-container::before {
     content: "";
     display: block;
-    padding-top: 56.25%; /* 16:9 = 9/16 = 0.5625 = 56.25% */
+    padding-top: 56.25%; /* 16:9 */
   }
-
   .video-js {
     position: absolute;
     top: 0;
@@ -226,9 +222,18 @@ body {
     max-height: none !important;
   }
 
-  /* A playlist fica abaixo do vídeo e faz scroll vertical */
+  /*
+    Para que a playlist fique logo abaixo do vídeo,
+    definimos top com base na altura do ratio-box.
+    Ajuste conforme necessidade.
+  */
   .playlist-container {
-    flex: 1 1 auto;
-    overflow-y: auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(56.25vw); /* altura aproximada do ratio 16:9 em função da largura */
+    bottom: 0;          /* até o footer */
+    background-color: #2a2a2a;
+    overflow-y: auto;   /* rolagem vertical na playlist */
   }
 }
