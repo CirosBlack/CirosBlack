@@ -1,234 +1,236 @@
-/* Resete básico */
+/* Resete básico de CSS */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Corpo */
+/* Corpo (Body) */
 body {
-    background-color: #1a1a1a;
-    color: #ffffff;
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
 }
 
-/* Navbar fixa */
+/* ===== NAVBAR ===== */
+/*
+  Barra de navegação fixa no topo, com altura de 60px.
+  A classe .nav-title não deve ter margens extras
+  para não aumentar a altura.
+*/
 .navbar {
-    background-color: #1a1a1a;
-    padding: 1rem 2rem;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    height: 60px;
-    z-index: 1000;
-    text-transform: uppercase;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background-color: #1a1a1a;
+  z-index: 1000;
 }
 
-/* Footer fixo */
+.nav-content {
+  /* Se quiser centralizar algo dentro do nav, pode usar display flex */
+}
+
+.nav-title {
+  margin: 0;           /* Remove espaçamento extra */
+  font-size: 1rem;     /* Ajuste conforme preferir */
+  line-height: 60px;   /* Alinha verticalmente o texto */
+  padding-left: 1rem;  /* Espaçamento à esquerda */
+  text-transform: uppercase;
+}
+
+/* ===== FOOTER ===== */
+/*
+  Rodapé fixo na parte inferior, altura de 40px.
+*/
 .footer {
-    background-color: #1a1a1a;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
 }
 
 .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-    color: #888;
+  color: #888;
 }
 
-/* Container que fica entre navbar e footer */
-.main-content {
-    /* Não precisa de margens se .container for fixo */
-    flex: 1;
-    position: relative;
-    /* overflow: hidden removido para não cortar o player */
-    overflow: auto;
-}
-
-/* Grid principal fixo entre top e bottom */
+/* ===== CONTAINER PRINCIPAL ===== */
+/*
+  .container ocupa tudo entre a navbar (60px) e o footer (40px).
+  Por isso definimos:
+    top: 60px;
+    bottom: 40px;
+*/
 .container {
-    position: fixed;
-    top: 60px;     /* abaixo da navbar */
-    bottom: 40px;  /* acima do footer */
-    left: 0;
-    right: 0;
+  position: fixed;
+  top: 60px;    /* distância a partir do topo, sob a navbar */
+  bottom: 40px; /* distância até o rodapé */
+  left: 0;
+  right: 0;
 
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 0;
+  display: grid;
+  grid-template-columns: 1fr 400px; /* primeira coluna (vídeo) + segunda coluna (playlist) */
+  overflow: hidden; /* para não criar scrolls desnecessários no grid inteiro */
 }
 
-/* Container de vídeo */
+/* ===== VIDEO CONTAINER ===== */
+/*
+  Espaço onde o player de vídeo ocupa 100% da coluna e linha disponíveis.
+*/
 .video-container {
-    width: 100%;
-    height: 100%;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+  position: relative;
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+
+  /* Display flex para centralizar o player */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Ajustes do player */
+/*
+  Ajuste do player de vídeo (video.js), forçando a largura e altura
+  para ocupar todo o espaço. 
+  max-height: 100% evita que ele extravase
+*/
 .video-js {
-    width: 100% !important;
-    height: 100% !important;
-    max-height: 100% !important; /* evita corte */
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
 }
 
-/* Navegação de vídeo, setas etc. */
-.video-navigation {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 100;
-    display: flex;
-    gap: 5px;
-}
-
-.nav-button {
-    background-color: rgba(43, 51, 63, 0.7);
-    color: white;
-    border: none;
-    border-radius: 3px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 1.2em;
-}
-
-.nav-button:hover {
-    background-color: rgba(115, 133, 159, 0.5);
-}
-
-/* Lista de módulos (playlist) */
+/* ===== PLAYLIST ===== */
+/*
+  A playlist de vídeos fica na segunda coluna (400px).
+  overflow-y: auto permite rolagem interna para listas grandes.
+*/
 .playlist-container {
-    background-color: #2a2a2a;
-    overflow-y: auto;
-    scroll-behavior: smooth;
+  background-color: #2a2a2a;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
-/* Módulos */
+/* ===== MÓDULOS / VÍDEOS (expansíveis) ===== */
+
+/* Cada módulo individual */
 .module {
-    margin-bottom: 10px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
 }
 
+/* Efeito de "saltar" levemente ao passar o mouse */
 .module:hover {
-    transform: translateY(-2px);
+  transform: translateY(-2px);
 }
 
+/*
+  Cabeçalho do módulo (título).
+  Ao clicar, pode expandir/ocultar a lista de vídeos.
+*/
 .module-title {
-    color: #fff;
-    font-size: 1em;
-    padding: 12px 15px;
-    background-color: #3a3a3a;
-    margin-bottom: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  background-color: #3a3a3a;
+  color: #fff;
+  font-size: 1em;
+  padding: 12px 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
 }
 
+/* Indicador visual de expandir (+) ou fechar (x) */
 .module-title:after {
-    content: '+';
-    font-size: 1.2em;
-    transition: transform 0.3s ease;
+  content: '+';
+  font-size: 1.2em;
+  transition: transform 0.3s ease;
 }
 
 .module.active .module-title:after {
-    transform: rotate(45deg);
+  transform: rotate(45deg);
 }
 
-.module-title:hover {
-    background-color: #444;
-}
-
+/* Lista de vídeos (fica oculta inicialmente) */
 .video-list {
-    display: none;
-    transition: all 0.3s ease-in-out;
+  display: none;
 }
 
 .module.active .video-list {
-    display: block;
+  display: block;
 }
 
-/* Itens de vídeo */
+/*
+  Item de vídeo individual, com hover expandindo padding
+  e barra lateral colorida se estiver "active".
+*/
 .video-item {
-    padding: 12px 15px;
-    margin: 0;
-    background-color: #333;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-left: 3px solid transparent;
-    display: flex;
-    align-items: center;
+  background-color: #333;
+  padding: 12px 15px;
+  border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .video-item:hover {
-    background-color: #444;
-    padding-left: 20px;
+  background-color: #444;
+  padding-left: 20px;
 }
 
 .video-item.active {
-    background-color: #4a4a4a;
-    border-left: 3px solid #8e44ad;
-    padding-left: 20px;
+  background-color: #4a4a4a;
+  border-left: 3px solid #8e44ad;
+  padding-left: 20px;
 }
 
 .video-title {
-    color: #ddd;
-    font-size: 0.9em;
+  color: #ddd;
+  font-size: 0.9em;
 }
 
-/* Media queries */
-@media (max-width: 768px) {
-    .container {
-        grid-template-columns: 1fr;
-    }
-
-    .video-container {
-        margin-bottom: 20px;
-    }
-
-    .playlist-container {
-        max-height: 400px;
-    }
-}
-
-/* Scrollbar customizado (opcional) */
+/* ===== SCROLLBAR PERSONALIZADA (opcional) ===== */
 ::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
+
 ::-webkit-scrollbar-track {
-    background: #2a2a2a;
+  background: #2a2a2a;
 }
+
 ::-webkit-scrollbar-thumb {
-    background: #4a4a4a;
-    border-radius: 4px;
+  background: #4a4a4a;
+  border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+/*
+  Para telas menores, o grid se transforma em uma única coluna.
+  O vídeo pode ficar em cima e a lista abaixo (ou vice-versa).
+*/
+@media (max-width: 768px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+
+  .video-container {
+    height: 50vh; /* Ajuste conforme desejar */
+  }
+
+  .playlist-container {
+    height: 50vh; /* Ajuste conforme desejar */
+  }
 }
