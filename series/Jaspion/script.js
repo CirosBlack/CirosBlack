@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  // Prevenir menu de contexto
+  // Prevenir o menu de contexto
   $(document).on('contextmenu', function(e) {
     e.preventDefault();
   });
@@ -51,27 +51,65 @@ $(document).ready(function() {
     playVideo($(this).data('url'));
   });
 
-  // Botão "prev"
-  $('.nav-button.prev').on('click', function() {
-    if (currentVideoIndex > 0) {
-      currentVideoIndex--;
-      var prevItem = videoItems.eq(currentVideoIndex);
-      updateActiveStates(prevItem);
-      playVideo(prevItem.data('url'));
+  // Criação de botões customizados para a barra de controles usando video.js
+  var Button = videojs.getComponent('Button');
+
+  var PrevButton = videojs.extend(Button, {
+    constructor: function(player, options) {
+      Button.call(this, player, options);
+      this.controlText('Anterior');
+      // Definindo o ícone (seta para a esquerda)
+      this.el().innerHTML = '&#9664;';
+    },
+    handleClick: function() {
+      if (currentVideoIndex > 0) {
+        currentVideoIndex--;
+        var prevItem = videoItems.eq(currentVideoIndex);
+        updateActiveStates(prevItem);
+        playVideo(prevItem.data('url'));
+      }
     }
   });
 
-  // Botão "next"
-  $('.nav-button.next').on('click', function() {
-    if (currentVideoIndex < videoItems.length - 1) {
-      currentVideoIndex++;
-      var nextItem = videoItems.eq(currentVideoIndex);
-      updateActiveStates(nextItem);
-      playVideo(nextItem.data('url'));
+  var NextButton = videojs.extend(Button, {
+    constructor: function(player, options) {
+      Button.call(this, player, options);
+      this.controlText('Próximo');
+      // Definindo o ícone (seta para a direita)
+      this.el().innerHTML = '&#9654;';
+    },
+    handleClick: function() {
+      if (currentVideoIndex < videoItems.length - 1) {
+        currentVideoIndex++;
+        var nextItem = videoItems.eq(currentVideoIndex);
+        updateActiveStates(nextItem);
+        playVideo(nextItem.data('url'));
+      }
     }
   });
 
-  // Ao finalizar o vídeo, passa para o próximo automaticamente
+  // Registrar os componentes customizados
+  videojs.registerComponent('PrevButton', PrevButton);
+  videojs.registerComponent('NextButton', NextButton);
+
+  // Adicionar os botões customizados na barra de controles, antes do botão "PlayToggle"
+  player.ready(function() {
+    var controlBar = player.getChild('controlBar');
+    // Procurar o índice do componente PlayToggle
+    var playToggleIndex = controlBar.children().findIndex(function(child) {
+      return child.name() === 'PlayToggle';
+    });
+    // Adiciona os botões antes do PlayToggle
+    if (playToggleIndex === -1) {
+      controlBar.addChild('PrevButton');
+      controlBar.addChild('NextButton');
+    } else {
+      controlBar.addChild('PrevButton', {}, playToggleIndex);
+      controlBar.addChild('NextButton', {}, playToggleIndex + 1);
+    }
+  });
+
+  // Ao finalizar o vídeo, passa automaticamente para o próximo
   player.on('ended', function() {
     currentVideoIndex++;
     if (currentVideoIndex < videoItems.length) {
