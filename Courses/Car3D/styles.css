@@ -94,7 +94,7 @@ body {
   max-height: 100% !important;
 }
 
-/* Playlist na coluna direita (400px), scroll vertical */
+/* Playlist na coluna direita (400px), com scroll vertical */
 .playlist-container {
   background-color: #2a2a2a;
   overflow-y: auto;
