@@ -1,9 +1,11 @@
+/* Resete básico */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Corpo */
 body {
     background-color: #1a1a1a;
     color: #ffffff;
@@ -12,21 +14,23 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    margin: 0;
-    padding: 0;
 }
 
-.main-content {
-    margin: 60px 0 40px 0;
-    flex: 1;
-    position: relative;
-    height: calc(100vh - 100px);
-    overflow: hidden;
+/* Navbar fixa */
+.navbar {
+    background-color: #1a1a1a;
+    padding: 1rem 2rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    height: 60px;
+    z-index: 1000;
+    text-transform: uppercase;
 }
 
+/* Footer fixo */
 .footer {
     background-color: #1a1a1a;
-    padding: 0;
     width: 100%;
     position: fixed;
     bottom: 0;
@@ -36,41 +40,40 @@ body {
     justify-content: center;
 }
 
-.navbar {
-    background-color: #1a1a1a;
-    padding: 1rem 2rem;
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    height: 60px;
-    text-transform: uppercase;
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    text-align: center;
+    color: #888;
 }
 
+/* Container que fica entre navbar e footer */
 .main-content {
-    margin: 0;
-    padding: 0;
+    /* Não precisa de margens se .container for fixo */
     flex: 1;
     position: relative;
-    height: calc(100vh - 100px);
-    overflow: hidden;
+    /* overflow: hidden removido para não cortar o player */
+    overflow: auto;
 }
 
+/* Grid principal fixo entre top e bottom */
 .container {
-    height: calc(100vh - 100px);
-    width: 100%;
-    margin: 0;
-    padding: 0;
+    position: fixed;
+    top: 60px;     /* abaixo da navbar */
+    bottom: 40px;  /* acima do footer */
+    left: 0;
+    right: 0;
+
     display: grid;
     grid-template-columns: 1fr 400px;
     gap: 0;
-    position: fixed;
-    top: 60px;
 }
 
+/* Container de vídeo */
 .video-container {
     width: 100%;
-    height: calc(100vh - 100px);
+    height: 100%;
     background: #000;
     display: flex;
     align-items: center;
@@ -78,13 +81,14 @@ body {
     position: relative;
 }
 
-
+/* Ajustes do player */
 .video-js {
     width: 100% !important;
     height: 100% !important;
-    max-height: calc(100vh - 100px);
+    max-height: 100% !important; /* evita corte */
 }
 
+/* Navegação de vídeo, setas etc. */
 .video-navigation {
     position: absolute;
     bottom: 5px;
@@ -114,15 +118,14 @@ body {
     background-color: rgba(115, 133, 159, 0.5);
 }
 
+/* Lista de módulos (playlist) */
 .playlist-container {
-    height: calc(100vh - 100px);
     background-color: #2a2a2a;
-    border-radius: 0;
-    padding: 0;
     overflow-y: auto;
     scroll-behavior: smooth;
 }
 
+/* Módulos */
 .module {
     margin-bottom: 10px;
     border-radius: 8px;
@@ -172,6 +175,7 @@ body {
     display: block;
 }
 
+/* Itens de vídeo */
 .video-item {
     padding: 12px 15px;
     margin: 0;
@@ -199,26 +203,7 @@ body {
     font-size: 0.9em;
 }
 
-.footer {
-    background-color: #1a1a1a;
-    padding: 0;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    text-align: center;
-    color: #888;
-}
-
+/* Media queries */
 @media (max-width: 768px) {
     .container {
         grid-template-columns: 1fr;
@@ -231,25 +216,19 @@ body {
     .playlist-container {
         max-height: 400px;
     }
-
-    .main-content {
-        margin-top: 60px;
-    }
 }
 
+/* Scrollbar customizado (opcional) */
 ::-webkit-scrollbar {
     width: 8px;
 }
-
 ::-webkit-scrollbar-track {
     background: #2a2a2a;
 }
-
 ::-webkit-scrollbar-thumb {
     background: #4a4a4a;
     border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
