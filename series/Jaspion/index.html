@@ -3,12 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jaspion com Playlist</title>
-  <!-- Estilos do Video.js -->
+  <title>Jaspion</title>
   <link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
-  <!-- Estilos do videojs-playlist-ui -->
-  <link href="videojs-playlist-ui.css" rel="stylesheet">
-  <!-- Estilos customizados -->
   <link href="styles.css" rel="stylesheet">
 </head>
 <body>
@@ -20,27 +16,155 @@
   <div class="main-content">
     <div class="container">
       <div class="video-container">
-        <!-- Elemento de vídeo do Video.js -->
-        <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" data-setup="{}">
-          <p class="vjs-no-js">
-            Para ver este vídeo, ative o JavaScript e considere atualizar para um navegador que suporte vídeo HTML5.
-          </p>
+        <video id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto">
+          <p class="vjs-no-js">Para ver este vídeo, ative o JavaScript e considere atualizar para um navegador que suporte vídeo HTML5</p>
         </video>
       </div>
       <div class="playlist-container">
-        <!-- Interface da playlist renderizada automaticamente pelo plugin -->
-        <div class="vjs-playlist"></div>
+        <div class="playlist-items">
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/001.mp4">
+            <span class="video-title">O planeta de Edin</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/002.mp4">
+            <span class="video-title">O triste fim de Sakura</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/003.mp4">
+            <span class="video-title">O sonho do menino galáctico</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/004.mp4">
+            <span class="video-title">A fúria do pântano</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/005.mp4">
+            <span class="video-title">O enigma da flauta</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/006.mp4">
+            <span class="video-title">Gordon em busca da mãe</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/007.mp4">
+            <span class="video-title">O demônio da montanha</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/008.mp4">
+            <span class="video-title">O casal fugitivo</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/009.mp4">
+            <span class="video-title">A história de uma árvore</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/010.mp4">
+            <span class="video-title">O ataque do Pyrossauro</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/011.mp4">
+            <span class="video-title">Perigo em Tsukuba</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/012.mp4">
+            <span class="video-title">A profecia</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/013.mp4">
+            <span class="video-title">A investida dos aliados espaciais</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/014.mp4">
+            <span class="video-title">Perigo na lagoa dos noivos</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/015.mp4">
+            <span class="video-title">Sonho ou ilusão? A imagem dourada</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/016.mp4">
+            <span class="video-title">Qual o destino da humanidade?</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/017.mp4">
+            <span class="video-title">O mistério do Pássaro Dourado</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/018.mp4">
+            <span class="video-title">O inimigo imortal</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/019.mp4">
+            <span class="video-title">Alerta no oceano</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/020.mp4">
+            <span class="video-title">A última chance</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/021.mp4">
+            <span class="video-title">O valente garoto jogador</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/022.mp4">
+            <span class="video-title">O feitiço de Titânia</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/023.mp4">
+            <span class="video-title">O monstro do século</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/024.mp4">
+            <span class="video-title">Ambição perigosa</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/025.mp4">
+            <span class="video-title">Tókio em perigo</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/026.mp4">
+            <span class="video-title">Contra ataque de Daileon</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/027.mp4">
+            <span class="video-title">Juventude ameaçadora</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/028.mp4">
+            <span class="video-title">Dados mortais do monstro eletrônico</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/029.mp4">
+            <span class="video-title">A morte de Macgaren</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/030.mp4">
+            <span class="video-title">O pânico do balão</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/031.mp4">
+            <span class="video-title">Golpe na TV</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/032.mp4">
+            <span class="video-title">A conspiração do robô</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/033.mp4">
+            <span class="video-title">Batalha da magia negra</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/034.mp4">
+            <span class="video-title">A fortaleza indestrutível</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/035.mp4">
+            <span class="video-title">A descoberta do pergaminho</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/036.mp4">
+            <span class="video-title">O milagre das novas vidas</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/037.mp4">
+            <span class="video-title">Cardápio infernal</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/038.mp4">
+            <span class="video-title">Trama miraculosa</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/039.mp4">
+            <span class="video-title">O poderoso beijo de Myio</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/040.mp4">
+            <span class="video-title">O enigma do meteoro</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/041.mp4">
+            <span class="video-title">O atirador da justiça</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/042.mp4">
+            <span class="video-title">A história de Pep e Hiroshi</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/043.mp4">
+            <span class="video-title">O misterioso mundo de Satã Goss</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/044.mp4">
+            <span class="video-title">Retorno satânico</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/045.mp4">
+            <span class="video-title">Sou o filho de Satã Goss!</span>
+          </div>
+          <div class="video-item" data-url="https://huggingface.co/datasets/CirosW/SmFzcGlvbg/resolve/main/046.mp4">
+            <span class="video-title">A união dos povos da Via Láctea</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-  <!-- Inclusão do jQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <!-- Inclusão do Video.js -->
   <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
-  <!-- Inclusão dos plugins videojs-playlist e videojs-playlist-ui -->
-  <script src="path/to/videojs-playlist/dist/videojs-playlist.js"></script>
-  <script src="path/to/videojs-playlist-ui/dist/videojs-playlist-ui.js"></script>
-  <!-- Script customizado -->
   <script src="script.js"></script>
 </body>
 </html>
