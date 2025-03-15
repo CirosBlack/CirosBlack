@@ -1,18 +1,21 @@
-/* Resete básico */
+/* ======================================= */
+/*          RESETE E ESTILOS GERAIS       */
+/* ======================================= */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* Corpo (Body) */
 body {
   background-color: #1a1a1a;
   color: #ffffff;
   font-family: Arial, sans-serif;
 }
 
-/* ===== NAVBAR ===== */
+/* ======================================= */
+/*             NAVBAR FIXA                */
+/* ======================================= */
 .navbar {
   position: fixed;
   top: 0;
@@ -23,19 +26,19 @@ body {
   z-index: 1000;
 }
 
-.nav-content {
-  /* Ajustes internos se quiser */
-}
+.nav-content { /* Ajustes internos, se precisar */ }
 
 .nav-title {
   margin: 0;
   font-size: 1rem;
-  line-height: 60px;
+  line-height: 60px; /* Alinha verticalmente */
   padding-left: 1rem;
   text-transform: uppercase;
 }
 
-/* ===== FOOTER ===== */
+/* ======================================= */
+/*             FOOTER FIXO                */
+/* ======================================= */
 .footer {
   position: fixed;
   bottom: 0;
@@ -53,22 +56,26 @@ body {
   color: #888;
 }
 
-/* ===== LAYOUT PADRÃO (lado a lado) =====
-   Player e playlist em duas colunas, ocupando
-   o espaço entre navbar (60px) e footer (40px). */
+/* ======================================= */
+/*       LAYOUT PADRÃO (lado a lado)      */
+/* ======================================= */
+/*
+  Quando a tela não estiver em modo retrato,
+  mantemos duas colunas: player e playlist.
+*/
 .container {
   position: fixed;
-  top: 60px;   
-  bottom: 40px; 
+  top: 60px;    /* espaço para navbar */
+  bottom: 40px; /* espaço para footer */
   left: 0;
   right: 0;
 
   display: grid;
-  grid-template-columns: 1fr 400px;  /* player (1fr) | playlist (400px) */
+  grid-template-columns: 1fr 400px; /* player (1fr) | playlist (400px) */
   overflow: hidden;
 }
 
-/* ===== VIDEO CONTAINER ===== */
+/* Vídeo ocupando 100% da coluna e altura total */
 .video-container {
   position: relative;
   background-color: #000;
@@ -80,20 +87,23 @@ body {
   justify-content: center;
 }
 
+/* Ajuste do player de vídeo (Video.js) */
 .video-js {
   width: 100% !important;
   height: 100% !important;
   max-height: 100% !important;
 }
 
-/* ===== PLAYLIST ===== */
+/* Playlist na coluna da direita */
 .playlist-container {
   background-color: #2a2a2a;
   overflow-y: auto;
   scroll-behavior: smooth;
 }
 
-/* ===== MÓDULOS / LISTA DE VÍDEOS ===== */
+/* ======================================= */
+/*        MÓDULOS / LISTA DE VÍDEOS       */
+/* ======================================= */
 .module {
   margin-bottom: 10px;
   border-radius: 8px;
@@ -128,7 +138,7 @@ body {
   transform: rotate(45deg);
 }
 
-/* Lista de vídeos (invisível até abrir) */
+/* Lista de vídeos, oculta até abrir o módulo */
 .video-list {
   display: none;
 }
@@ -162,7 +172,9 @@ body {
   font-size: 0.9em;
 }
 
-/* Scrollbar customizado (opcional) */
+/* ======================================= */
+/*     SCROLLBAR PERSONALIZADA (opcional) */
+/* ======================================= */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -177,31 +189,53 @@ body {
   background: #555;
 }
 
-/* ===== LAYOUT EM TELA VERTICAL =====
-   Se a largura for <= altura, consideramos "modo retrato".
-   Então, empilhamos o player (100% em cima) e playlist (100% embaixo). */
+/* ======================================= */
+/*     LAYOUT EM MODO RETRATO (VERTICAL)  */
+/* ======================================= */
+/*
+  Quando a largura <= altura, forçamos layout em
+  coluna: 
+    - Player no topo, 100% da largura
+    - Playlist embaixo, 100% da largura
+
+  E definimos a proporção do player (16:9, por exemplo)
+  para manter a altura adequada.
+*/
 @media screen and (max-aspect-ratio: 1/1) {
-  /* Removemos layout fixo e em grid */
   .container {
     position: static;
     display: block;
     width: 100%;
     height: auto;
-    margin-top: 60px;   /* espaço para a navbar */
-    margin-bottom: 40px;/* espaço para o footer */
+    margin-top: 60px;    /* espaço p/ navbar */
+    margin-bottom: 40px; /* espaço p/ footer */
     overflow: visible;
   }
 
+  /*
+    Define que o container do vídeo terá aspect-ratio,
+    ou seja, a altura será calculada dinamicamente
+    mantendo 16:9.
+  */
   .video-container {
     width: 100%;
-    height: auto;
+    aspect-ratio: 16 / 9;
+    position: relative;
     display: block;
+    background-color: #000; /* só para ver o espaço do vídeo */
   }
 
+  /* 
+    Para o Video.js, vamos ocupar 100% dessa área
+    aspect-ratio (largura 100%, altura automática)
+  */
   .video-js {
     width: 100% !important;
-    height: auto !important;
+    height: 100% !important;
     max-height: none !important;
+    position: absolute; /* preenche .video-container */
+    top: 0;
+    left: 0;
   }
 
   .playlist-container {
