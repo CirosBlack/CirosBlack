@@ -974,5 +974,23 @@
     </footer>
     <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
     <script src="script.js"></script>
+
+    <script>
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+  document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && !videoPlayer.paused) {
+    const currentTime = videoPlayer.currentTime;
+    videoPlayer.pause();
+    setTimeout(() => {
+      videoPlayer.currentTime = currentTime;
+      videoPlayer.play().catch(() => {});
+    }, 50); // 50ms de intervalo só pra suavizar
+  }
+});
+
+</script>
 </body>
 </html>
