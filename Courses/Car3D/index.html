@@ -975,22 +975,20 @@
     <script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
     <script src="script.js"></script>
 
-    <script>
-  document.addEventListener('contextmenu', function(e) {
-    e.preventDefault();
-  });
+<script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+<script>
+    const player = videojs('my-video');
 
-  document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && !videoPlayer.paused) {
-    const currentTime = videoPlayer.currentTime;
-    videoPlayer.pause();
-    setTimeout(() => {
-      videoPlayer.currentTime = currentTime;
-      videoPlayer.play().catch(() => {});
-    }, 50); // 50ms de intervalo só pra suavizar
-  }
-});
-
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !player.paused()) {
+            const currentTime = player.currentTime();
+            player.pause();
+            player.one('pause', () => {
+                player.currentTime(currentTime); // Garante que ele continue do ponto correto
+                player.play();
+            });
+        }
+    });
 </script>
 </body>
 </html>
