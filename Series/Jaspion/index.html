@@ -158,6 +158,14 @@
                 videoPlayer.play().then(() => {
                   videoPlayer.muted = false;
                   videoPlayer.volume = 1.0;
+
+                  // ✅ Corrige possível atraso de áudio
+                  const t = videoPlayer.currentTime;
+                  videoPlayer.pause();
+                  setTimeout(() => {
+                    videoPlayer.currentTime = t;
+                    videoPlayer.play().catch(() => {});
+                  }, 50);
                 });
               });
             };
@@ -192,6 +200,17 @@
           index: currentIndex,
           time: videoPlayer.currentTime
         }));
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !videoPlayer.paused) {
+          const t = videoPlayer.currentTime;
+          videoPlayer.pause();
+          setTimeout(() => {
+            videoPlayer.currentTime = t;
+            videoPlayer.play().catch(() => {});
+          }, 50);
+        }
       });
 
       document.addEventListener('contextmenu', e => e.preventDefault());
