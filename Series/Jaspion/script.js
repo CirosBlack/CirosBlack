@@ -87,22 +87,33 @@ document.addEventListener('DOMContentLoaded', () => {
       generatePlaylist();
       loadVideoByIndex(0);
 
-      // ✅ Tenta ativar som automaticamente, com fallback para mute se for bloqueado
       if (somAtivado) {
+        // Tenta tocar com som
         videoPlayer.muted = false;
         videoPlayer.volume = 1.0;
 
-        videoPlayer.play().then(() => {
-          console.log("Autoplay com som funcionou!");
-        }).catch(err => {
-          console.warn("Autoplay com som bloqueado. Tentando com som desligado...");
-          videoPlayer.muted = true;
-          videoPlayer.play().then(() => {
-            console.log("Reproduzindo com mute.");
-          }).catch(err2 => {
-            console.error("Mesmo com mute, não foi possível iniciar o vídeo automaticamente.", err2);
+        videoPlayer.play()
+          .then(() => {
+            console.log("Autoplay com som funcionou!");
+          })
+          .catch(() => {
+            // Segunda tentativa após pequeno atraso
+            setTimeout(() => {
+              videoPlayer.muted = false;
+              videoPlayer.volume = 1.0;
+              videoPlayer.play()
+                .then(() => {
+                  console.log("Autoplay funcionou na segunda tentativa.");
+                })
+                .catch(() => {
+                  // Último recurso: tocar com som desativado
+                  videoPlayer.muted = true;
+                  videoPlayer.play().then(() => {
+                    console.warn("Autoplay com som bloqueado. Reproduzindo com mute.");
+                  });
+                });
+            }, 500);
           });
-        });
       }
     });
 
