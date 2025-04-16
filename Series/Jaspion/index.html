@@ -11,30 +11,6 @@
       pointer-events: none;
       transition: opacity 0.3s;
     }
-
-    /* Estilo para a barra de progresso */
-    #progressContainer {
-      width: 100%;
-      height: 5px;
-      background-color: #ccc;
-      position: relative;
-    }
-
-    #progressBar {
-      height: 100%;
-      background-color: #76c7c0;
-    }
-
-    #progressHandle {
-      width: 14px;
-      height: 14px;
-      background-color: #000;
-      border-radius: 50%;
-      position: absolute;
-      top: -5px;
-      left: 0;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -310,32 +286,32 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
-    // Variável para verificar se estamos no dispositivo móvel
-    let isMobile = 'ontouchstart' in document.documentElement;
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
+    videoContainer.addEventListener('mousemove', () => {
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+    });
 
-    // Variável para controlar o estado de arraste
+    // Arrastar a barra de progresso
     let isDragging = false;
+    progressHandle.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      document.addEventListener('mousemove', handleDrag);
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleDrag);
+      });
+    });
 
-    // Função que lida com o arraste
     function handleDrag(e) {
       if (isDragging) {
         const rect = progressContainer.getBoundingClientRect();
-        const offsetX = isMobile ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+        const offsetX = e.clientX - rect.left;
         const percent = offsetX / rect.width;
         videoPlayer.currentTime = percent * videoPlayer.duration;
         updateProgress(); // Atualiza a barra de progresso enquanto arrasta
       }
     }
-
-    // Iniciar o arraste (para dispositivos de mouse e toque)
-    progressHandle.addEventListener(isMobile ? 'touchstart' : 'mousedown', (e) => {
-      isDragging = true;
-      document.addEventListener(isMobile ? 'touchmove' : 'mousemove', handleDrag);
-      document.addEventListener(isMobile ? 'touchend' : 'mouseup', () => {
-        isDragging = false;
-        document.removeEventListener(isMobile ? 'touchmove' : 'mousemove', handleDrag);
-      });
-    });
   </script>
 </body>
 </html>
