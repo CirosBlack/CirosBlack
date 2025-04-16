@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
   <meta charset="UTF-8" />
   <title>CirosBlack</title>
+  <!-- Favicon -->
   <link rel="icon" href="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/favicon.png" type="image/png">
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
+      font-family: Arial, sans-serif;
     }
 
     body {
       background-color: #141414;
       color: #fff;
       overflow-x: hidden;
-      font-size: 16px;
     }
 
+    /* ====== HEADER / NAVBAR ====== */
     header {
       width: 100%;
       position: fixed;
@@ -27,47 +27,32 @@
       left: 0;
       z-index: 999;
       background-color: rgba(0, 0, 0, 0.9);
-      padding: 20px 40px;
+      padding: 10px 40px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
-      transition: 0.3s ease;
+      justify-content: space-between;
+    }
+
+    .left-header {
+      display: flex;
+      align-items: center;
     }
 
     header .logo {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: bold;
       color: #e50914;
       text-transform: uppercase;
       letter-spacing: 2px;
       cursor: pointer;
       text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    header .logo:hover {
-      color: #fff;
-    }
-
-    header .search-container {
-      display: flex;
-      align-items: center;
     }
 
     #searchInput {
-      padding: 10px;
-      border-radius: 5px;
-      border: none;
-      background-color: #333;
-      color: white;
       margin-left: 20px;
-      width: 200px;
-      transition: width 0.3s ease;
-    }
-
-    #searchInput:focus {
-      width: 300px;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: none;
       outline: none;
     }
 
@@ -75,217 +60,303 @@
       list-style: none;
       display: flex;
       gap: 20px;
-      align-items: center;
     }
 
+    /* 
+      ========== BOTÕES NO MENU COM EFEITO NEON ==========
+    */
     nav ul li a {
       display: inline-block;
-      padding: 12px 24px;
+      padding: 10px 20px;
+      position: relative;
       color: #fff;
       text-decoration: none;
       text-transform: uppercase;
-      font-weight: 600;
+      font-weight: bold;
       letter-spacing: 1px;
+      border: 2px solid #e50914;
+      /* Ajuste o valor do border-radius para deixar mais ou menos arredondado */
       border-radius: 20px;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    nav ul li a::before {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background-color: #e50914;
-      transform: scaleX(0);
-      transform-origin: bottom right;
-      transition: transform 0.3s ease-out;
+      transition: 0.3s ease;
     }
 
     nav ul li a:hover {
       background-color: #111;
+      box-shadow:
+        0 0 5px #e50914,
+        0 0 10px #e50914,
+        0 0 20px #e50914,
+        0 0 30px #e50914;
+      color: #e50914;
+      transition: 0.3s ease;
     }
 
-    nav ul li a:hover::before {
-      transform: scaleX(1);
-      transform-origin: bottom left;
+    /* Animação opcional de pulsar (descomente se quiser um efeito contínuo) 
+    @keyframes neonPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 5px #e50914,
+          0 0 10px #e50914,
+          0 0 20px #e50914,
+          0 0 30px #e50914;
+      }
+      50% {
+        box-shadow:
+          0 0 10px #e50914,
+          0 0 15px #e50914,
+          0 0 25px #e50914,
+          0 0 40px #e50914;
+      }
     }
+    */
 
+    /* ====== HERO BANNER ====== */
     .hero {
       width: 100%;
-      height: 400px;
+      height: 200px;
       background: url("https://via.placeholder.com/1600x600?text=Assassino+a+Pre%C3%A7o+Fixo") center center no-repeat;
       background-size: cover;
       position: relative;
-      margin-top: 100px;
+      margin-top: 50px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: white;
-      padding: 0 20px;
-      box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.6);
+      justify-content: flex-start;
+      padding-left: 60px;
+      animation: fadeIn 1.5s ease;
     }
 
-    .hero h1 {
-      font-size: 50px;
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.7), transparent 60%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+    }
+
+    .hero-content h1 {
+      font-size: 48px;
       margin-bottom: 20px;
     }
 
-    .hero p {
-      font-size: 20px;
-      margin-bottom: 30px;
+    .hero-content p {
+      font-size: 18px;
+      line-height: 1.4;
+      margin-bottom: 20px;
     }
 
-    .hero button {
-      padding: 15px 30px;
+    .hero-content button {
+      padding: 12px 24px;
       background-color: #e50914;
       border: none;
       border-radius: 4px;
-      font-size: 18px;
+      font-size: 16px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
 
-    .hero button:hover {
+    .hero-content button:hover {
       background-color: #f6121d;
     }
 
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    /* ====== MAIN CONTENT ====== */
     main {
-      padding: 60px 40px;
+      width: 100%;
+      padding: 20px 40px 80px; /* Padding inferior para dar espaço */
       margin-top: 20px;
     }
 
     .section-title {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 30px;
-      text-align: center;
-      color: #e50914;
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 20px;
     }
 
     .movie-row {
       display: grid;
-      gap: 30px;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px 30px;
     }
 
     .movie-card {
       background-color: #222;
-      border-radius: 10px;
+      border-radius: 6px;
       overflow: hidden;
+      position: relative;
       cursor: pointer;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .movie-card:hover {
       transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
     }
 
     .movie-card img {
       width: 100%;
       display: block;
-      transition: opacity 0.3s ease;
     }
 
     .movie-card-info {
-      padding: 15px;
-      text-align: center;
+      padding: 8px;
     }
 
     .movie-card-info h4 {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: #fff;
+      font-size: 14px;
+      margin-bottom: 6px;
     }
 
     .movie-card-info p {
-      font-size: 14px;
+      font-size: 12px;
       color: #bbb;
     }
 
-    /* Responsividade */
+    /* ====== RESPONSIVO ====== */
     @media (max-width: 768px) {
-      .hero h1 {
-        font-size: 30px;
+      .hero {
+        height: 250px;
+        padding-left: 20px;
       }
 
-      .hero p {
-        font-size: 16px;
+      .hero-content h1 {
+        font-size: 28px;
       }
 
-      .hero button {
+      .hero-content p {
         font-size: 14px;
-        padding: 12px 24px;
+      }
+
+      .hero-content button {
+        font-size: 14px;
+      }
+
+      header .logo {
+        font-size: 18px;
+      }
+
+      nav ul li a {
+        font-size: 14px;
       }
 
       .section-title {
-        font-size: 24px;
+        font-size: 18px;
       }
+    }
 
-      nav ul {
-        gap: 15px;
+    /* MODO RETRATO */
+    @media (orientation: portrait) {
+      .movie-row {
+        grid-template-columns: repeat(4, 1fr);
       }
+    }
 
-      #searchInput {
-        width: 150px;
+    /* MODO PAISAGEM */
+    @media (orientation: landscape) {
+      @media (min-width: 1780px) {
+        .movie-row {
+          grid-template-columns: repeat(6, 1fr);
+        }
+      }
+      @media (max-width: 1779px) {
+        .movie-row {
+          grid-template-columns: repeat(5, 1fr);
+        }
       }
     }
   </style>
 </head>
-
 <body>
-
+  <!-- ====== HEADER / NAVBAR ====== -->
   <header>
-    <div class="logo">
-      CirosBlack
+    <div class="left-header">
+      <a href="https://cirosblack.github.io/CirosBlack" class="logo">CirosBlack</a>
+      <input type="text" id="searchInput" placeholder="Pesquisar..." />
     </div>
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Pesquisar...">
-      <nav>
-        <ul>
-          <li><a href="https://cirosblack.github.io/CirosBlack/">Início</a></li>
-          <li><a href="#">Animes</a></li>
-          <li><a href="https://cirosblack.github.io/Filmes/">Filmes</a></li>
-          <li><a href="#">Séries</a></li>
-          <li><a href="https://cirosblack.github.io/CirosBlack/Courses/Car3D/">Cursos</a></li>
-        </ul>
-      </nav>
-    </div>
+    <nav>
+      <ul>
+        <!-- Links transformados em “botões” com neon -->
+        <li><a href="https://cirosblack.github.io/CirosBlack/">Início</a></li>
+        <li><a href="#">Animes</a></li>
+        <li><a href="https://cirosblack.github.io/Filmes/">Filmes</a></li>
+        <li><a href="#">Séries</a></li>
+        <li><a href="https://cirosblack.github.io/CirosBlack/Courses/Car3D/">Cursos</a></li>
+      </ul>
+    </nav>
   </header>
 
+  <!-- ====== HERO BANNER ====== -->
   <div class="hero">
-    <div>
-      <h1>Bem-vindo ao CirosBlack</h1>
-      <p>Explore nossos conteúdos e divirta-se</p>
-      <button>Explore Agora</button>
+    <div class="hero-content">
+      <h1>Bem-vindo CirosBlack</h1>
+      <p>Todos os seus conteúdos em um só lugar!</p>
     </div>
   </div>
 
+  <!-- ====== MAIN CONTENT ====== -->
   <main>
-    <h2 class="section-title">Destaques</h2>
-    <div class="movie-row">
-      <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho'">
-        <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
-        <div class="movie-card-info">
-          <h4>Yu Yu Hakusho</h4>
-          <p>Animes</p>
+    <div class="section">
+      <h2 class="section-title">Destaques</h2>
+      <div class="movie-row">
+        <!-- Exemplo de Cards -->
+        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho'">
+          <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
+          <div class="movie-card-info">
+            <h4>Yu Yu Hakusho</h4>
+            <p>Animes</p>
+          </div>
+        </div>
+        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/Jaspion'">
+          <img src="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/SmFzcGlvbg.jpg" alt="Jaspion" />
+          <div class="movie-card-info">
+            <h4>Jaspion</h4>
+            <p>Séries - Tokusatsu</p>
+          </div>
+        </div>
+        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/"Changeman">
+          <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Changeman.jpg" alt="Changeman" />
+          <div class="movie-card-info">
+            <h4>Changeman</h4>
+            <p>Séries - Tokusatsu</p>
+          </div>
+        </div>
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Doctor Strange" />
+          <div class="movie-card-info">
+            <h4>Doctor Strange</h4>
+            <p>Marvel</p>
+          </div>
+        </div>
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Wonka" />
+          <div class="movie-card-info">
+            <h4>Wonka</h4>
+            <p>Fantasia</p>
+          </div>
+        </div>
+        <div class="movie-card">
+          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Exemplo" />
+          <div class="movie-card-info">
+            <h4>Exemplo</h4>
+            <p>Categoria</p>
+          </div>
         </div>
       </div>
-      <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/Jaspion'">
-        <img src="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/SmFzcGlvbg.jpg" alt="Jaspion" />
-        <div class="movie-card-info">
-          <h4>Jaspion</h4>
-          <p>Séries - Tokusatsu</p>
-        </div>
-      </div>
-      <!-- Adicione mais cards conforme necessário -->
     </div>
   </main>
 
+  <!-- ====== SCRIPT DE PESQUISA ====== -->
   <script>
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', function() {
@@ -298,7 +369,10 @@
       });
     });
   </script>
-
+  <script>
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+  </script>
 </body>
-
 </html>
