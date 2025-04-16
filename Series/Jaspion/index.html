@@ -158,14 +158,6 @@
                 videoPlayer.play().then(() => {
                   videoPlayer.muted = false;
                   videoPlayer.volume = 1.0;
-
-                  // ✅ Corrige possível atraso de áudio
-                  const t = videoPlayer.currentTime;
-                  videoPlayer.pause();
-                  setTimeout(() => {
-                    videoPlayer.currentTime = t;
-                    videoPlayer.play().catch(() => {});
-                  }, 50);
                 });
               });
             };
@@ -222,14 +214,18 @@
         loadVideoByIndex(parseInt(li.dataset.index));
         videoPlayer.play();
       }
+      // Reinicia o timer para ocultar controles após interação na playlist
+      resetHideControlsTimeout();
     });
 
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
+      resetHideControlsTimeout();
     });
 
     nextBtn.addEventListener('click', () => {
       if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
+      resetHideControlsTimeout();
     });
 
     playPauseBtn.addEventListener('click', () => {
@@ -240,6 +236,7 @@
         videoPlayer.pause();
       }
       updatePlayPauseButton();
+      resetHideControlsTimeout();
     });
 
     fullscreenBtn.addEventListener('click', () => {
@@ -248,54 +245,41 @@
       } else {
         document.exitFullscreen().catch(() => {});
       }
+      resetHideControlsTimeout();
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
+      resetHideControlsTimeout();
     });
 
-    videoPlayer.addEventListener('timeupdate', updateProgress);
-    videoPlayer.addEventListener('loadedmetadata', updateProgress);
-
-    videoPlayer.addEventListener('ended', () => {
-      if (currentIndex + 1 < videos.length) {
-        loadVideoByIndex(currentIndex + 1);
-        videoPlayer.play();
-      }
-    });
-
-    progressContainer.addEventListener('click', (e) => {
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const percent = offsetX / rect.width;
-      videoPlayer.currentTime = percent * videoPlayer.duration;
-    });
-
-    // Controle para ocultar a barra de controles após interação
+    // Resetando o timeout de esconder controles
     let hideControlsTimeout;
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
 
-    // Mostra os controles ao mover o mouse
-    videoContainer.addEventListener('mousemove', () => {
-      controlsOverlay.classList.remove('hidden');
+    // Função para resetar o timeout
+    function resetHideControlsTimeout() {
       clearTimeout(hideControlsTimeout);
+      controlsOverlay.classList.remove('hidden');
       hideControlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
       }, 2000);
+    }
+
+    // Mostra os controles ao mover o mouse
+    videoContainer.addEventListener('mousemove', () => {
+      resetHideControlsTimeout();
     });
 
     // Mostra controles ao entrar com o mouse no container
     videoContainer.addEventListener('mouseenter', () => {
-      controlsOverlay.classList.remove('hidden');
-      clearTimeout(hideControlsTimeout);
+      resetHideControlsTimeout();
     });
 
     // Oculta os controles quando sai com o mouse
     videoContainer.addEventListener('mouseleave', () => {
-      hideControlsTimeout = setTimeout(() => {
-        controlsOverlay.classList.add('hidden');
-      }, 2000);
+      resetHideControlsTimeout();
     });
   </script>
 </body>
