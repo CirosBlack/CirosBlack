@@ -67,7 +67,8 @@ function updateProgress() {
   timeRemaining.textContent = formatTime(duration - currentTime);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+// ✅ USAR window.onload GARANTE MELHOR SUPORTE DE AUTOPLAY
+window.addEventListener('load', () => {
   fetch(videoSource)
     .then(res => res.json())
     .then(data => {
@@ -80,17 +81,15 @@ document.addEventListener('DOMContentLoaded', () => {
       generatePlaylist();
       loadVideoByIndex(0);
 
-      // ✅ Autoplay com som garantido (sem precisar de parâmetro)
+      // ✅ Técnica funcional: autoplay com mute, seguido de desmute no then()
       videoPlayer.muted = true;
-      videoPlayer.play()
-        .then(() => {
-          videoPlayer.muted = false;
-          videoPlayer.volume = 1.0;
-          console.log("Som ativado após autoplay.");
-        })
-        .catch((err) => {
-          console.warn("Autoplay bloqueado. Usuário precisará interagir para ativar o som.");
-        });
+      videoPlayer.play().then(() => {
+        videoPlayer.muted = false;
+        videoPlayer.volume = 1.0;
+        console.log("Som ativado após autoplay com sucesso.");
+      }).catch((err) => {
+        console.warn("Autoplay bloqueado. Som será ativado após interação do usuário.", err);
+      });
     });
 
   document.addEventListener('visibilitychange', () => {
