@@ -5,6 +5,13 @@
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
+  <style>
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+  </style>
 </head>
 <body>
   <div class="video-container" id="videoContainer">
@@ -18,7 +25,7 @@
       muted
     ></video>
 
-    <div class="controls-overlay" id="controlsOverlay">
+    <div class="controls-overlay hidden" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -57,7 +64,6 @@
     <ul id="playlist"></ul>
   </div>
 
-  <!-- POPUP “Continuar assistindo?” -->
   <div id="resumePrompt" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#111; color:#fff; padding:20px; border-radius:10px; z-index:9999; text-align:center; box-shadow:0 0 20px #000;">
     <p>Continuar assistindo de onde parou?</p>
     <button id="resumeYes">Sim</button>
@@ -78,9 +84,18 @@
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
+    const controlsOverlay = document.getElementById('controlsOverlay');
 
     let videos = [];
     let currentIndex = 0;
+    let controlsTimeout;
+
+    function resetControlsTimeout() {
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 3000); // Esconde após 3 segundos de inatividade
+    }
 
     function generatePlaylist() {
       playlist.innerHTML = "";
@@ -159,7 +174,6 @@
                   videoPlayer.muted = false;
                   videoPlayer.volume = 1.0;
 
-                  // ✅ Corrige possível atraso de áudio
                   const t = videoPlayer.currentTime;
                   videoPlayer.pause();
                   setTimeout(() => {
@@ -270,6 +284,39 @@
       const percent = offsetX / rect.width;
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
+
+    // Mostrar controles ao clicar no vídeo
+    videoPlayer.addEventListener('click', () => {
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+    });
+
+    // Mostrar controles ao clicar na playlist
+    playlistContainer.addEventListener('click', () => {
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+    });
+
+    // Arrastar a barra de progresso
+    let isDragging = false;
+    progressHandle.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      document.addEventListener('mousemove', handleDrag);
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleDrag);
+      });
+    });
+
+    function handleDrag(e) {
+      if (isDragging) {
+        const rect = progressContainer.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const percent = offsetX / rect.width;
+        videoPlayer.currentTime = percent * videoPlayer.duration;
+        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
+      }
+    }
   </script>
 </body>
 </html>
