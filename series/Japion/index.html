@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carregando série...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="video-container" id="videoContainer">
+    <video 
+      id="videoPlayer"
+      preload="auto"
+      playsinline
+      webkit-playsinline
+      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+      muted
+    ></video>
+
+    <div class="controls-overlay" id="controlsOverlay">
+      <div class="bottom-controls">
+        <div class="controls-container">
+          <div class="left-buttons">
+            <button id="prevBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
+            </button>
+            <button id="playPauseBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play" />
+            </button>
+            <button id="nextBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
+            </button>
+          </div>
+          <div class="right-buttons">
+            <button id="fullscreenBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
+            </button>
+            <button id="toggleDownloadsBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
+            </button>
+          </div>
+        </div>
+        <div class="progress-wrapper">
+          <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-handle" id="progressHandle"></div>
+          </div>
+          <span id="timeRemaining">00:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="playlist-container" id="playlistContainer">
+    <h2 id="videoTitle">Carregando...</h2>
+    <ul id="playlist"></ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+S
