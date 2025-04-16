@@ -16,6 +16,11 @@ const timeRemaining = document.getElementById('timeRemaining');
 let videos = [];
 let currentIndex = 0;
 
+function getParam(param) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+}
+
 function generatePlaylist() {
   playlist.innerHTML = "";
   videos.forEach((video, index) => {
@@ -68,18 +73,28 @@ function updateProgress() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const somAtivado = getParam('som') === '1';
+
   fetch(videoSource)
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
       if (data.serie) {
         document.title = data.serie;
         videoTitle.textContent = data.serie;
       }
+
       videos = data.episodios;
       generatePlaylist();
       loadVideoByIndex(0);
+
+      // Ativa som automaticamente se ?som=1
+      if (somAtivado) {
+        videoPlayer.muted = false;
+        videoPlayer.play().catch(() => {});
+      }
     });
 
+  // Corrige sincronização de áudio/vídeo ao voltar à aba
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !videoPlayer.paused) {
       const currentTime = videoPlayer.currentTime;
@@ -91,6 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Bloqueia botão direito
   document.addEventListener('contextmenu', e => e.preventDefault());
 });
 
@@ -110,6 +126,7 @@ nextBtn.addEventListener('click', () => {
 });
 
 playPauseBtn.addEventListener('click', () => {
+  videoPlayer.muted = false;
   if (videoPlayer.paused) {
     videoPlayer.play();
   } else {
