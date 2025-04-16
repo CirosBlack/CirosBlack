@@ -88,31 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
       loadVideoByIndex(0);
 
       if (somAtivado) {
-        // Tenta tocar com som
-        videoPlayer.muted = false;
-        videoPlayer.volume = 1.0;
-
+        // ✅ Inicia com muted para garantir autoplay
+        videoPlayer.muted = true;
         videoPlayer.play()
           .then(() => {
-            console.log("Autoplay com som funcionou!");
+            // ✅ Após autoplay com mute, ativa o som
+            videoPlayer.muted = false;
+            videoPlayer.volume = 1.0;
+            console.log("Vídeo desmutado após autoplay bem-sucedido.");
           })
-          .catch(() => {
-            // Segunda tentativa após pequeno atraso
-            setTimeout(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
-              videoPlayer.play()
-                .then(() => {
-                  console.log("Autoplay funcionou na segunda tentativa.");
-                })
-                .catch(() => {
-                  // Último recurso: tocar com som desativado
-                  videoPlayer.muted = true;
-                  videoPlayer.play().then(() => {
-                    console.warn("Autoplay com som bloqueado. Reproduzindo com mute.");
-                  });
-                });
-            }, 500);
+          .catch((err) => {
+            console.warn("Não foi possível iniciar o vídeo automaticamente:", err);
           });
       }
     });
