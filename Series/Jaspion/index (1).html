@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minha Série</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container" id="videoContainer">
+    <video 
+      id="videoPlayer"
+      preload="auto"
+      playsinline
+      webkit-playsinline
+      x-webkit-airplay="allow"
+      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+      muted
+    ></video>
+
+    <div class="controls-overlay hidden" id="controlsOverlay">
+      <div class="bottom-controls">
+        <div class="controls-container">
+          <div class="left-buttons">
+            <button id="prevBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
+            </button>
+            <button id="playPauseBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play" />
+            </button>
+            <button id="nextBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
+            </button>
+          </div>
+          <div class="right-buttons">
+            <button id="fullscreenBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
+            </button>
+            <button id="toggleDownloadsBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
+            </button>
+          </div>
+        </div>
+        <div class="progress-wrapper">
+          <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-handle" id="progressHandle"></div>
+          </div>
+          <span id="timeRemaining">00:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="playlist-container" id="playlistContainer">
+    <h2 id="videoTitle">Carregando...</h2>
+    <ul id="playlist"></ul>
+  </div>
+
+  <div id="resumePrompt" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#111; color:#fff; padding:20px; border-radius:10px; z-index:9999; text-align:center; box-shadow:0 0 20px #000;">
+    <p>Continuar assistindo de onde parou?</p>
+    <button id="resumeYes">Sim</button>
+    <button id="resumeNo">Não</button>
+  </div>
+
+  <script>
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoTitle = document.getElementById('videoTitle');
+    const playlist = document.getElementById('playlist');
+    const prevBtn = document.getElementById('prevBtn');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
+    const playlistContainer = document.getElementById('playlistContainer');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressHandle = document.getElementById('progressHandle');
+    const timeRemaining = document.getElementById('timeRemaining');
+    const controlsOverlay = document.getElementById('controlsOverlay');
+    const videoContainer = document.getElementById('videoContainer');
+
+    let videos = [];
+    let currentIndex = 0;
+    let controlsTimeout;
+
+    function resetControlsTimeout() {
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 3000); // Esconde após 3 segundos de inatividade
+    }
+
+    function generatePlaylist() {
+      playlist.innerHTML = "";
+      videos.forEach((video, index) => {
+        const li = document.createElement('li');
+        li.dataset.index = index;
+        li.innerHTML = ` 
+          <span class="episode-title">${video.title}</span>
+          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
+        `;
+        playlist.appendChild(li);
+      });
+    }
+
+    function updatePlayPauseButton() {
+      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+    }
+
+    function loadVideoByIndex(index) {
+      if (index < 0 || index >= videos.length) return;
+      currentIndex = index;
+      videoPlayer.src = videos[index].src;
+      videoTitle.textContent = videos[index].title;
+      highlightCurrentItem();
+      updatePlayPauseButton();
+    }
+
+    function highlightCurrentItem() {
+      const items = playlist.querySelectorAll('li');
+      items.forEach(li => li.classList.remove('playing'));
+      const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (current) current.classList.add('playing');
+    }
+
+    function formatTime(seconds) {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(Math.floor(seconds % 60)).padStart(2, '0');
+      return `${m}:${s}`;
+    }
+
+    function updateProgress() {
+      const duration = videoPlayer.duration || 0;
+      const currentTime = videoPlayer.currentTime || 0;
+      const percent = (currentTime / duration) * 100;
+      progressBar.style.width = percent + '%';
+      progressHandle.style.left = `calc(${percent}% - 7px)`;
+      timeRemaining.textContent = formatTime(duration - currentTime);
+    }
+
+    window.addEventListener('load', () => {
+      fetch('dados/jaspion.json')
+        .then(res => res.json())
+        .then(data => {
+          videos = data.episodios || [];
+          if (data.serie) {
+            document.title = data.serie;
+            videoTitle.textContent = data.serie;
+          }
+          generatePlaylist();
+
+          const ultima = JSON.parse(localStorage.getItem('ultimaAssistida'));
+          if (ultima) {
+            const prompt = document.getElementById('resumePrompt');
+            prompt.style.display = 'block';
+
+            document.getElementById('resumeYes').onclick = () => {
+              prompt.style.display = 'none';
+              loadVideoByIndex(ultima.index);
+              videoPlayer.addEventListener('loadedmetadata', function resumeOnce() {
+                videoPlayer.removeEventListener('loadedmetadata', resumeOnce);
+                videoPlayer.currentTime = ultima.time || 0;
+                videoPlayer.muted = true;
+                videoPlayer.play().then(() => {
+                  videoPlayer.muted = false;
+                  videoPlayer.volume = 1.0;
+
+                  const t = videoPlayer.currentTime;
+                  videoPlayer.pause();
+                  setTimeout(() => {
+                    videoPlayer.currentTime = t;
+                    videoPlayer.play().catch(() => {});
+                  }, 50);
+                });
+              });
+            };
+
+            document.getElementById('resumeNo').onclick = () => {
+              prompt.style.display = 'none';
+              loadVideoByIndex(0);
+              videoPlayer.addEventListener('loadedmetadata', function startFreshOnce() {
+                videoPlayer.removeEventListener('loadedmetadata', startFreshOnce);
+                videoPlayer.muted = true;
+                videoPlayer.play().then(() => {
+                  videoPlayer.muted = false;
+                  videoPlayer.volume = 1.0;
+                });
+              });
+            };
+          } else {
+            loadVideoByIndex(0);
+            videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+              videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
+              videoPlayer.muted = true;
+              videoPlayer.play().then(() => {
+                videoPlayer.muted = false;
+                videoPlayer.volume = 1.0;
+              });
+            });
+          }
+        });
+
+      window.addEventListener('beforeunload', () => {
+        localStorage.setItem('ultimaAssistida', JSON.stringify({
+          index: currentIndex,
+          time: videoPlayer.currentTime
+        }));
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && !videoPlayer.paused) {
+          const t = videoPlayer.currentTime;
+          videoPlayer.pause();
+          setTimeout(() => {
+            videoPlayer.currentTime = t;
+            videoPlayer.play().catch(() => {});
+          }, 50);
+        }
+      });
+
+      document.addEventListener('contextmenu', e => e.preventDefault());
+    });
+
+    playlist.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (li && li.dataset.index) {
+        loadVideoByIndex(parseInt(li.dataset.index));
+        videoPlayer.play();
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
+    });
+
+    playPauseBtn.addEventListener('click', () => {
+      videoPlayer.muted = false;
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+      } else {
+        videoPlayer.pause();
+      }
+      updatePlayPauseButton();
+    });
+
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        videoContainer.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    toggleDownloadsBtn.addEventListener('click', () => {
+      playlistContainer.classList.toggle('show-downloads');
+    });
+
+    videoPlayer.addEventListener('timeupdate', updateProgress);
+    videoPlayer.addEventListener('loadedmetadata', updateProgress);
+
+    videoPlayer.addEventListener('ended', () => {
+      if (currentIndex + 1 < videos.length) {
+        loadVideoByIndex(currentIndex + 1);
+        videoPlayer.play();
+      }
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const percent = offsetX / rect.width;
+      videoPlayer.currentTime = percent * videoPlayer.duration;
+    });
+
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
+    videoContainer.addEventListener('mousemove', () => {
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+    });
+
+    // Arrastar a barra de progresso
+    let isDragging = false;
+
+    // Mouse events
+    progressHandle.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      document.addEventListener('mousemove', handleDrag);
+      document.addEventListener('mouseup', stopDrag);
+    });
+
+    // Touch events
+    progressHandle.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Impede o comportamento padrão do toque
+      isDragging = true;
+      document.addEventListener('touchmove', handleDrag);
+      document.addEventListener('touchend', stopDrag);
+    });
+
+    function stopDrag() {
+      isDragging = false;
+      document.removeEventListener('mousemove', handleDrag);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchmove', handleDrag);
+      document.removeEventListener('touchend', stopDrag);
+    }
+
+    function handleDrag(e) {
+      if (isDragging) {
+        let clientX;
+        // Verifica se é um evento de toque ou de mouse e pega a posição X
+        if (e.touches) {
+          clientX = e.touches[0].clientX; // Pega a posição do primeiro toque
+        } else {
+          clientX = e.clientX; // Pega a posição do mouse
+        }
+
+        const rect = progressContainer.getBoundingClientRect();
+        const offsetX = clientX - rect.left;
+        const percent = offsetX / rect.width;
+        videoPlayer.currentTime = percent * videoPlayer.duration;
+        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
+      }
+    }
+  </script>
+</body>
+</html>
