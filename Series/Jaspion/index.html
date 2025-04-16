@@ -5,48 +5,6 @@
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Controle de visibilidade dos controles */
-    .controls-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s;
-    }
-
-    /* Estilo da barra de progresso */
-    .progress-container {
-      position: relative;
-      flex: 1;
-      height: 10px;
-      background-color: #444;
-      border-radius: 4px;
-      margin-right: 10px;
-      cursor: pointer;
-    }
-
-    .progress-bar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100%;
-      width: 0%;
-      background-color: red;
-      transition: width 0.1s linear;
-    }
-
-    .progress-handle {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
-      background-color: #fff;
-      border-radius: 50%;
-      pointer-events: auto;
-      cursor: pointer;
-      left: 0%;
-    }
-  </style>
 </head>
 <body>
   <div class="video-container" id="videoContainer">
@@ -60,7 +18,7 @@
       muted
     ></video>
 
-    <div class="controls-overlay hidden" id="controlsOverlay">
+    <div class="controls-overlay" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -120,12 +78,9 @@
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
-    const controlsOverlay = document.getElementById('controlsOverlay');
-    const resumePrompt = document.getElementById('resumePrompt');
-    
+
     let videos = [];
     let currentIndex = 0;
-    let hideControlsTimeout;
 
     function generatePlaylist() {
       playlist.innerHTML = "";
@@ -177,16 +132,6 @@
       timeRemaining.textContent = formatTime(duration - currentTime);
     }
 
-    function hideControls() {
-      controlsOverlay.classList.add('hidden');
-    }
-
-    function resetHideControlsTimeout() {
-      clearTimeout(hideControlsTimeout);
-      controlsOverlay.classList.remove('hidden');
-      hideControlsTimeout = setTimeout(hideControls, 2000);
-    }
-
     window.addEventListener('load', () => {
       fetch('dados/jaspion.json')
         .then(res => res.json())
@@ -197,14 +142,57 @@
             videoTitle.textContent = data.serie;
           }
           generatePlaylist();
-          loadVideoByIndex(0);
-          videoPlayer.addEventListener('loadedmetadata', () => {
-            videoPlayer.muted = true;
-            videoPlayer.play().then(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
+
+          const ultima = JSON.parse(localStorage.getItem('ultimaAssistida'));
+          if (ultima) {
+            const prompt = document.getElementById('resumePrompt');
+            prompt.style.display = 'block';
+
+            document.getElementById('resumeYes').onclick = () => {
+              prompt.style.display = 'none';
+              loadVideoByIndex(ultima.index);
+              videoPlayer.addEventListener('loadedmetadata', function resumeOnce() {
+                videoPlayer.removeEventListener('loadedmetadata', resumeOnce);
+                videoPlayer.currentTime = ultima.time || 0;
+                videoPlayer.muted = true;
+                videoPlayer.play().then(() => {
+                  videoPlayer.muted = false;
+                  videoPlayer.volume = 1.0;
+
+                  // ✅ Corrige possível atraso de áudio
+                  const t = videoPlayer.currentTime;
+                  videoPlayer.pause();
+                  setTimeout(() => {
+                    videoPlayer.currentTime = t;
+                    videoPlayer.play().catch(() => {});
+                  }, 50);
+                });
+              });
+            };
+
+            document.getElementById('resumeNo').onclick = () => {
+              prompt.style.display = 'none';
+              loadVideoByIndex(0);
+              videoPlayer.addEventListener('loadedmetadata', function startFreshOnce() {
+                videoPlayer.removeEventListener('loadedmetadata', startFreshOnce);
+                videoPlayer.muted = true;
+                videoPlayer.play().then(() => {
+                  videoPlayer.muted = false;
+                  videoPlayer.volume = 1.0;
+                });
+              });
+            };
+          } else {
+            loadVideoByIndex(0);
+            videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+              videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
+              videoPlayer.muted = true;
+              videoPlayer.play().then(() => {
+                videoPlayer.muted = false;
+                videoPlayer.volume = 1.0;
+              });
             });
-          });
+          }
         });
 
       window.addEventListener('beforeunload', () => {
@@ -228,28 +216,20 @@
       document.addEventListener('contextmenu', e => e.preventDefault());
     });
 
-    // Evento de clique na tela ou na playlist para exibir controles
-    videoContainer.addEventListener('click', () => {
-      resetHideControlsTimeout();
-    });
-
     playlist.addEventListener('click', (e) => {
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
         videoPlayer.play();
       }
-      resetHideControlsTimeout();
     });
 
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
-      resetHideControlsTimeout();
     });
 
     nextBtn.addEventListener('click', () => {
       if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
-      resetHideControlsTimeout();
     });
 
     playPauseBtn.addEventListener('click', () => {
@@ -260,7 +240,6 @@
         videoPlayer.pause();
       }
       updatePlayPauseButton();
-      resetHideControlsTimeout();
     });
 
     fullscreenBtn.addEventListener('click', () => {
@@ -269,37 +248,10 @@
       } else {
         document.exitFullscreen().catch(() => {});
       }
-      resetHideControlsTimeout();
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
-      resetHideControlsTimeout();
-    });
-
-    // Lógica para arrastar a barra de progresso
-    let isDragging = false;
-
-    progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const percent = offsetX / rect.width;
-      videoPlayer.currentTime = percent * videoPlayer.duration;
-      updateProgress();
-    });
-
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const percent = offsetX / rect.width;
-      videoPlayer.currentTime = percent * videoPlayer.duration;
-      updateProgress();
-    });
-
-    window.addEventListener('mouseup', () => {
-      isDragging = false;
     });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
@@ -310,6 +262,13 @@
         loadVideoByIndex(currentIndex + 1);
         videoPlayer.play();
       }
+    });
+
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const percent = offsetX / rect.width;
+      videoPlayer.currentTime = percent * videoPlayer.duration;
     });
   </script>
 </body>
