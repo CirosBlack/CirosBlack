@@ -87,14 +87,25 @@ document.addEventListener('DOMContentLoaded', () => {
       generatePlaylist();
       loadVideoByIndex(0);
 
-      // Ativa som automaticamente se ?som=1
+      // ✅ Tenta ativar som automaticamente, com fallback para mute se for bloqueado
       if (somAtivado) {
         videoPlayer.muted = false;
-        videoPlayer.play().catch(() => {});
+        videoPlayer.volume = 1.0;
+
+        videoPlayer.play().then(() => {
+          console.log("Autoplay com som funcionou!");
+        }).catch(err => {
+          console.warn("Autoplay com som bloqueado. Tentando com som desligado...");
+          videoPlayer.muted = true;
+          videoPlayer.play().then(() => {
+            console.log("Reproduzindo com mute.");
+          }).catch(err2 => {
+            console.error("Mesmo com mute, não foi possível iniciar o vídeo automaticamente.", err2);
+          });
+        });
       }
     });
 
-  // Corrige sincronização de áudio/vídeo ao voltar à aba
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && !videoPlayer.paused) {
       const currentTime = videoPlayer.currentTime;
@@ -106,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Bloqueia botão direito
   document.addEventListener('contextmenu', e => e.preventDefault());
 });
 
@@ -149,6 +159,7 @@ toggleDownloadsBtn.addEventListener('click', () => {
 
 videoPlayer.addEventListener('timeupdate', updateProgress);
 videoPlayer.addEventListener('loadedmetadata', updateProgress);
+
 videoPlayer.addEventListener('ended', () => {
   if (currentIndex + 1 < videos.length) {
     loadVideoByIndex(currentIndex + 1);
