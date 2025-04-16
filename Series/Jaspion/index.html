@@ -103,7 +103,7 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
-        li.innerHTML = `
+        li.innerHTML = ` 
           <span class="episode-title">${video.title}</span>
           <a href="${video.src}?download=true" class="download-btn" download>Download</a>
         `;
@@ -294,19 +294,42 @@
 
     // Arrastar a barra de progresso
     let isDragging = false;
+
+    // Mouse events
     progressHandle.addEventListener('mousedown', (e) => {
       isDragging = true;
       document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleDrag);
-      });
+      document.addEventListener('mouseup', stopDrag);
     });
+
+    // Touch events
+    progressHandle.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // Impede o comportamento padrão do toque
+      isDragging = true;
+      document.addEventListener('touchmove', handleDrag);
+      document.addEventListener('touchend', stopDrag);
+    });
+
+    function stopDrag() {
+      isDragging = false;
+      document.removeEventListener('mousemove', handleDrag);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchmove', handleDrag);
+      document.removeEventListener('touchend', stopDrag);
+    }
 
     function handleDrag(e) {
       if (isDragging) {
+        let clientX;
+        // Verifica se é um evento de toque ou de mouse e pega a posição X
+        if (e.touches) {
+          clientX = e.touches[0].clientX; // Pega a posição do primeiro toque
+        } else {
+          clientX = e.clientX; // Pega a posição do mouse
+        }
+
         const rect = progressContainer.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
+        const offsetX = clientX - rect.left;
         const percent = offsetX / rect.width;
         videoPlayer.currentTime = percent * videoPlayer.duration;
         updateProgress(); // Atualiza a barra de progresso enquanto arrasta
