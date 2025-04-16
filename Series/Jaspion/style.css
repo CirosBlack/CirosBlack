@@ -286,91 +286,27 @@ body {
   transform: scale(1.05);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
+/* Estilos da barra de contagem regressiva */
+#countdownBarContainer {
+  width: 100%;
+  height: 10px;
+  background-color: #444;
+  border-radius: 5px;
+  margin-top: 15px;
+  position: relative;
 }
 
-@media (orientation: landscape) {
-  html, body {
-    overflow: hidden;
-  }
-  body {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-  .video-container {
-    width: 70%;
-    height: 100%;
-    padding-top: 0;
-  }
-  #videoPlayer {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .playlist-container {
-    width: 30%;
-    margin-top: 0;
-    margin-left: 0;
-    height: 100%;
-    overflow-y: auto;
-  }
-
-  #resumePrompt {
-    width: 60%;
-    max-width: 500px;
-  }
+#countdownBar {
+  height: 100%;
+  width: 100%;
+  background-color: green;
+  border-radius: 5px;
+  transition: width 1s linear;
 }
 
-@media (orientation: portrait) {
-  .playlist-container {
-    height: 100%;
-    overflow-y: auto;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
-  }
-
-  #resumePrompt {
-    width: 90%;
-    padding: 25px 20px;
-  }
-
-  #resumePrompt button {
-    width: 100px;
-    margin: 10px 5px;
-  }
-}
-
-@media (max-width: 600px) {
-  #timeRemaining {
-    font-size: 0.8rem;
-  }
-  .controls-container {
-    flex-wrap: wrap;
-  }
-  .controls-container button {
-    margin-top: 5px;
-  }
-}
-
-.playlist-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.playlist-container::-webkit-scrollbar-track {
-  background: #000;
-}
-
-.playlist-container::-webkit-scrollbar-thumb {
-  background: #0000;
-  border-radius: 10px;
+#countdownText {
+  margin-top: 5px;
+  font-size: 1rem;
+  color: #fff;
+  font-weight: bold;
 }
