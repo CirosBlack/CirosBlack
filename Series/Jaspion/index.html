@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -95,7 +96,7 @@
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
-      }, 3000); // Esconde após 3 segundos de inatividade
+      }, 3000);
     }
 
     function generatePlaylist() {
@@ -286,25 +287,21 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
-    // Mostrar controles ao mover o mouse sobre a tela de vídeo
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+      resetControlsTimeout();
     });
 
-    // Arrastar a barra de progresso
     let isDragging = false;
 
-    // Mouse events
     progressHandle.addEventListener('mousedown', (e) => {
       isDragging = true;
       document.addEventListener('mousemove', handleDrag);
       document.addEventListener('mouseup', stopDrag);
     });
 
-    // Touch events
     progressHandle.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // Impede o comportamento padrão do toque
+      e.preventDefault();
       isDragging = true;
       document.addEventListener('touchmove', handleDrag);
       document.addEventListener('touchend', stopDrag);
@@ -321,18 +318,18 @@
     function handleDrag(e) {
       if (isDragging) {
         let clientX;
-        // Verifica se é um evento de toque ou de mouse e pega a posição X
         if (e.touches) {
-          clientX = e.touches[0].clientX; // Pega a posição do primeiro toque
+          clientX = e.touches[0].clientX;
         } else {
-          clientX = e.clientX; // Pega a posição do mouse
+          clientX = e.clientX;
         }
 
         const rect = progressContainer.getBoundingClientRect();
         const offsetX = clientX - rect.left;
         const percent = offsetX / rect.width;
         videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
+        updateProgress();
+        resetControlsTimeout(); // <-- Correção aplicada aqui!
       }
     }
   </script>
