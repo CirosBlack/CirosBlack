@@ -5,6 +5,13 @@
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
+  <style>
+    .controls-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
+    }
+  </style>
 </head>
 <body>
   <div class="video-container" id="videoContainer">
@@ -18,7 +25,7 @@
       muted
     ></video>
 
-    <div class="controls-overlay" id="controlsOverlay">
+    <div class="controls-overlay hidden" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -78,10 +85,13 @@
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
+    const controlsOverlay = document.getElementById('controlsOverlay');
 
     let videos = [];
     let currentIndex = 0;
+    let hideControlsTimeout;
 
+    // Função para gerar a playlist
     function generatePlaylist() {
       playlist.innerHTML = "";
       videos.forEach((video, index) => {
@@ -95,12 +105,14 @@
       });
     }
 
+    // Função para atualizar o botão de play/pause
     function updatePlayPauseButton() {
       const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
       const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
       playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
     }
 
+    // Função para carregar o vídeo pela index
     function loadVideoByIndex(index) {
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
@@ -110,6 +122,7 @@
       updatePlayPauseButton();
     }
 
+    // Função para destacar o vídeo atual na playlist
     function highlightCurrentItem() {
       const items = playlist.querySelectorAll('li');
       items.forEach(li => li.classList.remove('playing'));
@@ -117,12 +130,14 @@
       if (current) current.classList.add('playing');
     }
 
+    // Função para formatar o tempo
     function formatTime(seconds) {
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
       const s = String(Math.floor(seconds % 60)).padStart(2, '0');
       return `${m}:${s}`;
     }
 
+    // Função para atualizar a barra de progresso
     function updateProgress() {
       const duration = videoPlayer.duration || 0;
       const currentTime = videoPlayer.currentTime || 0;
@@ -130,6 +145,18 @@
       progressBar.style.width = percent + '%';
       progressHandle.style.left = `calc(${percent}% - 7px)`;
       timeRemaining.textContent = formatTime(duration - currentTime);
+    }
+
+    // Função para ocultar os controles após 2 segundos sem interação
+    function hideControls() {
+      controlsOverlay.classList.add('hidden');
+    }
+
+    // Função para resetar o tempo de ocultação dos controles
+    function resetHideControlsTimeout() {
+      clearTimeout(hideControlsTimeout);
+      controlsOverlay.classList.remove('hidden');
+      hideControlsTimeout = setTimeout(hideControls, 2000);
     }
 
     window.addEventListener('load', () => {
@@ -142,49 +169,14 @@
             videoTitle.textContent = data.serie;
           }
           generatePlaylist();
-
-          const ultima = JSON.parse(localStorage.getItem('ultimaAssistida'));
-          if (ultima) {
-            const prompt = document.getElementById('resumePrompt');
-            prompt.style.display = 'block';
-
-            document.getElementById('resumeYes').onclick = () => {
-              prompt.style.display = 'none';
-              loadVideoByIndex(ultima.index);
-              videoPlayer.addEventListener('loadedmetadata', function resumeOnce() {
-                videoPlayer.removeEventListener('loadedmetadata', resumeOnce);
-                videoPlayer.currentTime = ultima.time || 0;
-                videoPlayer.muted = true;
-                videoPlayer.play().then(() => {
-                  videoPlayer.muted = false;
-                  videoPlayer.volume = 1.0;
-                });
-              });
-            };
-
-            document.getElementById('resumeNo').onclick = () => {
-              prompt.style.display = 'none';
-              loadVideoByIndex(0);
-              videoPlayer.addEventListener('loadedmetadata', function startFreshOnce() {
-                videoPlayer.removeEventListener('loadedmetadata', startFreshOnce);
-                videoPlayer.muted = true;
-                videoPlayer.play().then(() => {
-                  videoPlayer.muted = false;
-                  videoPlayer.volume = 1.0;
-                });
-              });
-            };
-          } else {
-            loadVideoByIndex(0);
-            videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
-              videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
-              videoPlayer.muted = true;
-              videoPlayer.play().then(() => {
-                videoPlayer.muted = false;
-                videoPlayer.volume = 1.0;
-              });
+          loadVideoByIndex(0);
+          videoPlayer.addEventListener('loadedmetadata', () => {
+            videoPlayer.muted = true;
+            videoPlayer.play().then(() => {
+              videoPlayer.muted = false;
+              videoPlayer.volume = 1.0;
             });
-          }
+          });
         });
 
       window.addEventListener('beforeunload', () => {
@@ -208,13 +200,17 @@
       document.addEventListener('contextmenu', e => e.preventDefault());
     });
 
+    // Eventos de clique na playlist ou na tela para mostrar controles
+    videoContainer.addEventListener('click', () => {
+      resetHideControlsTimeout();
+    });
+
     playlist.addEventListener('click', (e) => {
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
         videoPlayer.play();
       }
-      // Reinicia o timer para ocultar controles após interação na playlist
       resetHideControlsTimeout();
     });
 
@@ -253,33 +249,21 @@
       resetHideControlsTimeout();
     });
 
-    // Resetando o timeout de esconder controles
-    let hideControlsTimeout;
-    const controlsOverlay = document.getElementById('controlsOverlay');
-    const videoContainer = document.getElementById('videoContainer');
+    videoPlayer.addEventListener('timeupdate', updateProgress);
+    videoPlayer.addEventListener('loadedmetadata', updateProgress);
 
-    // Função para resetar o timeout
-    function resetHideControlsTimeout() {
-      clearTimeout(hideControlsTimeout);
-      controlsOverlay.classList.remove('hidden');
-      hideControlsTimeout = setTimeout(() => {
-        controlsOverlay.classList.add('hidden');
-      }, 2000);
-    }
-
-    // Mostra os controles ao mover o mouse
-    videoContainer.addEventListener('mousemove', () => {
-      resetHideControlsTimeout();
+    videoPlayer.addEventListener('ended', () => {
+      if (currentIndex + 1 < videos.length) {
+        loadVideoByIndex(currentIndex + 1);
+        videoPlayer.play();
+      }
     });
 
-    // Mostra controles ao entrar com o mouse no container
-    videoContainer.addEventListener('mouseenter', () => {
-      resetHideControlsTimeout();
-    });
-
-    // Oculta os controles quando sai com o mouse
-    videoContainer.addEventListener('mouseleave', () => {
-      resetHideControlsTimeout();
+    progressContainer.addEventListener('click', (e) => {
+      const rect = progressContainer.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const percent = offsetX / rect.width;
+      videoPlayer.currentTime = percent * videoPlayer.duration;
     });
   </script>
 </body>
