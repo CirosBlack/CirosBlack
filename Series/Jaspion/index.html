@@ -270,9 +270,8 @@
       const percent = offsetX / rect.width;
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
-  </script>
 
-  <script>
+    // Controle para ocultar a barra de controles após interação
     let hideControlsTimeout;
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
