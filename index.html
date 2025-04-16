@@ -282,7 +282,6 @@
     </div>
     <nav>
       <ul>
-        <!-- Links transformados em “botões” com neon -->
         <li><a href="https://cirosblack.github.io/CirosBlack/">Início</a></li>
         <li><a href="#">Animes</a></li>
         <li><a href="https://cirosblack.github.io/Filmes/">Filmes</a></li>
@@ -313,6 +312,13 @@
             <p>Animes</p>
           </div>
         </div>
+        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/Jaspion'">
+          <img src="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/SmFzcGlvbg.jpg" alt="Jaspion" />
+          <div class="movie-card-info">
+            <h4>Jaspion</h4>
+            <p>Séries - Tokusatsu</p>
+          </div>
+        </div>
         <!-- Mais cards -->
       </div>
     </div>
@@ -329,11 +335,6 @@
         const category = card.querySelector('.movie-card-info p').textContent.toLowerCase();
         card.style.display = (title.includes(query) || category.includes(query)) ? '' : 'none';
       });
-    });
-  </script>
-  <script>
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
     });
   </script>
 </body>
