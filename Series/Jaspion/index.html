@@ -271,5 +271,33 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
   </script>
+
+  <script>
+    let hideControlsTimeout;
+    const controlsOverlay = document.getElementById('controlsOverlay');
+    const videoContainer = document.getElementById('videoContainer');
+
+    // Mostra os controles ao mover o mouse
+    videoContainer.addEventListener('mousemove', () => {
+      controlsOverlay.classList.remove('hidden');
+      clearTimeout(hideControlsTimeout);
+      hideControlsTimeout = setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 2000);
+    });
+
+    // Mostra controles ao entrar com o mouse no container
+    videoContainer.addEventListener('mouseenter', () => {
+      controlsOverlay.classList.remove('hidden');
+      clearTimeout(hideControlsTimeout);
+    });
+
+    // Oculta os controles quando sai com o mouse
+    videoContainer.addEventListener('mouseleave', () => {
+      hideControlsTimeout = setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 2000);
+    });
+  </script>
 </body>
 </html>
