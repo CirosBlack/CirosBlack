@@ -57,7 +57,7 @@
     <ul id="playlist"></ul>
   </div>
 
-  <!-- ✅ POPUP “Continuar assistindo?” -->
+  <!-- POPUP “Continuar assistindo?” -->
   <div id="resumePrompt" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#111; color:#fff; padding:20px; border-radius:10px; z-index:9999; text-align:center; box-shadow:0 0 20px #000;">
     <p>Continuar assistindo de onde parou?</p>
     <button id="resumeYes">Sim</button>
@@ -143,7 +143,6 @@
           }
           generatePlaylist();
 
-          // Verifica se há progresso salvo
           const ultima = JSON.parse(localStorage.getItem('ultimaAssistida'));
           if (ultima) {
             const prompt = document.getElementById('resumePrompt');
@@ -152,34 +151,42 @@
             document.getElementById('resumeYes').onclick = () => {
               prompt.style.display = 'none';
               loadVideoByIndex(ultima.index);
-              videoPlayer.currentTime = ultima.time || 0;
-              videoPlayer.muted = true;
-              videoPlayer.play().then(() => {
-                videoPlayer.muted = false;
-                videoPlayer.volume = 1.0;
+              videoPlayer.addEventListener('loadedmetadata', function resumeOnce() {
+                videoPlayer.removeEventListener('loadedmetadata', resumeOnce);
+                videoPlayer.currentTime = ultima.time || 0;
+                videoPlayer.muted = true;
+                videoPlayer.play().then(() => {
+                  videoPlayer.muted = false;
+                  videoPlayer.volume = 1.0;
+                });
               });
             };
 
             document.getElementById('resumeNo').onclick = () => {
               prompt.style.display = 'none';
               loadVideoByIndex(0);
+              videoPlayer.addEventListener('loadedmetadata', function startFreshOnce() {
+                videoPlayer.removeEventListener('loadedmetadata', startFreshOnce);
+                videoPlayer.muted = true;
+                videoPlayer.play().then(() => {
+                  videoPlayer.muted = false;
+                  videoPlayer.volume = 1.0;
+                });
+              });
+            };
+          } else {
+            loadVideoByIndex(0);
+            videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+              videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
               videoPlayer.muted = true;
               videoPlayer.play().then(() => {
                 videoPlayer.muted = false;
                 videoPlayer.volume = 1.0;
               });
-            };
-          } else {
-            loadVideoByIndex(0);
-            videoPlayer.muted = true;
-            videoPlayer.play().then(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
             });
           }
         });
 
-      // Salva progresso antes de sair
       window.addEventListener('beforeunload', () => {
         localStorage.setItem('ultimaAssistida', JSON.stringify({
           index: currentIndex,
