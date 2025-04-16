@@ -2,23 +2,21 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Jaspion</title>
+  <title>Carregando série...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="video-container" id="videoContainer">
     <video 
       id="videoPlayer"
-      preload="metadata"
+      preload="auto"
       playsinline
       webkit-playsinline
-      x-webkit-airplay="allow"
-      disablepictureinpicture
       controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
       muted
     ></video>
-    
-    <!-- CONTROLES SOBRE O VÍDEO -->
+
     <div class="controls-overlay" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
@@ -37,7 +35,6 @@
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
             </button>
-            <!-- Botão para alternar a exibição dos downloads -->
             <button id="toggleDownloadsBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
             </button>
@@ -53,13 +50,13 @@
       </div>
     </div>
   </div>
-  
-  <!-- PLAYLIST -->
+
   <div class="playlist-container" id="playlistContainer">
     <h2 id="videoTitle">Carregando...</h2>
     <ul id="playlist"></ul>
   </div>
-  
+
   <script src="script.js"></script>
 </body>
 </html>
+S
