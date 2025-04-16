@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exibir Séries</title>
+    <style>
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .serie-card {
+            width: 200px;
+            text-align: center;
+        }
+        img {
+            width: 200px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Séries</h1>
+    <div class="container" id="seriesContainer"></div>
+
+    <script>
+        fetch('https://api.github.com/repos/CirosBlack/CirosBlack/contents/Series/seriesjson', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer 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'
+            }
+        }).then(response => response.json())
+          .then(data => {
+              const seriesContainer = document.getElementById('seriesContainer');
+              data.forEach(item => {
+                  const serieData = JSON.parse(atob(item.content));
+                  const serieCard = document.createElement('div');
+                  serieCard.classList.add('serie-card');
+                  
+                  const serieImg = document.createElement('img');
+                  serieImg.src = serieData.capa;
+                  const serieLink = document.createElement('a');
+                  serieLink.href = serieData.url;
+                  serieLink.textContent = 'Ver Página';
+                  
+                  const deleteButton = document.createElement('button');
+                  deleteButton.textContent = 'Deletar';
+                  deleteButton.addEventListener('click', function() {
+                      if (confirm(`Deseja realmente deletar a série ${serieData.nome}?`)) {
+                          deleteSerie(serieData.nome, item.sha);
+                      }
+                  });
+(exibir.html)
+                  serieCard.appendChild(serieImg);
+                  serieCard.appendChild(serieLink);
+                  serieCard.appendChild(deleteButton);
+                  seriesContainer.appendChild(serieCard);
+              });
+          }).catch(error => console.error('Erro ao carregar séries:', error));
+
+        function deleteSerie(nomeSerie, sha) {
+            fetch('https://api.github.com/repos/CirosBlack/CirosBlack/contents/Series/seriesjson', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': 'Bearer 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',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: 'Deletar série',
+                    sha: sha
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  alert('Série deletada com sucesso!');
+                  window.location.reload();
+              }).catch(error => {
+                  alert('Erro ao deletar a série.');
+              });
+        }
+    </script>
+</body>
+</html>
