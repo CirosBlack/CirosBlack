@@ -64,10 +64,17 @@
     <ul id="playlist"></ul>
   </div>
 
-  <div id="resumePrompt" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#111; color:#fff; padding:20px; border-radius:10px; z-index:9999; text-align:center; box-shadow:0 0 20px #000;">
+  <!-- Pop-up de continuação -->
+  <div id="resumePrompt" style="display:none;">
     <p>Continuar assistindo de onde parou?</p>
     <button id="resumeYes">Sim</button>
     <button id="resumeNo">Não</button>
+    
+    <!-- Barra de contagem regressiva -->
+    <div id="countdownBarContainer">
+      <div id="countdownBar"></div>
+    </div>
+    <span id="countdownText">10:00</span>
   </div>
 
   <script>
@@ -86,9 +93,14 @@
     const timeRemaining = document.getElementById('timeRemaining');
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
+    const countdownBar = document.getElementById('countdownBar');
+    const countdownText = document.getElementById('countdownText');
+    const resumeNoButton = document.getElementById('resumeNo');
 
     let videos = [];
     let currentIndex = 0;
+    let countdownTime = 10; // Tempo de contagem regressiva em segundos
+    let countdownInterval;
     let controlsTimeout;
 
     function resetControlsTimeout() {
@@ -148,6 +160,46 @@
       timeRemaining.textContent = formatTime(duration - currentTime);
     }
 
+    function startCountdown() {
+      countdownInterval = setInterval(() => {
+        countdownTime--;
+        const percentage = (countdownTime / 10) * 100;
+        countdownBar.style.width = percentage + '%';
+
+        // Mudança de cor da barra de verde para vermelho
+        if (percentage <= 30) {
+          countdownBar.style.backgroundColor = 'red';
+        }
+
+        const minutes = Math.floor(countdownTime / 60);
+        const seconds = countdownTime % 60;
+        countdownText.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+        if (countdownTime <= 0) {
+          clearInterval(countdownInterval);
+          resumeNoButton.click(); // A opção "Não" será selecionada automaticamente
+        }
+      }, 1000);
+    }
+
+    function showResumePrompt() {
+      const prompt = document.getElementById('resumePrompt');
+      prompt.style.display = 'block';
+      startCountdown(); // Inicia a contagem regressiva
+
+      document.getElementById('resumeYes').onclick = () => {
+        clearInterval(countdownInterval);
+        prompt.style.display = 'none';
+        // Lógica para continuar o vídeo
+      };
+
+      document.getElementById('resumeNo').onclick = () => {
+        clearInterval(countdownInterval);
+        prompt.style.display = 'none';
+        // Lógica para começar o vídeo do início
+      };
+    }
+
     window.addEventListener('load', () => {
       fetch('dados/jaspion.json')
         .then(res => res.json())
@@ -161,42 +213,7 @@
 
           const ultima = JSON.parse(localStorage.getItem('ultimaAssistida'));
           if (ultima) {
-            const prompt = document.getElementById('resumePrompt');
-            prompt.style.display = 'block';
-
-            document.getElementById('resumeYes').onclick = () => {
-              prompt.style.display = 'none';
-              loadVideoByIndex(ultima.index);
-              videoPlayer.addEventListener('loadedmetadata', function resumeOnce() {
-                videoPlayer.removeEventListener('loadedmetadata', resumeOnce);
-                videoPlayer.currentTime = ultima.time || 0;
-                videoPlayer.muted = true;
-                videoPlayer.play().then(() => {
-                  videoPlayer.muted = false;
-                  videoPlayer.volume = 1.0;
-
-                  const t = videoPlayer.currentTime;
-                  videoPlayer.pause();
-                  setTimeout(() => {
-                    videoPlayer.currentTime = t;
-                    videoPlayer.play().catch(() => {});
-                  }, 50);
-                });
-              });
-            };
-
-            document.getElementById('resumeNo').onclick = () => {
-              prompt.style.display = 'none';
-              loadVideoByIndex(0);
-              videoPlayer.addEventListener('loadedmetadata', function startFreshOnce() {
-                videoPlayer.removeEventListener('loadedmetadata', startFreshOnce);
-                videoPlayer.muted = true;
-                videoPlayer.play().then(() => {
-                  videoPlayer.muted = false;
-                  videoPlayer.volume = 1.0;
-                });
-              });
-            };
+            showResumePrompt(); // Mostrar o prompt de continuar assistindo
           } else {
             loadVideoByIndex(0);
             videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
@@ -285,56 +302,6 @@
       const percent = offsetX / rect.width;
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
-
-    // Mostrar controles ao mover o mouse sobre a tela de vídeo
-    videoContainer.addEventListener('mousemove', () => {
-      controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
-    });
-
-    // Arrastar a barra de progresso
-    let isDragging = false;
-
-    // Mouse events
-    progressHandle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', stopDrag);
-    });
-
-    // Touch events
-    progressHandle.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // Impede o comportamento padrão do toque
-      isDragging = true;
-      document.addEventListener('touchmove', handleDrag);
-      document.addEventListener('touchend', stopDrag);
-    });
-
-    function stopDrag() {
-      isDragging = false;
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', stopDrag);
-      document.removeEventListener('touchmove', handleDrag);
-      document.removeEventListener('touchend', stopDrag);
-    }
-
-    function handleDrag(e) {
-      if (isDragging) {
-        let clientX;
-        // Verifica se é um evento de toque ou de mouse e pega a posição X
-        if (e.touches) {
-          clientX = e.touches[0].clientX; // Pega a posição do primeiro toque
-        } else {
-          clientX = e.clientX; // Pega a posição do mouse
-        }
-
-        const rect = progressContainer.getBoundingClientRect();
-        const offsetX = clientX - rect.left;
-        const percent = offsetX / rect.width;
-        videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
-      }
-    }
   </script>
 </body>
 </html>
