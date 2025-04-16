@@ -16,11 +16,6 @@ const timeRemaining = document.getElementById('timeRemaining');
 let videos = [];
 let currentIndex = 0;
 
-function getParam(param) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(param);
-}
-
 function generatePlaylist() {
   playlist.innerHTML = "";
   videos.forEach((video, index) => {
@@ -73,8 +68,6 @@ function updateProgress() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const somAtivado = getParam('som') === '1';
-
   fetch(videoSource)
     .then(res => res.json())
     .then(data => {
@@ -87,20 +80,17 @@ document.addEventListener('DOMContentLoaded', () => {
       generatePlaylist();
       loadVideoByIndex(0);
 
-      if (somAtivado) {
-        // ✅ Inicia com muted para garantir autoplay
-        videoPlayer.muted = true;
-        videoPlayer.play()
-          .then(() => {
-            // ✅ Após autoplay com mute, ativa o som
-            videoPlayer.muted = false;
-            videoPlayer.volume = 1.0;
-            console.log("Vídeo desmutado após autoplay bem-sucedido.");
-          })
-          .catch((err) => {
-            console.warn("Não foi possível iniciar o vídeo automaticamente:", err);
-          });
-      }
+      // ✅ Autoplay com som garantido (sem precisar de parâmetro)
+      videoPlayer.muted = true;
+      videoPlayer.play()
+        .then(() => {
+          videoPlayer.muted = false;
+          videoPlayer.volume = 1.0;
+          console.log("Som ativado após autoplay.");
+        })
+        .catch((err) => {
+          console.warn("Autoplay bloqueado. Usuário precisará interagir para ativar o som.");
+        });
     });
 
   document.addEventListener('visibilitychange', () => {
