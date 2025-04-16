@@ -85,6 +85,7 @@
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
     const controlsOverlay = document.getElementById('controlsOverlay');
+    const videoContainer = document.getElementById('videoContainer');
 
     let videos = [];
     let currentIndex = 0;
@@ -285,14 +286,8 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
-    // Mostrar controles ao clicar no vídeo
-    videoPlayer.addEventListener('click', () => {
-      controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
-    });
-
-    // Mostrar controles ao clicar na playlist
-    playlistContainer.addEventListener('click', () => {
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
+    videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
       resetControlsTimeout(); // Reinicia o tempo para esconder os controles
     });
