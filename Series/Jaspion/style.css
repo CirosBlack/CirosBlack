@@ -82,7 +82,7 @@ body {
 }
 
 #nextBtn {
-  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-right: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
 }
 
 .middle-controls {
