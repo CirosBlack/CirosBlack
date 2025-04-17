@@ -72,13 +72,13 @@ body {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  gap: 15px;
 }
 
-.left-buttons,
-.right-buttons {
+.left-buttons, .middle-controls, .right-buttons {
   display: flex;
   align-items: center;
-  gap: 15px; /* Adiciona espaço entre os botões */
+  gap: 10px; /* Espaçamento entre os botões */
 }
 
 .controls-container button {
@@ -110,14 +110,16 @@ body {
   transform: scale(1.2);
 }
 
+/* Barra de progresso e tempo */
 .progress-wrapper {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 15px;
+  gap: 15px; /* Espaçamento entre a barra de progresso e o tempo */
+  flex: 1;
 }
 
 .progress-container {
+  position: relative;
   flex: 1;
   height: 10px;
   background-color: #444;
@@ -126,15 +128,38 @@ body {
   cursor: pointer;
 }
 
+#progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: red;
+  transition: width 0.1s linear;
+}
+
+#progressHandle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  left: 0%;
+}
+
 #timeRemaining {
   font-size: 0.9rem;
   color: #ccc;
-  min-width: 50px;
+  min-width: 45px;
   text-align: right;
   font-weight: bold;
-  white-space: nowrap;
 }
 
+/* Playlist container e outros estilos */
 .playlist-container {
   width: 100%;
   background-color: #111;
