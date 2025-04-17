@@ -78,21 +78,21 @@ body {
 .left-buttons {
   display: flex;
   align-items: center;
-  gap: 5px; /* Espaço entre os botões da esquerda */
+  gap: 15px; /* Espaço entre os botões da esquerda */
 }
 
 .middle-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-grow: 1;
-  gap: 15px; /* Aumentado de 5px para 15px */
+  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
+  gap: 20px; /* Aumentei o espaço */
 }
 
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 5px; /* Espaço entre os botões da direita */
+  gap: 15px; /* Espaço entre os botões da direita */
 }
 
 .controls-container button {
@@ -128,7 +128,7 @@ body {
 .progress-wrapper {
   display: flex;
   align-items: center;
-  gap: 5px; /* Espaço entre a barra de progresso e o tempo reduzido */
+  gap: 15px; /* Espaço entre a barra de progresso e o tempo */
   flex: 1;
 }
 
@@ -140,6 +140,7 @@ body {
   border-radius: 4px;
   margin-right: 10px;
   cursor: pointer;
+  touch-action: none; /* Impede comportamentos padrões de toque */
 }
 
 #progressBar {
