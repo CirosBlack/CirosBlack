@@ -132,7 +132,10 @@
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       videoTitle.textContent = videos[index].title;
-      
+
+      // Garantir que o vídeo não comece mudo
+      videoPlayer.muted = false;
+
       moveTitleToTop();  // Chama a animação do título
       
       highlightCurrentItem();
