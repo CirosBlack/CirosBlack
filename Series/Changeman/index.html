@@ -16,12 +16,6 @@
     .hidden-cursor {
       cursor: none;
     }
-
-    /* Animação para mover o título para o topo */
-    #videoTitle.move-up {
-      transform: translateY(-50px); /* Move o título para cima */
-      transition: transform 0.5s ease;
-    }
   </style>
 </head>
 <body>
@@ -36,7 +30,7 @@
       muted
     ></video>
 
-    <div class="controls-overlay hidden" id="controlsOverlay">
+    <div class="controls-overlay" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -133,37 +127,10 @@
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       videoTitle.textContent = videos[index].title;
-
-      // Garantir que o vídeo não comece mudo
-      videoPlayer.muted = false;
-
-      moveTitleToTop();  // Chama a animação do título
-      
       highlightCurrentItem();
+      scrollPlaylistToCurrent();  // Rola a playlist até o vídeo atual
       updatePlayPauseButton();
-      scrollToTop(); // Chama a função para rolar a lista para o vídeo atual
-    }
-
-    function moveTitleToTop() {
-      // Animação de título para o topo
-      const videoTitleElement = document.getElementById('videoTitle');
-      videoTitleElement.classList.add('move-up');
-      
-      // Espera a animação terminar para continuar
-      setTimeout(() => {
-        // Remover a classe de animação após a transição
-        videoTitleElement.classList.remove('move-up');
-      }, 500); // 500ms de duração da animação
-    }
-
-    function scrollToTop() {
-      const currentVideoItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-      if (currentVideoItem) {
-        currentVideoItem.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start' // Garante que o vídeo seja movido para o topo da lista
-        });
-      }
+      videoPlayer.play().catch(() => {});
     }
 
     function highlightCurrentItem() {
@@ -171,6 +138,13 @@
       items.forEach(li => li.classList.remove('playing'));
       const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
       if (current) current.classList.add('playing');
+    }
+
+    function scrollPlaylistToCurrent() {
+      const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (currentItem) {
+        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });  // Alterado para 'start'
+      }
     }
 
     function formatTime(seconds) {
@@ -184,9 +158,53 @@
       const currentTime = videoPlayer.currentTime || 0;
       const percent = (currentTime / duration) * 100;
       progressBar.style.width = percent + '%';
-      progressHandle.style.left = `calc(${percent}% - 7px)`; // Ajuste para a posição do botão
+      progressHandle.style.left = `calc(${percent}% - 7px)`;
       timeRemaining.textContent = formatTime(duration - currentTime);
     }
+
+    function scrub(e) {
+      const rect = progressContainer.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left; // Pega a posição do clique
+      let ratio = offsetX / rect.width;
+      ratio = Math.min(Math.max(ratio, 0), 1); // Limita o valor entre 0 e 1
+      const newTime = ratio * videoPlayer.duration;
+      videoPlayer.currentTime = newTime;
+      updateProgress(); // Atualiza a barra de progresso
+    }
+
+    progressContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      scrub(e);
+    });
+
+    progressContainer.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    });
+
+    progressContainer.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    progressContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+    });
+
+    progressContainer.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      scrub(e);
+    }, { passive: false });
+
+    progressContainer.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    }, { passive: false });
+
+    progressContainer.addEventListener('touchend', () => {
+      isDragging = false;
+    });
 
     window.addEventListener('load', () => {
       fetch('dados/Changeman.json')
@@ -199,35 +217,18 @@
           }
           generatePlaylist();
           loadVideoByIndex(0);
+
           videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
             videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
             videoPlayer.muted = true;
             videoPlayer.play().then(() => {
               videoPlayer.muted = false;
               videoPlayer.volume = 1.0;
+            }).catch(() => {
+              console.log('Erro ao tentar iniciar o vídeo automaticamente');
             });
           });
         });
-
-      window.addEventListener('beforeunload', () => {
-        localStorage.setItem('ultimaAssistida', JSON.stringify({
-          index: currentIndex,
-          time: videoPlayer.currentTime
-        }));
-      });
-
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && !videoPlayer.paused) {
-          const t = videoPlayer.currentTime;
-          videoPlayer.pause();
-          setTimeout(() => {
-            videoPlayer.currentTime = t;
-            videoPlayer.play().catch(() => {});
-          }, 50);
-        }
-      });
-
-      document.addEventListener('contextmenu', e => e.preventDefault());
     });
 
     playlist.addEventListener('click', (e) => {
@@ -239,17 +240,11 @@
     });
 
     prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        loadVideoByIndex(currentIndex - 1);
-        videoPlayer.play(); // Reproduz o vídeo automaticamente
-      }
+      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
     });
 
     nextBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) {
-        loadVideoByIndex(currentIndex + 1);
-        videoPlayer.play(); // Reproduz o vídeo automaticamente
-      }
+      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
     });
 
     playPauseBtn.addEventListener('click', () => {
@@ -272,16 +267,22 @@
 
     pipBtn.addEventListener('click', () => {
       if (videoPlayer !== document.pictureInPictureElement) {
-        // Ativa o PiP
         videoPlayer.requestPictureInPicture().catch(error => {
           console.error("Erro ao ativar o PiP:", error);
         });
       } else {
-        // Sai do PiP
         document.exitPictureInPicture().catch(error => {
           console.error("Erro ao sair do PiP:", error);
         });
       }
+    });
+
+    videoPlayer.addEventListener('enterpictureinpicture', () => {
+      console.log('PiP ativado');
+    });
+
+    videoPlayer.addEventListener('leavepictureinpicture', () => {
+      console.log('PiP desativado');
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
@@ -298,62 +299,61 @@
       }
     });
 
-    progressContainer.addEventListener('click', (e) => {
-      if (!isDragging) { // Evita interferência enquanto arrasta
-        const rect = progressContainer.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percent = offsetX / rect.width;
-        videoPlayer.currentTime = percent * videoPlayer.duration;
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
+    videoContainer.addEventListener('mousemove', () => {
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+
+      // Remove a classe que esconde o cursor quando o mouse se move
+      videoContainer.classList.remove('hidden-cursor');
+      
+      // Limpa o temporizador se o mouse se mover
+      clearTimeout(mouseTimeout);
+
+      // Define um novo temporizador para esconder o cursor após 3 segundos
+      mouseTimeout = setTimeout(() => {
+        videoContainer.classList.add('hidden-cursor');
+      }, 3000); // 3 segundos
+    });
+
+    // Duplo clique para alternar entre tela cheia
+    videoPlayer.addEventListener('dblclick', () => {
+      if (!document.fullscreenElement) {
+        // Entra no modo de tela cheia
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) { // Firefox
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari e Opera
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
+          videoContainer.msRequestFullscreen();
+        }
+      } else {
+        // Sai do modo de tela cheia
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari e Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
       }
     });
 
-    progressHandle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      document.addEventListener('mousemove', onDrag);
-      document.addEventListener('mouseup', stopDrag);
+    // Evitar atraso do áudio com o evento visibilitychange
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !videoPlayer.paused) {
+        const currentTime = videoPlayer.currentTime;
+        videoPlayer.pause();
+        setTimeout(() => {
+          videoPlayer.currentTime = currentTime;
+          videoPlayer.play().catch(() => {});
+        }, 50);
+      }
     });
-
-    function stopDrag() {
-      isDragging = false;
-      document.removeEventListener('mousemove', onDrag);
-      document.removeEventListener('mouseup', stopDrag);
-    }
-
-    function onDrag(e) {
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const percent = Math.min(Math.max(0, offsetX / rect.width), 1); // Limita entre 0% e 100%
-      videoPlayer.currentTime = percent * videoPlayer.duration;
-      progressBar.style.width = percent * 100 + '%';
-      progressHandle.style.left = `calc(${percent * 100}% - 7px)`; // Ajuste para a posição do botão
-    }
-
-    // Suporte para toque (para tablets)
-    progressContainer.addEventListener('touchstart', (e) => {
-      const touch = e.touches[0];
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = touch.clientX - rect.left;
-      const percent = offsetX / rect.width;
-      videoPlayer.currentTime = percent * videoPlayer.duration;
-      e.preventDefault();
-    });
-
-    progressHandle.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      document.addEventListener('touchmove', onTouchMove);
-      document.addEventListener('touchend', stopDrag);
-      e.preventDefault(); // Evita seleção de texto durante o toque
-    });
-
-    function onTouchMove(e) {
-      const touch = e.touches[0];
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = touch.clientX - rect.left;
-      const percent = Math.min(Math.max(0, offsetX / rect.width), 1); // Limita entre 0% e 100%
-      videoPlayer.currentTime = percent * videoPlayer.duration;
-      progressBar.style.width = percent * 100 + '%';
-      progressHandle.style.left = `calc(${percent * 100}% - 7px)`; // Ajuste para a posição do botão
-    }
   </script>
 </body>
 </html>
