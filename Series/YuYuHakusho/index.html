@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -65,12 +64,6 @@
     <ul id="playlist"></ul>
   </div>
 
-  <div id="resumePrompt" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:#111; color:#fff; padding:20px; border-radius:10px; z-index:9999; text-align:center; box-shadow:0 0 20px #000;">
-    <p>Continuar assistindo de onde parou?</p>
-    <button id="resumeYes">Sim</button>
-    <button id="resumeNo">Não</button>
-  </div>
-
   <script>
     const videoPlayer = document.getElementById('videoPlayer');
     const videoTitle = document.getElementById('videoTitle');
@@ -96,7 +89,7 @@
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
-      }, 3000);
+      }, 3000); // Esconde após 3 segundos de inatividade
     }
 
     function generatePlaylist() {
@@ -150,7 +143,7 @@
     }
 
     window.addEventListener('load', () => {
-      fetch('dados/YuYuHakusho.json')
+      fetch('dados/jaspion.json')
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
@@ -159,56 +152,15 @@
             videoTitle.textContent = data.serie;
           }
           generatePlaylist();
-
-          const ultima = JSON.parse(localStorage.getItem('ultimaAssistida'));
-          if (ultima) {
-            const prompt = document.getElementById('resumePrompt');
-            prompt.style.display = 'block';
-
-            document.getElementById('resumeYes').onclick = () => {
-              prompt.style.display = 'none';
-              loadVideoByIndex(ultima.index);
-              videoPlayer.addEventListener('loadedmetadata', function resumeOnce() {
-                videoPlayer.removeEventListener('loadedmetadata', resumeOnce);
-                videoPlayer.currentTime = ultima.time || 0;
-                videoPlayer.muted = true;
-                videoPlayer.play().then(() => {
-                  videoPlayer.muted = false;
-                  videoPlayer.volume = 1.0;
-
-                  const t = videoPlayer.currentTime;
-                  videoPlayer.pause();
-                  setTimeout(() => {
-                    videoPlayer.currentTime = t;
-                    videoPlayer.play().catch(() => {});
-                  }, 50);
-                });
-              });
-            };
-
-            document.getElementById('resumeNo').onclick = () => {
-              prompt.style.display = 'none';
-              loadVideoByIndex(0);
-              videoPlayer.addEventListener('loadedmetadata', function startFreshOnce() {
-                videoPlayer.removeEventListener('loadedmetadata', startFreshOnce);
-                videoPlayer.muted = true;
-                videoPlayer.play().then(() => {
-                  videoPlayer.muted = false;
-                  videoPlayer.volume = 1.0;
-                });
-              });
-            };
-          } else {
-            loadVideoByIndex(0);
-            videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
-              videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
-              videoPlayer.muted = true;
-              videoPlayer.play().then(() => {
-                videoPlayer.muted = false;
-                videoPlayer.volume = 1.0;
-              });
+          loadVideoByIndex(0);
+          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
+            videoPlayer.muted = true;
+            videoPlayer.play().then(() => {
+              videoPlayer.muted = false;
+              videoPlayer.volume = 1.0;
             });
-          }
+          });
         });
 
       window.addEventListener('beforeunload', () => {
@@ -287,49 +239,30 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout();
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
     });
 
+    // Arrastar a barra de progresso
     let isDragging = false;
-
     progressHandle.addEventListener('mousedown', (e) => {
       isDragging = true;
       document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleDrag);
+      });
     });
-
-    progressHandle.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      isDragging = true;
-      document.addEventListener('touchmove', handleDrag);
-      document.addEventListener('touchend', stopDrag);
-    });
-
-    function stopDrag() {
-      isDragging = false;
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', stopDrag);
-      document.removeEventListener('touchmove', handleDrag);
-      document.removeEventListener('touchend', stopDrag);
-    }
 
     function handleDrag(e) {
       if (isDragging) {
-        let clientX;
-        if (e.touches) {
-          clientX = e.touches[0].clientX;
-        } else {
-          clientX = e.clientX;
-        }
-
         const rect = progressContainer.getBoundingClientRect();
-        const offsetX = clientX - rect.left;
+        const offsetX = e.clientX - rect.left;
         const percent = offsetX / rect.width;
         videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress();
-        resetControlsTimeout(); // <-- Correção aplicada aqui!
+        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
       }
     }
   </script>
