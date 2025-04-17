@@ -305,7 +305,6 @@ body {
 .playlist-container::-webkit-scrollbar-thumb {
   background: #0000;
   border-radius: 10px;
-
 }
 
 /* Botões flutuantes para controle no PiP */
