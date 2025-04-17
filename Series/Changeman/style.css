@@ -310,13 +310,13 @@ body {
 /* Botões flutuantes para controle no PiP */
 #controlsFloating {
   position: fixed;
-  bottom: 20px; /* Ajuste conforme necessário */
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 20px;
-  z-index: 9999; /* Garantir que os botões fiquem acima de outros conteúdos */
-  visibility: hidden; /* Inicialmente invisível */
+  z-index: 9999; /* Botões fiquem sobre outros conteúdos */
+  visibility: visible; /* Visível por padrão */
 }
 
 #controlsFloating button {
