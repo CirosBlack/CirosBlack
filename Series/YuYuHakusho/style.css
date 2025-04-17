@@ -306,3 +306,8 @@ body {
   background: #0000;
   border-radius: 10px;
 }
+
+/* Classe para esconder o cursor */
+.hidden-cursor {
+  cursor: none;
+}
