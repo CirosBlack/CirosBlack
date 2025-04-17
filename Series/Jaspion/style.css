@@ -78,7 +78,7 @@ body {
 .left-buttons {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaço entre os botões da esquerda */
+  gap: 5px; /* Espaço entre os botões da esquerda */
 }
 
 .middle-controls {
@@ -92,7 +92,7 @@ body {
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaço entre os botões da direita */
+  gap: 5px; /* Espaço entre os botões da direita */
 }
 
 .controls-container button {
