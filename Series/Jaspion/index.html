@@ -143,7 +143,7 @@
     function scrollPlaylistToCurrent() {
       const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
       if (currentItem) {
-        currentItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });  // Alterado para 'start'
       }
     }
 
