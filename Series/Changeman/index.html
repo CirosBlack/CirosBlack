@@ -137,6 +137,7 @@
       
       highlightCurrentItem();
       updatePlayPauseButton();
+      scrollToTop(); // Chama a função para rolar a lista para o vídeo atual
     }
 
     function moveTitleToTop() {
@@ -149,6 +150,16 @@
         // Remover a classe de animação após a transição
         videoTitleElement.classList.remove('move-up');
       }, 500); // 500ms de duração da animação
+    }
+
+    function scrollToTop() {
+      const currentVideoItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (currentVideoItem) {
+        currentVideoItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start' // Garante que o vídeo seja movido para o topo da lista
+        });
+      }
     }
 
     function highlightCurrentItem() {
