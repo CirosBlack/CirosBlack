@@ -48,6 +48,9 @@
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
             </button>
+            <button id="pipBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pip.png" alt="PiP" style="width:35px; height:35px;" />
+            </button>
             <button id="toggleDownloadsBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
             </button>
@@ -77,6 +80,7 @@
     const playPauseBtn = document.getElementById('playPauseBtn');
     const nextBtn = document.getElementById('nextBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const pipBtn = document.getElementById('pipBtn');
     const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
     const playlistContainer = document.getElementById('playlistContainer');
     const progressContainer = document.getElementById('progressContainer');
@@ -222,6 +226,28 @@
       } else {
         document.exitFullscreen().catch(() => {});
       }
+    });
+
+    pipBtn.addEventListener('click', () => {
+      if (videoPlayer !== document.pictureInPictureElement) {
+        // Ativa o PiP
+        videoPlayer.requestPictureInPicture().catch(error => {
+          console.error("Erro ao ativar o PiP:", error);
+        });
+      } else {
+        // Sai do PiP
+        document.exitPictureInPicture().catch(error => {
+          console.error("Erro ao sair do PiP:", error);
+        });
+      }
+    });
+
+    videoPlayer.addEventListener('enterpictureinpicture', () => {
+      console.log('PiP ativado');
+    });
+
+    videoPlayer.addEventListener('leavepictureinpicture', () => {
+      console.log('PiP desativado');
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
