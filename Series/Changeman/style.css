@@ -294,11 +294,6 @@ body {
   }
 }
 
-/* Estilo para ocultar o cursor após 3 segundos */
-.hidden-cursor {
-  cursor: none;
-}
-
 .playlist-container::-webkit-scrollbar {
   width: 6px;
 }
@@ -310,4 +305,9 @@ body {
 .playlist-container::-webkit-scrollbar-thumb {
   background: #0000;
   border-radius: 10px;
+}
+
+/* Classe para esconder o cursor */
+.hidden-cursor {
+  cursor: none;
 }
