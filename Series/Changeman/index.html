@@ -11,6 +11,11 @@
       pointer-events: none;
       transition: opacity 0.3s;
     }
+
+    /* Ocultar o cursor quando ele estiver inativo */
+    .hidden-cursor {
+      cursor: none;
+    }
   </style>
 </head>
 <body>
@@ -84,12 +89,22 @@
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
+    let cursorTimeout;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
       }, 3000); // Esconde após 3 segundos de inatividade
+    }
+
+    // Função para resetar o temporizador do cursor
+    function resetCursorTimeout() {
+      clearTimeout(cursorTimeout);
+      document.body.classList.remove('hidden-cursor'); // Mostra o cursor
+      cursorTimeout = setTimeout(() => {
+        document.body.classList.add('hidden-cursor'); // Oculta o cursor
+      }, 3000); // Oculta após 3 segundos de inatividade
     }
 
     function generatePlaylist() {
@@ -239,32 +254,12 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
-    // Mostrar controles ao mover o mouse sobre a tela de vídeo
+    // Mostrar controles e resetar o tempo do cursor ao mover o mouse sobre a tela de vídeo
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
       resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+      resetCursorTimeout();  // Reinicia o tempo para esconder o cursor
     });
-
-    // Arrastar a barra de progresso
-    let isDragging = false;
-    progressHandle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleDrag);
-      });
-    });
-
-    function handleDrag(e) {
-      if (isDragging) {
-        const rect = progressContainer.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percent = offsetX / rect.width;
-        videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
-      }
-    }
   </script>
 </body>
 </html>
