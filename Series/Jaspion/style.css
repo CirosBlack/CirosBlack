@@ -70,15 +70,29 @@ body {
 
 .controls-container {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px;
+  width: 100%;
 }
 
-.left-buttons, .middle-controls, .right-buttons {
+.left-buttons {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espaçamento entre os botões */
+  gap: 15px; /* Espaço entre os botões da esquerda */
+}
+
+.middle-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
+  gap: 15px; /* Espaço entre a barra de progresso e o tempo */
+}
+
+.right-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espaço entre os botões da direita */
 }
 
 .controls-container button {
@@ -114,7 +128,7 @@ body {
 .progress-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaçamento entre a barra de progresso e o tempo */
+  gap: 15px; /* Espaço entre a barra de progresso e o tempo */
   flex: 1;
 }
 
