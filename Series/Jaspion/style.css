@@ -99,6 +99,10 @@ body {
   gap: 5px; /* Espaço entre os botões da direita */
 }
 
+#fullscreenBtn {
+  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
+
 .controls-container button {
   background-color: transparent;
   color: #fff;
