@@ -78,21 +78,21 @@ body {
 .left-buttons {
   display: flex;
   align-items: center;
-  gap: 5px; /* Espaço entre os botões da esquerda reduzido */
+  gap: 5px; /* Espaço entre os botões da esquerda */
 }
 
 .middle-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
-  gap: 5px; /* Espaço entre a barra de progresso e o tempo reduzido */
+  flex-grow: 1;
+  gap: 15px; /* Aumentado de 5px para 15px */
 }
 
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 5px; /* Espaço entre os botões da direita reduzido */
+  gap: 5px; /* Espaço entre os botões da direita */
 }
 
 .controls-container button {
