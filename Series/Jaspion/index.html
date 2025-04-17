@@ -5,18 +5,6 @@
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
-  <style>
-    .hidden {
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-
-    /* Adicionando estilo para esconder o cursor */
-    .hidden-cursor {
-      cursor: none;
-    }
-  </style>
 </head>
 <body>
   <div class="video-container" id="videoContainer">
@@ -33,6 +21,7 @@
     <div class="controls-overlay" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
+          <!-- Botões de controle -->
           <div class="left-buttons">
             <button id="prevBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
@@ -44,6 +33,19 @@
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
             </button>
           </div>
+
+          <!-- Barra de progresso e tempo -->
+          <div class="middle-controls">
+            <div class="progress-wrapper">
+              <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-handle" id="progressHandle"></div>
+              </div>
+              <span id="timeRemaining">00:00</span>
+            </div>
+          </div>
+
+          <!-- Botões de controle à direita -->
           <div class="right-buttons">
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
@@ -55,13 +57,6 @@
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
             </button>
           </div>
-        </div>
-        <div class="progress-wrapper">
-          <div class="progress-container" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
-            <div class="progress-handle" id="progressHandle"></div>
-          </div>
-          <span id="timeRemaining">00:00</span>
         </div>
       </div>
     </div>
