@@ -65,7 +65,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 5px;
 }
 
 .controls-container {
@@ -86,7 +86,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
-  gap: 15px; /* Espaço entre a barra de progresso e o tempo */
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
 }
 
 .right-buttons {
@@ -128,7 +128,7 @@ body {
 .progress-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espaço entre a barra de progresso e o tempo */
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
   flex: 1;
 }
 
