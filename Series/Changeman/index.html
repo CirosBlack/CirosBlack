@@ -12,7 +12,7 @@
       transition: opacity 0.3s;
     }
 
-    /* Ocultar o cursor quando ele estiver inativo */
+    /* Adicionando estilo para esconder o cursor */
     .hidden-cursor {
       cursor: none;
     }
@@ -89,22 +89,13 @@
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
-    let cursorTimeout;
+    let mouseTimeout;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
       }, 3000); // Esconde após 3 segundos de inatividade
-    }
-
-    // Função para resetar o temporizador do cursor
-    function resetCursorTimeout() {
-      clearTimeout(cursorTimeout);
-      document.body.classList.remove('hidden-cursor'); // Mostra o cursor
-      cursorTimeout = setTimeout(() => {
-        document.body.classList.add('hidden-cursor'); // Oculta o cursor
-      }, 3000); // Oculta após 3 segundos de inatividade
     }
 
     function generatePlaylist() {
@@ -254,12 +245,43 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
-    // Mostrar controles e resetar o tempo do cursor ao mover o mouse sobre a tela de vídeo
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
       resetControlsTimeout(); // Reinicia o tempo para esconder os controles
-      resetCursorTimeout();  // Reinicia o tempo para esconder o cursor
+
+      // Remove a classe que esconde o cursor quando o mouse se move
+      videoContainer.classList.remove('hidden-cursor');
+      
+      // Limpa o temporizador se o mouse se mover
+      clearTimeout(mouseTimeout);
+
+      // Define um novo temporizador para esconder o cursor após 3 segundos
+      mouseTimeout = setTimeout(() => {
+        videoContainer.classList.add('hidden-cursor');
+      }, 3000); // 3 segundos
     });
+
+    // Arrastar a barra de progresso
+    let isDragging = false;
+    progressHandle.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      document.addEventListener('mousemove', handleDrag);
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleDrag);
+      });
+    });
+
+    function handleDrag(e) {
+      if (isDragging) {
+        const rect = progressContainer.getBoundingClientRect();
+        const offsetX = e.clientX - rect.left;
+        const percent = offsetX / rect.width;
+        videoPlayer.currentTime = percent * videoPlayer.duration;
+        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
+      }
+    }
   </script>
 </body>
 </html>
