@@ -16,6 +16,12 @@
     .hidden-cursor {
       cursor: none;
     }
+
+    /* Animação para mover o título para o topo */
+    #videoTitle.move-up {
+      transform: translateY(-50px); /* Move o título para cima */
+      transition: transform 0.5s ease;
+    }
   </style>
 </head>
 <body>
@@ -126,8 +132,23 @@
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       videoTitle.textContent = videos[index].title;
+      
+      moveTitleToTop();  // Chama a animação do título
+      
       highlightCurrentItem();
       updatePlayPauseButton();
+    }
+
+    function moveTitleToTop() {
+      // Animação de título para o topo
+      const videoTitleElement = document.getElementById('videoTitle');
+      videoTitleElement.classList.add('move-up');
+      
+      // Espera a animação terminar para continuar
+      setTimeout(() => {
+        // Remover a classe de animação após a transição
+        videoTitleElement.classList.remove('move-up');
+      }, 500); // 500ms de duração da animação
     }
 
     function highlightCurrentItem() {
@@ -203,11 +224,17 @@
     });
 
     prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
+      if (currentIndex > 0) {
+        loadVideoByIndex(currentIndex - 1);
+        videoPlayer.play(); // Reproduz o vídeo automaticamente
+      }
     });
 
     nextBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
+      if (currentIndex < videos.length - 1) {
+        loadVideoByIndex(currentIndex + 1);
+        videoPlayer.play(); // Reproduz o vídeo automaticamente
+      }
     });
 
     playPauseBtn.addEventListener('click', () => {
@@ -240,14 +267,6 @@
           console.error("Erro ao sair do PiP:", error);
         });
       }
-    });
-
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
