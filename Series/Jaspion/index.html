@@ -168,43 +168,38 @@
     }
 
     progressContainer.addEventListener('mousedown', (e) => {
-  isDragging = true;
-  scrub(e);
-});
+      isDragging = true;
+      scrub(e);
+    });
 
-progressContainer.addEventListener('mousemove', (e) => {
-  if (isDragging) {
-    scrub(e);
-  }
-});
+    progressContainer.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    });
 
-progressContainer.addEventListener('mouseup', () => {
-  isDragging = false;
-});
+    progressContainer.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
 
-progressContainer.addEventListener('mouseleave', () => {
-  isDragging = false;
-});
+    progressContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+    });
 
-// Adicionando suporte para toque em dispositivos móveis e tablets
-progressContainer.addEventListener('touchstart', (e) => {
-  isDragging = true;
-  scrub(e);
-}, { passive: false });
+    progressContainer.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      scrub(e);
+    }, { passive: false });
 
-progressContainer.addEventListener('touchmove', (e) => {
-  if (isDragging) {
-    scrub(e);
-  }
-}, { passive: false });
+    progressContainer.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    }, { passive: false });
 
-progressContainer.addEventListener('touchend', () => {
-  isDragging = false;
-});
-
-progressContainer.addEventListener('touchcancel', () => {
-  isDragging = false;
-});
+    progressContainer.addEventListener('touchend', () => {
+      isDragging = false;
+    });
 
     window.addEventListener('load', () => {
       fetch('dados/jaspion.json')

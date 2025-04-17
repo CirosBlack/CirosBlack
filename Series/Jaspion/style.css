@@ -86,6 +86,7 @@ body {
   align-items: center;
   justify-content: center;
   flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
+  gap: 15px; /* Espaço entre a barra de progresso e o tempo */
 }
 
 .right-buttons {
@@ -139,7 +140,6 @@ body {
   border-radius: 4px;
   margin-right: 10px;
   cursor: pointer;
-  touch-action: none; /* Impede comportamentos padrões de toque */
 }
 
 #progressBar {
@@ -326,11 +326,4 @@ body {
 /* Classe para esconder o cursor */
 .hidden-cursor {
   cursor: none;
-}
-
-/* Aumentando a distância entre o botão próximo e a barra de progresso */
-.right-buttons {
-  display: flex;
-  align-items: center;
-  gap: 25px; /* Aumentei a distância entre o botão próximo e a barra de progresso */
 }
