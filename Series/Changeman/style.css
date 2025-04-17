@@ -62,6 +62,10 @@ body {
   position: relative;
   width: 100%;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
 }
 
 .controls-container {
@@ -69,13 +73,30 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 0;
 }
 
-.left-buttons,
+.left-buttons {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* Espaço entre os botões da esquerda */
+}
+
+#nextBtn {
+  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
+
+.middle-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+}
+
 .right-buttons {
   display: flex;
   align-items: center;
+  gap: 5px; /* Espaço entre os botões da direita */
 }
 
 .controls-container button {
@@ -107,13 +128,12 @@ body {
   transform: scale(1.2);
 }
 
+/* Barra de progresso e tempo */
 .progress-wrapper {
-  width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 5px;
-  padding: 0 10px;
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  flex: 1;
 }
 
 .progress-container {
@@ -126,7 +146,7 @@ body {
   cursor: pointer;
 }
 
-.progress-bar {
+#progressBar {
   position: absolute;
   top: 0;
   left: 0;
@@ -136,7 +156,7 @@ body {
   transition: width 0.1s linear;
 }
 
-.progress-handle {
+#progressHandle {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -150,7 +170,6 @@ body {
 }
 
 #timeRemaining {
-  display: inline-block;
   font-size: 0.9rem;
   color: #ccc;
   min-width: 45px;
@@ -158,6 +177,7 @@ body {
   font-weight: bold;
 }
 
+/* Playlist container e outros estilos */
 .playlist-container {
   width: 100%;
   background-color: #111;
@@ -172,12 +192,6 @@ body {
   font-size: 1.2rem;
   margin-bottom: 10px;
   color: #fff;
-}
-
-/* Animação para mover o título para o topo */
-#videoTitle.move-up {
-  transform: translateY(-50px); /* Move o título para cima */
-  transition: transform 0.5s ease;
 }
 
 .playlist-container ul {
