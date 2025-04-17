@@ -1,4 +1,3 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -96,7 +95,7 @@
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
-      }, 3000);
+      }, 3000); // Esconde após 3 segundos de inatividade
     }
 
     function generatePlaylist() {
@@ -104,7 +103,7 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
-        li.innerHTML = ` 
+        li.innerHTML = `
           <span class="episode-title">${video.title}</span>
           <a href="${video.src}?download=true" class="download-btn" download>Download</a>
         `;
@@ -287,49 +286,30 @@
       videoPlayer.currentTime = percent * videoPlayer.duration;
     });
 
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout();
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
     });
 
+    // Arrastar a barra de progresso
     let isDragging = false;
-
     progressHandle.addEventListener('mousedown', (e) => {
       isDragging = true;
       document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('mouseup', () => {
+        isDragging = false;
+        document.removeEventListener('mousemove', handleDrag);
+      });
     });
-
-    progressHandle.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      isDragging = true;
-      document.addEventListener('touchmove', handleDrag);
-      document.addEventListener('touchend', stopDrag);
-    });
-
-    function stopDrag() {
-      isDragging = false;
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', stopDrag);
-      document.removeEventListener('touchmove', handleDrag);
-      document.removeEventListener('touchend', stopDrag);
-    }
 
     function handleDrag(e) {
       if (isDragging) {
-        let clientX;
-        if (e.touches) {
-          clientX = e.touches[0].clientX;
-        } else {
-          clientX = e.clientX;
-        }
-
         const rect = progressContainer.getBoundingClientRect();
-        const offsetX = clientX - rect.left;
+        const offsetX = e.clientX - rect.left;
         const percent = offsetX / rect.width;
         videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress();
-        resetControlsTimeout(); // <-- Correção aplicada aqui!
+        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
       }
     }
   </script>
