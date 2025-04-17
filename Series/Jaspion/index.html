@@ -265,6 +265,20 @@
         updateProgress(); // Atualiza a barra de progresso enquanto arrasta
       }
     }
+
+    let cursorTimeout;
+
+videoContainer.addEventListener('mousemove', () => {
+  // Remove a classe de esconder o cursor sempre que o mouse se mover
+  videoContainer.classList.remove('hide-cursor');
+  
+  // Limpa o timeout anterior e configura um novo para esconder o cursor após 3 segundos
+  clearTimeout(cursorTimeout);
+  cursorTimeout = setTimeout(() => {
+    videoContainer.classList.add('hide-cursor');
+  }, 3000); // 3 segundos
+});
+
   </script>
 </body>
 </html>
