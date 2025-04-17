@@ -79,8 +79,6 @@ body {
   display: flex;
   align-items: center;
   gap: 5px; /* Espaço entre os botões da esquerda */
-  #nextBtn {
-  margin-left: 10px; /* Espaço de 10px */
 }
 
 .middle-controls {
