@@ -11,6 +11,11 @@
       pointer-events: none;
       transition: opacity 0.3s;
     }
+
+    /* Adicionando estilo para esconder o cursor */
+    .hidden-cursor {
+      cursor: none;
+    }
   </style>
 </head>
 <body>
@@ -43,6 +48,9 @@
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
             </button>
+            <button id="pipBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pip.png" alt="PiP" style="width:35px; height:35px;" />
+            </button>
             <button id="toggleDownloadsBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
             </button>
@@ -72,6 +80,7 @@
     const playPauseBtn = document.getElementById('playPauseBtn');
     const nextBtn = document.getElementById('nextBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
+    const pipBtn = document.getElementById('pipBtn');
     const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
     const playlistContainer = document.getElementById('playlistContainer');
     const progressContainer = document.getElementById('progressContainer');
@@ -84,6 +93,7 @@
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
+    let mouseTimeout;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -143,7 +153,7 @@
     }
 
     window.addEventListener('load', () => {
-      fetch('dados/jaspion.json')
+      fetch('dados/Changeman.json')
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
@@ -218,6 +228,28 @@
       }
     });
 
+    pipBtn.addEventListener('click', () => {
+      if (videoPlayer !== document.pictureInPictureElement) {
+        // Ativa o PiP
+        videoPlayer.requestPictureInPicture().catch(error => {
+          console.error("Erro ao ativar o PiP:", error);
+        });
+      } else {
+        // Sai do PiP
+        document.exitPictureInPicture().catch(error => {
+          console.error("Erro ao sair do PiP:", error);
+        });
+      }
+    });
+
+    videoPlayer.addEventListener('enterpictureinpicture', () => {
+      console.log('PiP ativado');
+    });
+
+    videoPlayer.addEventListener('leavepictureinpicture', () => {
+      console.log('PiP desativado');
+    });
+
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
     });
@@ -243,42 +275,45 @@
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
       resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+
+      // Remove a classe que esconde o cursor quando o mouse se move
+      videoContainer.classList.remove('hidden-cursor');
+      
+      // Limpa o temporizador se o mouse se mover
+      clearTimeout(mouseTimeout);
+
+      // Define um novo temporizador para esconder o cursor após 3 segundos
+      mouseTimeout = setTimeout(() => {
+        videoContainer.classList.add('hidden-cursor');
+      }, 3000); // 3 segundos
     });
 
-    // Arrastar a barra de progresso
-    let isDragging = false;
-    progressHandle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleDrag);
-      });
-    });
-
-    function handleDrag(e) {
-      if (isDragging) {
-        const rect = progressContainer.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percent = offsetX / rect.width;
-        videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
+    // Duplo clique para alternar entre tela cheia
+    videoPlayer.addEventListener('dblclick', () => {
+      if (!document.fullscreenElement) {
+        // Entra no modo de tela cheia
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) { // Firefox
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari e Opera
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
+          videoContainer.msRequestFullscreen();
+        }
+      } else {
+        // Sai do modo de tela cheia
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari e Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
       }
-    }
-
-    let cursorTimeout;
-
-videoContainer.addEventListener('mousemove', () => {
-  // Remove a classe de esconder o cursor sempre que o mouse se mover
-  videoContainer.classList.remove('hide-cursor');
-  
-  // Limpa o timeout anterior e configura um novo para esconder o cursor após 3 segundos
-  clearTimeout(cursorTimeout);
-  cursorTimeout = setTimeout(() => {
-    videoContainer.classList.add('hide-cursor');
-  }, 3000); // 3 segundos
-});
-
+    });
   </script>
 </body>
 </html>
