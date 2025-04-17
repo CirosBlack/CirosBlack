@@ -262,26 +262,32 @@
       }, 3000); // 3 segundos
     });
 
-    // Arrastar a barra de progresso
-    let isDragging = false;
-    progressHandle.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', () => {
-        isDragging = false;
-        document.removeEventListener('mousemove', handleDrag);
-      });
-    });
-
-    function handleDrag(e) {
-      if (isDragging) {
-        const rect = progressContainer.getBoundingClientRect();
-        const offsetX = e.clientX - rect.left;
-        const percent = offsetX / rect.width;
-        videoPlayer.currentTime = percent * videoPlayer.duration;
-        updateProgress(); // Atualiza a barra de progresso enquanto arrasta
+    // Duplo clique para alternar entre tela cheia
+    videoPlayer.addEventListener('dblclick', () => {
+      if (!document.fullscreenElement) {
+        // Entra no modo de tela cheia
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) { // Firefox
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari e Opera
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
+          videoContainer.msRequestFullscreen();
+        }
+      } else {
+        // Sai do modo de tela cheia
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari e Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
       }
-    }
+    });
   </script>
 </body>
 </html>
