@@ -342,6 +342,18 @@
         }
       }
     });
+
+    // Evitar atraso do áudio com o evento visibilitychange
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !videoPlayer.paused) {
+        const currentTime = videoPlayer.currentTime;
+        videoPlayer.pause();
+        setTimeout(() => {
+          videoPlayer.currentTime = currentTime;
+          videoPlayer.play().catch(() => {});
+        }, 50);
+      }
+    });
   </script>
 </body>
 </html>
