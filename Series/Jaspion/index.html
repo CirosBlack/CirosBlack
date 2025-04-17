@@ -164,7 +164,7 @@
 
     function scrub(e) {
       const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left; // Pega a posição do clique
+      const offsetX = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left; // Verifica se é mouse ou toque
       let ratio = offsetX / rect.width;
       ratio = Math.min(Math.max(ratio, 0), 1); // Limita o valor entre 0 e 1
       const newTime = ratio * videoPlayer.duration;
@@ -203,6 +203,10 @@
     }, { passive: false });
 
     progressContainer.addEventListener('touchend', () => {
+      isDragging = false;
+    });
+
+    progressContainer.addEventListener('touchcancel', () => {
       isDragging = false;
     });
 
