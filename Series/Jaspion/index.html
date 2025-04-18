@@ -87,7 +87,60 @@
 
     let videos = [];
     let currentIndex = 0;
+    let controlsTimeout;
+    let mouseTimeout;
     let isDragging = false;
+
+    function resetControlsTimeout() {
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => {
+        controlsOverlay.classList.add('hidden');
+      }, 3000); // Esconde após 3 segundos de inatividade
+    }
+
+    function generatePlaylist() {
+      playlist.innerHTML = "";
+      videos.forEach((video, index) => {
+        const li = document.createElement('li');
+        li.dataset.index = index;
+        li.innerHTML = ` 
+          <span class="episode-title">${video.title}</span>
+          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
+        `;
+        playlist.appendChild(li);
+      });
+    }
+
+    function updatePlayPauseButton() {
+      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+    }
+
+    function loadVideoByIndex(index) {
+      if (index < 0 || index >= videos.length) return;
+      currentIndex = index;
+      videoPlayer.src = videos[index].src;
+      videoTitle.textContent = videos[index].title;
+      highlightCurrentItem();
+      scrollPlaylistToCurrent();  // Rola a playlist até o vídeo atual
+      updatePlayPauseButton();
+      videoPlayer.play().catch(() => {});
+    }
+
+    function highlightCurrentItem() {
+      const items = playlist.querySelectorAll('li');
+      items.forEach(li => li.classList.remove('playing'));
+      const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (current) current.classList.add('playing');
+    }
+
+    function scrollPlaylistToCurrent() {
+      const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+      if (currentItem) {
+        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });  // Alterado para 'start'
+      }
+    }
 
     function formatTime(seconds) {
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -114,25 +167,21 @@
       updateProgress(); // Atualiza a barra de progresso
     }
 
-    function handleMouseEvents(e) {
-      if (!isDragging) return;
-      scrub(e);
-    }
-
-    function handleTouchEvents(e) {
-      if (!isDragging) return;
-      scrub(e);
-    }
-
     progressContainer.addEventListener('mousedown', (e) => {
       isDragging = true;
       scrub(e);
     });
 
-    progressContainer.addEventListener('mousemove', handleMouseEvents);
+    progressContainer.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    });
+
     progressContainer.addEventListener('mouseup', () => {
       isDragging = false;
     });
+
     progressContainer.addEventListener('mouseleave', () => {
       isDragging = false;
     });
@@ -142,12 +191,49 @@
       scrub(e);
     }, { passive: false });
 
-    progressContainer.addEventListener('touchmove', handleTouchEvents, { passive: false });
+    progressContainer.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    }, { passive: false });
+
     progressContainer.addEventListener('touchend', () => {
       isDragging = false;
     });
 
-    // Lógica de controle do vídeo
+    window.addEventListener('load', () => {
+      fetch('dados/jaspion.json')
+        .then(res => res.json())
+        .then(data => {
+          videos = data.episodios || [];
+          if (data.serie) {
+            document.title = data.serie;
+            videoTitle.textContent = data.serie;
+          }
+          generatePlaylist();
+          loadVideoByIndex(0);
+
+          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
+            videoPlayer.muted = true;
+            videoPlayer.play().then(() => {
+              videoPlayer.muted = false;
+              videoPlayer.volume = 1.0;
+            }).catch(() => {
+              console.log('Erro ao tentar iniciar o vídeo automaticamente');
+            });
+          });
+        });
+    });
+
+    playlist.addEventListener('click', (e) => {
+      const li = e.target.closest('li');
+      if (li && li.dataset.index) {
+        loadVideoByIndex(parseInt(li.dataset.index));
+        videoPlayer.play();
+      }
+    });
+
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
     });
@@ -166,41 +252,101 @@
       updatePlayPauseButton();
     });
 
-    function loadVideoByIndex(index) {
-      if (index < 0 || index >= videos.length) return;
-      currentIndex = index;
-      videoPlayer.src = videos[index].src;
-      videoTitle.textContent = videos[index].title;
-      videoPlayer.play();
-      updatePlayPauseButton();
-    }
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        videoContainer.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
 
-    function updatePlayPauseButton() {
-      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
-    }
+    pipBtn.addEventListener('click', () => {
+      if (videoPlayer !== document.pictureInPictureElement) {
+        videoPlayer.requestPictureInPicture().catch(error => {
+          console.error("Erro ao ativar o PiP:", error);
+        });
+      } else {
+        document.exitPictureInPicture().catch(error => {
+          console.error("Erro ao sair do PiP:", error);
+        });
+      }
+    });
+
+    videoPlayer.addEventListener('enterpictureinpicture', () => {
+      console.log('PiP ativado');
+    });
+
+    videoPlayer.addEventListener('leavepictureinpicture', () => {
+      console.log('PiP desativado');
+    });
+
+    toggleDownloadsBtn.addEventListener('click', () => {
+      playlistContainer.classList.toggle('show-downloads');
+    });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
 
-    // Aguardar vídeos
-    window.addEventListener('load', () => {
-      fetch('dados/jaspion.json')
-        .then(res => res.json())
-        .then(data => {
-          videos = data.episodios || [];
-          if (data.serie) {
-            document.title = data.serie;
-            videoTitle.textContent = data.serie;
-          }
-          loadVideoByIndex(0);
-        });
-    });
-
     videoPlayer.addEventListener('ended', () => {
       if (currentIndex + 1 < videos.length) {
         loadVideoByIndex(currentIndex + 1);
+        videoPlayer.play();
+      }
+    });
+
+    // Mostrar controles ao mover o mouse sobre a tela de vídeo
+    videoContainer.addEventListener('mousemove', () => {
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
+
+      // Remove a classe que esconde o cursor quando o mouse se move
+      videoContainer.classList.remove('hidden-cursor');
+      
+      // Limpa o temporizador se o mouse se mover
+      clearTimeout(mouseTimeout);
+
+      // Define um novo temporizador para esconder o cursor após 3 segundos
+      mouseTimeout = setTimeout(() => {
+        videoContainer.classList.add('hidden-cursor');
+      }, 3000); // 3 segundos
+    });
+
+    // Duplo clique para alternar entre tela cheia
+    videoPlayer.addEventListener('dblclick', () => {
+      if (!document.fullscreenElement) {
+        // Entra no modo de tela cheia
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) { // Firefox
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari e Opera
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
+          videoContainer.msRequestFullscreen();
+        }
+      } else {
+        // Sai do modo de tela cheia
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) { // Firefox
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) { // Chrome, Safari e Opera
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) { // IE/Edge
+          document.msExitFullscreen();
+        }
+      }
+    });
+
+    // Evitar atraso do áudio com o evento visibilitychange
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !videoPlayer.paused) {
+        const currentTime = videoPlayer.currentTime;
+        videoPlayer.pause();
+        setTimeout(() => {
+          videoPlayer.currentTime = currentTime;
+          videoPlayer.play().catch(() => {});
+        }, 50);
       }
     });
   </script>
