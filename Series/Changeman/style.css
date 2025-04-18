@@ -99,6 +99,10 @@ body {
   gap: 5px; /* Espaço entre os botões da direita */
 }
 
+#fullscreenBtn {
+  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
+
 .controls-container button {
   background-color: transparent;
   color: #fff;
@@ -170,12 +174,13 @@ body {
 }
 
 #timeRemaining {
-  font-size: 0.9rem;
+  font-size: 1.0rem;
   color: #ccc;
   min-width: 45px;
   text-align: right;
-  font-weight: bold;
+  font-weight: bold; /* Este comando já coloca o texto em negrito */
 }
+
 
 /* Playlist container e outros estilos */
 .playlist-container {
@@ -304,8 +309,13 @@ body {
 
 @media (max-width: 600px) {
   #timeRemaining {
-    font-size: 0.8rem;
-  }
+  font-size: 0.9rem;
+  color: #ccc;
+  min-width: 45px;
+  text-align: right;
+  font-weight: bold; /* Este comando já coloca o texto em negrito */
+}
+
   .controls-container {
     flex-wrap: wrap;
   }
