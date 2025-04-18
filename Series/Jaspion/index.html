@@ -188,12 +188,12 @@
 
     progressContainer.addEventListener('touchstart', (e) => {
       isDragging = true;
-      scrub(e);
+      scrub(e.touches[0]);  // Usar e.touches[0] para capturar o primeiro toque
     }, { passive: false });
 
     progressContainer.addEventListener('touchmove', (e) => {
       if (isDragging) {
-        scrub(e);
+        scrub(e.touches[0]);  // Usar e.touches[0] para capturar o primeiro toque
       }
     }, { passive: false });
 
