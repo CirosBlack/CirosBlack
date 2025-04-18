@@ -21,7 +21,6 @@
     <div class="controls-overlay" id="controlsOverlay">
       <div class="bottom-controls">
         <div class="controls-container">
-          <!-- Botões de controle à esquerda -->
           <div class="left-buttons">
             <button id="prevBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
@@ -34,7 +33,6 @@
             </button>
           </div>
 
-          <!-- Barra de progresso e tempo no meio -->
           <div class="middle-controls">
             <div class="progress-wrapper">
               <div class="progress-container" id="progressContainer">
@@ -45,7 +43,6 @@
             </div>
           </div>
 
-          <!-- Botões à direita -->
           <div class="right-buttons">
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
@@ -95,7 +92,7 @@
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
-      }, 3000); // Esconde após 3 segundos de inatividade
+      }, 3000);
     }
 
     function generatePlaylist() {
@@ -123,7 +120,7 @@
       videoPlayer.src = videos[index].src;
       videoTitle.textContent = videos[index].title;
       highlightCurrentItem();
-      scrollPlaylistToCurrent();  // Rola a playlist até o vídeo atual
+      scrollPlaylistToCurrent();
       updatePlayPauseButton();
       videoPlayer.play().catch(() => {});
     }
@@ -138,7 +135,7 @@
     function scrollPlaylistToCurrent() {
       const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
       if (currentItem) {
-        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });  // Alterado para 'start'
+        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
 
@@ -159,12 +156,12 @@
 
     function scrub(e) {
       const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left; // Pega a posição do clique
+      const offsetX = e.clientX - rect.left;
       let ratio = offsetX / rect.width;
-      ratio = Math.min(Math.max(ratio, 0), 1); // Limita o valor entre 0 e 1
+      ratio = Math.min(Math.max(ratio, 0), 1);
       const newTime = ratio * videoPlayer.duration;
       videoPlayer.currentTime = newTime;
-      updateProgress(); // Atualiza a barra de progresso
+      updateProgress();
     }
 
     progressContainer.addEventListener('mousedown', (e) => {
@@ -188,12 +185,12 @@
 
     progressContainer.addEventListener('touchstart', (e) => {
       isDragging = true;
-      scrub(e.touches[0]);  // Usar e.touches[0] para capturar o primeiro toque
+      scrub(e.touches[0]);
     }, { passive: false });
 
     progressContainer.addEventListener('touchmove', (e) => {
       if (isDragging) {
-        scrub(e.touches[0]);  // Usar e.touches[0] para capturar o primeiro toque
+        scrub(e.touches[0]);
       }
     }, { passive: false });
 
@@ -202,7 +199,7 @@
     });
 
     window.addEventListener('load', () => {
-      fetch('dados/Changeman.json')
+      fetch('dados/jaspion.json')
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
@@ -227,6 +224,19 @@
     });
 
     playlist.addEventListener('click', (e) => {
+      const downloadBtn = e.target.closest('.download-btn');
+      if (downloadBtn) {
+        e.preventDefault();
+        const url = downloadBtn.href;
+        const tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.download = '';
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
+        return;
+      }
+
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
@@ -294,51 +304,24 @@
       }
     });
 
-    // Mostrar controles ao mover o mouse sobre a tela de vídeo
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout(); // Reinicia o tempo para esconder os controles
-
-      // Remove a classe que esconde o cursor quando o mouse se move
+      resetControlsTimeout();
       videoContainer.classList.remove('hidden-cursor');
-      
-      // Limpa o temporizador se o mouse se mover
       clearTimeout(mouseTimeout);
-
-      // Define um novo temporizador para esconder o cursor após 3 segundos
       mouseTimeout = setTimeout(() => {
         videoContainer.classList.add('hidden-cursor');
-      }, 3000); // 3 segundos
+      }, 3000);
     });
 
-    // Duplo clique para alternar entre tela cheia
     videoPlayer.addEventListener('dblclick', () => {
       if (!document.fullscreenElement) {
-        // Entra no modo de tela cheia
-        if (videoContainer.requestFullscreen) {
-          videoContainer.requestFullscreen();
-        } else if (videoContainer.mozRequestFullScreen) { // Firefox
-          videoContainer.mozRequestFullScreen();
-        } else if (videoContainer.webkitRequestFullscreen) { // Chrome, Safari e Opera
-          videoContainer.webkitRequestFullscreen();
-        } else if (videoContainer.msRequestFullscreen) { // IE/Edge
-          videoContainer.msRequestFullscreen();
-        }
+        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
       } else {
-        // Sai do modo de tela cheia
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        } else if (document.mozCancelFullScreen) { // Firefox
-          document.mozCancelFullScreen();
-        } else if (document.webkitExitFullscreen) { // Chrome, Safari e Opera
-          document.webkitExitFullscreen();
-        } else if (document.msExitFullscreen) { // IE/Edge
-          document.msExitFullscreen();
-        }
+        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
       }
     });
 
-    // Evitar atraso do áudio com o evento visibilitychange
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && !videoPlayer.paused) {
         const currentTime = videoPlayer.currentTime;
