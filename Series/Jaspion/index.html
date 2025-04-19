@@ -210,6 +210,7 @@
         });
     });
 
+    // DOWNLOAD FUNCIONAL COM NOME DO TÍTULO
     playlist.addEventListener('click', (e) => {
       const downloadBtn = e.target.closest('.download-btn');
 
@@ -221,16 +222,24 @@
 
         const index = parseInt(li.dataset.index);
         const video = videos[index];
-
         const safeTitle = video.title.replace(/[\\/:*?"<>|]/g, '').trim();
-        const url = `${video.src}?download=true`;
+        const videoUrl = `${video.src}?download=true`;
 
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${safeTitle}.mp4`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        fetch(videoUrl)
+          .then(response => response.blob())
+          .then(blob => {
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `${safeTitle}.mp4`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+          })
+          .catch(error => {
+            console.error('Erro ao baixar o vídeo:', error);
+          });
 
         return;
       }
