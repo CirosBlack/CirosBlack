@@ -102,7 +102,7 @@
         li.dataset.index = index;
         li.innerHTML = ` 
           <span class="episode-title">${video.title}</span>
-          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
+          <a href="#" class="download-btn">Download</a>
         `;
         playlist.appendChild(li);
       });
@@ -213,7 +213,6 @@
     playlist.addEventListener('click', (e) => {
       const downloadBtn = e.target.closest('.download-btn');
 
-      // Caso clique no botão de download
       if (downloadBtn) {
         e.preventDefault();
 
@@ -223,15 +222,15 @@
         const index = parseInt(li.dataset.index);
         const video = videos[index];
 
-        // Sanitizar o título para evitar problemas com caracteres inválidos em nomes de arquivos
         const safeTitle = video.title.replace(/[\\/:*?"<>|]/g, '').trim();
+        const url = `${video.src}?download=true`;
 
-        const tempLink = document.createElement('a');
-        tempLink.href = video.src;
-        tempLink.download = `${safeTitle}.mp4`;
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${safeTitle}.mp4`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
         return;
       }
