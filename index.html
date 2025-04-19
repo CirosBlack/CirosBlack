@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>CirosBlack</title>
-  <!-- Favicon -->
   <link rel="icon" href="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/favicon.png" type="image/png">
   <style>
     * {
@@ -62,53 +61,33 @@
       gap: 20px;
     }
 
-    /* 
-      ========== BOTÕES NO MENU COM EFEITO NEON ==========
-    */
     nav ul li a {
-      display: inline-block;
-      padding: 10px 20px;
-      position: relative;
-      color: #fff;
+      color: #ffffff;
       text-decoration: none;
-      text-transform: uppercase;
-      font-weight: bold;
-      letter-spacing: 1px;
-      border: 2px solid #e50914;
-      /* Ajuste o valor do border-radius para deixar mais ou menos arredondado */
-      border-radius: 20px;
-      transition: 0.3s ease;
+      font-weight: 500;
+      padding: 8px 12px;
+      transition: color 0.3s ease;
+      border-bottom: 2px solid transparent;
     }
 
     nav ul li a:hover {
-      background-color: #111;
-      box-shadow:
-        0 0 5px #e50914,
-        0 0 10px #e50914,
-        0 0 20px #e50914,
-        0 0 30px #e50914;
       color: #e50914;
-      transition: 0.3s ease;
+      border-bottom: 2px solid #e50914;
     }
 
-    /* Animação opcional de pulsar (descomente se quiser um efeito contínuo) 
-    @keyframes neonPulse {
-      0%, 100% {
-        box-shadow:
-          0 0 5px #e50914,
-          0 0 10px #e50914,
-          0 0 20px #e50914,
-          0 0 30px #e50914;
-      }
-      50% {
-        box-shadow:
-          0 0 10px #e50914,
-          0 0 15px #e50914,
-          0 0 25px #e50914,
-          0 0 40px #e50914;
-      }
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
     }
-    */
+
+    .menu-toggle span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      margin: 4px 0;
+      transition: 0.4s;
+    }
 
     /* ====== HERO BANNER ====== */
     .hero {
@@ -174,7 +153,7 @@
     /* ====== MAIN CONTENT ====== */
     main {
       width: 100%;
-      padding: 20px 40px 80px; /* Padding inferior para dar espaço */
+      padding: 20px 40px 80px;
       margin-top: 20px;
     }
 
@@ -246,6 +225,27 @@
         font-size: 18px;
       }
 
+      nav ul {
+        position: absolute;
+        top: 60px;
+        right: 40px;
+        background: #111;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 20px;
+        display: none;
+        border-radius: 4px;
+      }
+
+      nav ul.active {
+        display: flex;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
       nav ul li a {
         font-size: 14px;
       }
@@ -255,14 +255,12 @@
       }
     }
 
-    /* MODO RETRATO */
     @media (orientation: portrait) {
       .movie-row {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    /* MODO PAISAGEM */
     @media (orientation: landscape) {
       @media (min-width: 1780px) {
         .movie-row {
@@ -278,15 +276,18 @@
   </style>
 </head>
 <body>
-  <!-- ====== HEADER / NAVBAR ====== -->
   <header>
     <div class="left-header">
       <a href="https://cirosblack.github.io/CirosBlack" class="logo">CirosBlack</a>
       <input type="text" id="searchInput" placeholder="Pesquisar..." />
     </div>
+    <div class="menu-toggle" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
     <nav>
       <ul>
-        <!-- Links transformados em “botões” com neon -->
         <li><a href="https://cirosblack.github.io/CirosBlack/">Início</a></li>
         <li><a href="#">Animes</a></li>
         <li><a href="https://cirosblack.github.io/Filmes/">Filmes</a></li>
@@ -296,7 +297,6 @@
     </nav>
   </header>
 
-  <!-- ====== HERO BANNER ====== -->
   <div class="hero">
     <div class="hero-content">
       <h1>Bem-vindo CirosBlack</h1>
@@ -304,12 +304,10 @@
     </div>
   </div>
 
-  <!-- ====== MAIN CONTENT ====== -->
   <main>
     <div class="section">
       <h2 class="section-title">Destaques</h2>
       <div class="movie-row">
-        <!-- Exemplo de Cards -->
         <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho'">
           <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
           <div class="movie-card-info">
@@ -356,10 +354,9 @@
     </div>
   </main>
 
-  <!-- ====== SCRIPT DE PESQUISA ====== -->
   <script>
     const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', function() {
+    searchInput.addEventListener('input', function () {
       const query = this.value.toLowerCase().trim();
       const cards = document.querySelectorAll('.movie-card');
       cards.forEach(card => {
@@ -368,9 +365,13 @@
         card.style.display = (title.includes(query) || category.includes(query)) ? '' : 'none';
       });
     });
-  </script>
-  <script>
-    document.addEventListener('contextmenu', function(e) {
+
+    function toggleMenu() {
+      const nav = document.querySelector("nav ul");
+      nav.classList.toggle("active");
+    }
+
+    document.addEventListener('contextmenu', function (e) {
       e.preventDefault();
     });
   </script>
