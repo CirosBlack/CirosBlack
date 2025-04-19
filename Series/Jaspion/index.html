@@ -89,8 +89,7 @@
     let isDragging = false;
     let wasInPiP = false;
 
-    function showAndAutoHideControls() {
-      controlsOverlay.classList.remove('hidden');
+    function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
@@ -306,16 +305,13 @@
     });
 
     videoContainer.addEventListener('mousemove', () => {
-      showAndAutoHideControls();
+      controlsOverlay.classList.remove('hidden');
+      resetControlsTimeout();
       videoContainer.classList.remove('hidden-cursor');
       clearTimeout(mouseTimeout);
       mouseTimeout = setTimeout(() => {
         videoContainer.classList.add('hidden-cursor');
       }, 3000);
-    });
-
-    videoContainer.addEventListener('touchstart', () => {
-      showAndAutoHideControls();
     });
 
     videoPlayer.addEventListener('dblclick', () => {
