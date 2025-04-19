@@ -170,18 +170,11 @@
     });
 
     progressContainer.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
+      if (isDragging) scrub(e);
     });
 
-    progressContainer.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('mouseleave', () => {
-      isDragging = false;
-    });
+    progressContainer.addEventListener('mouseup', () => isDragging = false);
+    progressContainer.addEventListener('mouseleave', () => isDragging = false);
 
     progressContainer.addEventListener('touchstart', (e) => {
       isDragging = true;
@@ -189,14 +182,10 @@
     }, { passive: false });
 
     progressContainer.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        scrub(e.touches[0]);
-      }
+      if (isDragging) scrub(e.touches[0]);
     }, { passive: false });
 
-    progressContainer.addEventListener('touchend', () => {
-      isDragging = false;
-    });
+    progressContainer.addEventListener('touchend', () => isDragging = false);
 
     window.addEventListener('load', () => {
       fetch('dados/jaspion.json')
@@ -216,24 +205,34 @@
             videoPlayer.play().then(() => {
               videoPlayer.muted = false;
               videoPlayer.volume = 1.0;
-            }).catch(() => {
-              console.log('Erro ao tentar iniciar o vídeo automaticamente');
-            });
+            }).catch(() => {});
           });
         });
     });
 
     playlist.addEventListener('click', (e) => {
       const downloadBtn = e.target.closest('.download-btn');
+
+      // Caso clique no botão de download
       if (downloadBtn) {
         e.preventDefault();
-        const url = downloadBtn.href;
+
+        const li = e.target.closest('li');
+        if (!li || !li.dataset.index) return;
+
+        const index = parseInt(li.dataset.index);
+        const video = videos[index];
+
+        // Sanitizar o título para evitar problemas com caracteres inválidos em nomes de arquivos
+        const safeTitle = video.title.replace(/[\\/:*?"<>|]/g, '').trim();
+
         const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.download = '';
+        tempLink.href = video.src;
+        tempLink.download = `${safeTitle}.mp4`;
         document.body.appendChild(tempLink);
         tempLink.click();
         document.body.removeChild(tempLink);
+
         return;
       }
 
@@ -272,22 +271,10 @@
 
     pipBtn.addEventListener('click', () => {
       if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => {
-          console.error("Erro ao ativar o PiP:", error);
-        });
+        videoPlayer.requestPictureInPicture().catch(console.error);
       } else {
-        document.exitPictureInPicture().catch(error => {
-          console.error("Erro ao sair do PiP:", error);
-        });
+        document.exitPictureInPicture().catch(console.error);
       }
-    });
-
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
