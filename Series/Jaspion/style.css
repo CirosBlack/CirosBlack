@@ -1,341 +1,343 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Minha Série</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="video-container" id="videoContainer">
-    <video 
-      id="videoPlayer"
-      preload="auto"
-      playsinline
-      webkit-playsinline
-      x-webkit-airplay="allow"
-      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
-      muted
-    ></video>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
-    <div class="controls-overlay" id="controlsOverlay">
-      <div class="bottom-controls">
-        <div class="controls-container">
-          <div class="left-buttons">
-            <button id="prevBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
-            </button>
-            <button id="playPauseBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play" />
-            </button>
-            <button id="nextBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
-            </button>
-          </div>
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+  overflow: auto;
+}
 
-          <div class="middle-controls">
-            <div class="progress-wrapper">
-              <div class="progress-container" id="progressContainer">
-                <div class="progress-bar" id="progressBar"></div>
-                <div class="progress-handle" id="progressHandle"></div>
-              </div>
-              <span id="timeRemaining">00:00</span>
-            </div>
-          </div>
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
 
-          <div class="right-buttons">
-            <button id="fullscreenBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
-            </button>
-            <button id="pipBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/pip.png" alt="PiP" style="width:35px; height:35px;" />
-            </button>
-            <button id="toggleDownloadsBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 */
+  background-color: #111;
+  overflow: hidden;
+}
 
-  <div class="playlist-container" id="playlistContainer">
-    <h2 id="videoTitle">Carregando...</h2>
-    <ul id="playlist"></ul>
-  </div>
+#videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+  outline: none;
+}
 
-  <script>
-    const videoPlayer = document.getElementById('videoPlayer');
-    const videoTitle = document.getElementById('videoTitle');
-    const playlist = document.getElementById('playlist');
-    const prevBtn = document.getElementById('prevBtn');
-    const playPauseBtn = document.getElementById('playPauseBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    const pipBtn = document.getElementById('pipBtn');
-    const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
-    const playlistContainer = document.getElementById('playlistContainer');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    const progressHandle = document.getElementById('progressHandle');
-    const timeRemaining = document.getElementById('timeRemaining');
-    const controlsOverlay = document.getElementById('controlsOverlay');
-    const videoContainer = document.getElementById('videoContainer');
+.controls-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.4s;
+  pointer-events: auto;
+}
 
-    let videos = [];
-    let currentIndex = 0;
-    let controlsTimeout;
-    let mouseTimeout;
-    let isDragging = false;
-    let wasInPiP = false;
+.controls-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
 
-    function showAndAutoHideControls() {
-      controlsOverlay.classList.remove('hidden');
-      clearTimeout(controlsTimeout);
-      controlsTimeout = setTimeout(() => {
-        controlsOverlay.classList.add('hidden');
-      }, 3000);
-    }
+.bottom-controls {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+}
 
-    function generatePlaylist() {
-      playlist.innerHTML = "";
-      videos.forEach((video, index) => {
-        const li = document.createElement('li');
-        li.dataset.index = index;
-        li.innerHTML = ` 
-          <span class="episode-title">${video.title}</span>
-          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
-        `;
-        playlist.appendChild(li);
-      });
-    }
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
 
-    function updatePlayPauseButton() {
-      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
-    }
+.left-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px; /* Espaço entre os botões da esquerda */
+}
 
-    function loadVideoByIndex(index) {
-      if (index < 0 || index >= videos.length) return;
-      currentIndex = index;
-      videoPlayer.src = videos[index].src;
-      videoTitle.textContent = videos[index].title;
-      highlightCurrentItem();
-      scrollPlaylistToCurrent();
-      updatePlayPauseButton();
-      videoPlayer.play().catch(() => {});
-    }
+#nextBtn {
+  margin-right: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
 
-    function highlightCurrentItem() {
-      const items = playlist.querySelectorAll('li');
-      items.forEach(li => li.classList.remove('playing'));
-      const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-      if (current) current.classList.add('playing');
-    }
+.middle-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+}
 
-    function scrollPlaylistToCurrent() {
-      const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-      if (currentItem) {
-        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
+.right-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px; /* Espaço entre os botões da direita */
+}
 
-    function formatTime(seconds) {
-      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-      const s = String(Math.floor(seconds % 60)).padStart(2, '0');
-      return `${m}:${s}`;
-    }
+#fullscreenBtn {
+  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
 
-    function updateProgress() {
-      const duration = videoPlayer.duration || 0;
-      const currentTime = videoPlayer.currentTime || 0;
-      const percent = (currentTime / duration) * 100;
-      progressBar.style.width = percent + '%';
-      progressHandle.style.left = `calc(${percent}% - 7px)`;
-      timeRemaining.textContent = formatTime(duration - currentTime);
-    }
+.controls-container button {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  padding: 2px 2px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 10px;
+  position: relative;
+  transition: background-color 0.3s;
+}
 
-    function scrub(e) {
-      const rect = progressContainer.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      let ratio = offsetX / rect.width;
-      ratio = Math.min(Math.max(ratio, 0), 1);
-      const newTime = ratio * videoPlayer.duration;
-      videoPlayer.currentTime = newTime;
-      updateProgress();
-    }
+.controls-container button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
 
-    progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      scrub(e);
-    });
+.controls-container button img {
+  margin-bottom: 0;
+  width: 35px;
+  height: 35px;
+  transition: transform 0.2s ease;
+}
 
-    progressContainer.addEventListener('mousemove', (e) => {
-      if (isDragging) scrub(e);
-    });
+.controls-container button:hover img {
+  transform: scale(1.2);
+}
 
-    progressContainer.addEventListener('mouseup', () => isDragging = false);
-    progressContainer.addEventListener('mouseleave', () => isDragging = false);
+/* Barra de progresso e tempo */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  flex: 1;
+}
 
-    progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      scrub(e.touches[0]);
-    }, { passive: false });
+.progress-container {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  background-color: #444;
+  border-radius: 4px;
+  margin-right: 10px;
+  cursor: pointer;
+}
 
-    progressContainer.addEventListener('touchmove', (e) => {
-      if (isDragging) scrub(e.touches[0]);
-    }, { passive: false });
+#progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: red;
+  transition: width 0.1s linear;
+}
 
-    progressContainer.addEventListener('touchend', () => isDragging = false);
+#progressHandle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  left: 0%;
+}
 
-    window.addEventListener('load', () => {
-      fetch('dados/jaspion.json')
-        .then(res => res.json())
-        .then(data => {
-          videos = data.episodios || [];
-          if (data.serie) {
-            document.title = data.serie;
-            videoTitle.textContent = data.serie;
-          }
-          generatePlaylist();
-          loadVideoByIndex(0);
+#timeRemaining {
+  font-size: 1.0rem;
+  color: #ccc;
+  min-width: 45px;
+  text-align: right;
+  font-weight: bold; /* Este comando já coloca o texto em negrito */
+}
 
-          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
-            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
-            videoPlayer.muted = true;
-            videoPlayer.play().then(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
-            }).catch(() => {});
-          });
-        });
-    });
 
-    playlist.addEventListener('click', (e) => {
-      const downloadBtn = e.target.closest('.download-btn');
-      if (downloadBtn) {
-        e.preventDefault();
-        const url = downloadBtn.href;
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.download = '';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        return;
-      }
+/* Playlist container e outros estilos */
+.playlist-container {
+  width: 100%;
+  background-color: #111;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+}
 
-      const li = e.target.closest('li');
-      if (li && li.dataset.index) {
-        loadVideoByIndex(parseInt(li.dataset.index));
-        videoPlayer.play();
-      }
-    });
+#videoTitle {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
 
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
-    });
+.playlist-container ul {
+  list-style: none;
+  width: 100%;
+}
 
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
-    });
+.playlist-container li {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #222;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-    playPauseBtn.addEventListener('click', () => {
-      videoPlayer.muted = false;
-      if (videoPlayer.paused) {
-        videoPlayer.play();
-      } else {
-        videoPlayer.pause();
-      }
-      updatePlayPauseButton();
-    });
+.playlist-container li:hover {
+  background-color: #333;
+}
 
-    fullscreenBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen().catch(() => {});
-      }
-    });
+.playlist-container li.playing {
+  background-color: #444;
+}
 
-    pipBtn.addEventListener('click', () => {
-      if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => {
-          console.error("Erro ao ativar o PiP:", error);
-        });
-      } else {
-        document.exitPictureInPicture().catch(error => {
-          console.error("Erro ao sair do PiP:", error);
-        });
-      }
-    });
+.download-btn {
+  display: none;
+  color: #fff;
+  text-decoration: none;
+  background-color: #444;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  transition: background-color 0.3s;
+}
 
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
+.download-btn:hover {
+  background-color: red;
+}
 
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
-      wasInPiP = true;
-    });
+.playlist-container.show-downloads .download-btn {
+  display: inline-block;
+}
 
-    videoPlayer.addEventListener('loadeddata', async () => {
-      if (wasInPiP && document.pictureInPictureEnabled) {
-        try {
-          await videoPlayer.requestPictureInPicture();
-        } catch (e) {
-          console.warn('Erro ao tentar reentrar no PiP:', e);
-        }
-        wasInPiP = false;
-      }
-    });
+:fullscreen .video-container {
+  width: 100%;
+  height: 0;
+  padding-top: 56.25%;
+  background-color: #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
-    toggleDownloadsBtn.addEventListener('click', () => {
-      playlistContainer.classList.toggle('show-downloads');
-    });
+:fullscreen .controls-overlay {
+  display: flex;
+}
 
-    videoPlayer.addEventListener('timeupdate', updateProgress);
-    videoPlayer.addEventListener('loadedmetadata', updateProgress);
+:fullscreen #videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+}
 
-    videoPlayer.addEventListener('ended', () => {
-      if (currentIndex + 1 < videos.length) {
-        loadVideoByIndex(currentIndex + 1);
-        videoPlayer.play();
-      }
-    });
+@media (orientation: landscape) {
+  html, body {
+    overflow: hidden;
+  }
+  body {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .video-container {
+    width: 70%;
+    height: 100%;
+    padding-top: 0;
+  }
+  #videoPlayer {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .playlist-container {
+    width: 30%;
+    margin-top: 0;
+    margin-left: 0;
+    height: 100%;
+    overflow-y: auto;
+  }
+}
 
-    videoContainer.addEventListener('mousemove', () => {
-      showAndAutoHideControls();
-      videoContainer.classList.remove('hidden-cursor');
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => {
-        videoContainer.classList.add('hidden-cursor');
-      }, 3000);
-    });
+@media (orientation: portrait) {
+  .playlist-container {
+    height: 100%;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+}
 
-    videoContainer.addEventListener('touchstart', () => {
-      showAndAutoHideControls();
-    });
+@media (max-width: 600px) {
+  #timeRemaining {
+  font-size: 0.9rem;
+  color: #ccc;
+  min-width: 45px;
+  text-align: right;
+  font-weight: bold; /* Este comando já coloca o texto em negrito */
+}
 
-    videoPlayer.addEventListener('dblclick', () => {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
-      } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-      }
-    });
+  .controls-container {
+    flex-wrap: wrap;
+  }
+  .controls-container button {
+    margin-top: 5px;
+  }
+}
 
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && !videoPlayer.paused) {
-        const currentTime = videoPlayer.currentTime;
-        videoPlayer.pause();
-        setTimeout(() => {
-          videoPlayer.currentTime = currentTime;
-          videoPlayer.play().catch(() => {});
-        }, 50);
-      }
-    });
-  </script>
-</body>
-</html>
+.playlist-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+  background: #0000;
+  border-radius: 10px;
+}
+
+/* Classe para esconder o cursor */
+.hidden-cursor {
+  cursor: none;
+}
