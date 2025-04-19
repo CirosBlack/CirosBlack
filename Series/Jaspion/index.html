@@ -87,7 +87,6 @@
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
-    let wasInPiP = false;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -171,11 +170,18 @@
     });
 
     progressContainer.addEventListener('mousemove', (e) => {
-      if (isDragging) scrub(e);
+      if (isDragging) {
+        scrub(e);
+      }
     });
 
-    progressContainer.addEventListener('mouseup', () => isDragging = false);
-    progressContainer.addEventListener('mouseleave', () => isDragging = false);
+    progressContainer.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    progressContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+    });
 
     progressContainer.addEventListener('touchstart', (e) => {
       isDragging = true;
@@ -183,10 +189,14 @@
     }, { passive: false });
 
     progressContainer.addEventListener('touchmove', (e) => {
-      if (isDragging) scrub(e.touches[0]);
+      if (isDragging) {
+        scrub(e.touches[0]);
+      }
     }, { passive: false });
 
-    progressContainer.addEventListener('touchend', () => isDragging = false);
+    progressContainer.addEventListener('touchend', () => {
+      isDragging = false;
+    });
 
     window.addEventListener('load', () => {
       fetch('dados/jaspion.json')
@@ -206,7 +216,9 @@
             videoPlayer.play().then(() => {
               videoPlayer.muted = false;
               videoPlayer.volume = 1.0;
-            }).catch(() => {});
+            }).catch(() => {
+              console.log('Erro ao tentar iniciar o vídeo automaticamente');
+            });
           });
         });
     });
@@ -276,18 +288,6 @@
 
     videoPlayer.addEventListener('leavepictureinpicture', () => {
       console.log('PiP desativado');
-      wasInPiP = true;
-    });
-
-    videoPlayer.addEventListener('loadeddata', async () => {
-      if (wasInPiP && document.pictureInPictureEnabled) {
-        try {
-          await videoPlayer.requestPictureInPicture();
-        } catch (e) {
-          console.warn('Erro ao tentar reentrar no PiP:', e);
-        }
-        wasInPiP = false;
-      }
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
