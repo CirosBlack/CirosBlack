@@ -1,453 +1,260 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <title>CirosBlack</title>
-  <link rel="icon" href="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/favicon.png" type="image/png">
+  <meta charset="UTF-8">
+  <title>Player de Vídeo</title>
   <style>
-    * {
+    html, body {
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      background-color: black;
+      overflow: hidden;
+      height: 100%;
+      width: 100vw;
+      user-select: none;
+      cursor: none;
     }
 
-    body {
-      background-color: #141414;
-      color: #fff;
-      overflow-x: hidden;
-    }
-
-    header {
+    #videoContainer {
       width: 100%;
-      position: fixed;
-      top: 0;
+      height: calc(var(--vh, 1vh) * 100);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    video {
+      width: 100%;
+      height: auto;
+      max-height: 100%;
+      background: black;
+    }
+
+    #controlsWrapper {
+      position: absolute;
+      bottom: 0;
       left: 0;
-      z-index: 999;
-      background-color: rgba(0, 0, 0, 0.9);
-      padding: 10px 40px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 10px;
+      box-sizing: border-box;
+      transition: opacity 0.3s ease;
     }
 
-    .left-header {
-      display: flex;
-      align-items: center;
-    }
-
-    header .logo {
-      font-size: 24px;
-      font-weight: bold;
-      color: #e50914;
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-
-    #searchInput {
-      margin-left: 20px;
-      padding: 5px 10px;
-      border-radius: 4px;
+    button.icon-button {
+      width: 30px;
+      height: 30px;
       border: none;
-      outline: none;
-    }
-
-    nav ul {
-      list-style: none;
-      display: flex;
-      gap: 20px;
-    }
-
-    nav ul li a {
-      color: #ffffff;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 8px 12px;
-      transition: color 0.3s ease;
-      border-bottom: 2px solid transparent;
-    }
-
-    nav ul li a:hover {
-      color: #e50914;
-      border-bottom: 2px solid #e50914;
-    }
-
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
+      background: none;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 0;
+      margin-right: 2px;
       cursor: pointer;
+      transition: transform 0.2s ease;
     }
 
-    .menu-toggle span {
-      height: 3px;
-      width: 25px;
-      background: white;
-      margin: 4px 0;
-      transition: 0.4s;
+    #forward {
+      margin-right: 10px;
     }
 
-    .hero {
-      width: 100%;
-      height: 200px;
-      background: url("https://via.placeholder.com/1600x600?text=Assassino+a+Pre%C3%A7o+Fixo") center center no-repeat;
-      background-size: cover;
-      position: relative;
-      margin-top: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      padding-left: 60px;
-      animation: fadeIn 1.5s ease;
+    button.icon-button:hover {
+      transform: scale(1.07);
     }
 
-    .hero::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to right, rgba(0, 0, 0, 0.7), transparent 60%);
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 600px;
-    }
-
-    .hero-content h1 {
-      font-size: 48px;
-      margin-bottom: 20px;
-    }
-
-    .hero-content p {
-      font-size: 18px;
-      line-height: 1.4;
-      margin-bottom: 20px;
-    }
-
-    .hero-content button {
-      padding: 12px 24px;
-      background-color: #e50914;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .hero-content button:hover {
-      background-color: #f6121d;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-
-    main {
-      width: 100%;
-      padding: 20px 40px 80px;
-      margin-top: 20px;
-    }
-
-    .section-title {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-
-    .movie-row {
-      display: grid;
-      gap: 20px;
-      padding: 20px 30px;
-    }
-
-    .movie-card {
-      background-color: #222;
-      border-radius: 6px;
-      overflow: hidden;
-      position: relative;
-      cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .movie-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 10px #00f, 0 0 20px #00f, 0 0 30px #00f;
-    }
-
-    .movie-card img {
-      width: 100%;
-      display: block;
-    }
-
-    .movie-card-info {
-      padding: 8px;
-    }
-
-    .movie-card-info h4 {
+    #elapsedTime,
+    #remainingTime {
+      color: white;
+      min-width: 70px;
+      font-family: sans-serif;
       font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .movie-card-info p {
-      font-size: 12px;
-      color: #bbb;
-    }
-
-    @media (max-width: 768px) {
-      .hero {
-        height: 250px;
-        padding-left: 20px;
-      }
-
-      .hero-content h1 {
-        font-size: 28px;
-      }
-
-      .hero-content p {
-        font-size: 14px;
-      }
-
-      .hero-content button {
-        font-size: 14px;
-      }
-
-      header .logo {
-        font-size: 18px;
-      }
-
-      nav ul {
-        position: absolute;
-        top: 60px;
-        right: 40px;
-        background: #111;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 10px 20px;
-        display: none;
-        border-radius: 4px;
-      }
-
-      nav ul.active {
-        display: flex;
-      }
-
-      .menu-toggle {
-        display: flex;
-      }
-
-      nav ul li a {
-        font-size: 14px;
-      }
-
-      .section-title {
-        font-size: 18px;
-      }
-    }
-
-    @media (orientation: portrait) {
-      .movie-row {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (orientation: landscape) {
-      @media (min-width: 1780px) {
-        .movie-row {
-          grid-template-columns: repeat(6, 1fr);
-        }
-      }
-      @media (max-width: 1779px) {
-        .movie-row {
-          grid-template-columns: repeat(5, 1fr);
-        }
-      }
-    }
-
-    mark {
-      background-color: yellow;
-      color: black;
       font-weight: bold;
     }
 
-    #suggestions {
-      position: absolute;
-      background: #222;
-      list-style: none;
-      padding: 5px 10px;
-      border-radius: 4px;
-      max-height: 200px;
-      overflow-y: auto;
-      z-index: 1000;
-      display: none;
+    #elapsedTime {
+      text-align: left;
+      margin-right: 10px;
     }
 
-    #suggestions li {
-      padding: 6px;
-      cursor: pointer;
+    #remainingTime {
+      text-align: right;
+      margin-left: 10px;
     }
 
-    #suggestions li:hover {
-      background: #333;
+    #progressBar {
+      flex-grow: 1;
+      margin: 0 10px;
+    }
+
+    #volumeSlider {
+      width: 100px;
+      margin-left: 10px;
+    }
+
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
-</head>
-<body>
-  <header>
-    <div class="left-header">
-      <a href="https://cirosblack.github.io/CirosBlack" class="logo">CirosBlack</a>
-      <input type="text" id="searchInput" placeholder="Pesquisar..." autocomplete="off" />
-    </div>
-    <div class="menu-toggle" onclick="toggleMenu()">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-    <nav>
-      <ul>
-        <li><a href="https://cirosblack.github.io/CirosBlack/">Início</a></li>
-        <li><a href="#">Animes</a></li>
-        <li><a href="https://cirosblack.github.io/Filmes/">Filmes</a></li>
-        <li><a href="https://cirosblack.github.io/Filmes/Vingadores_Gerra_Infinita/">Séries</a></li>
-        <li><a href="https://cirosblack.github.io/CirosBlack/Courses/Car3D/">Cursos</a></li>
-      </ul>
-    </nav>
-  </header>
 
-  <div class="hero">
-    <div class="hero-content">
-      <h1>Bem-vindo CirosBlack</h1>
-      <p>Todos os seus conteúdos em um só lugar!</p>
-    </div>
-  </div>
-  <main>
-    <div class="section">
-      <h2 class="section-title">Destaques</h2>
-      <div class="movie-row">
-        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/YuYuHakusho'">
-          <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/WXUgWXUgSGFrdXNobw.jpg" alt="Yu Yu Hakusho" />
-          <div class="movie-card-info">
-            <h4>Yu Yu Hakusho</h4>
-            <p>Animes</p>
-          </div>
-        </div>
-        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/Jaspion'">
-          <img src="https://raw.githubusercontent.com/CirosBlack/jaspion/refs/heads/main/SmFzcGlvbg.jpg" alt="Jaspion" />
-          <div class="movie-card-info">
-            <h4>Jaspion</h4>
-            <p>Séries - Tokusatsu</p>
-          </div>
-        </div>
-        <div class="movie-card" onclick="window.location.href='https://cirosblack.github.io/CirosBlack/Series/Changeman'">
-          <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/Changeman.jpg" alt="Changeman" />
-          <div class="movie-card-info">
-            <h4>Changeman</h4>
-            <p>Séries - Tokusatsu</p>
-          </div>
-        </div>
-        <div class="movie-card">
-          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Doctor Strange" />
-          <div class="movie-card-info">
-            <h4>Doctor Strange</h4>
-            <p>Marvel</p>
-          </div>
-        </div>
-        <div class="movie-card">
-          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Wonka" />
-          <div class="movie-card-info">
-            <h4>Wonka</h4>
-            <p>Fantasia</p>
-          </div>
-        </div>
-        <div class="movie-card">
-          <img src="https://huggingface.co/datasets/CirosW/Q0FQQVM/resolve/main/WXUgWXUgSGFrdXNobw.jpg" alt="Exemplo" />
-          <div class="movie-card-info">
-            <h4>Exemplo</h4>
-            <p>Categoria</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <ul id="suggestions"></ul>
-
+  <!-- Script que calcula a altura real da viewport -->
   <script>
-    const searchInput = document.getElementById('searchInput');
-    const suggestionBox = document.getElementById('suggestions');
-    let timeout;
-
-    searchInput.addEventListener('input', function () {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        const query = this.value.toLowerCase().trim();
-        const termos = query.split(" ");
-        const cards = document.querySelectorAll('.movie-card');
-        const suggestions = new Set();
-
-        cards.forEach(card => {
-          const titleEl = card.querySelector('.movie-card-info h4');
-          const catEl = card.querySelector('.movie-card-info p');
-          const title = titleEl.textContent.toLowerCase();
-          const category = catEl.textContent.toLowerCase();
-
-          if (title.includes(query) || category.includes(query)) {
-            suggestions.add(titleEl.textContent);
-            suggestions.add(catEl.textContent);
-          }
-
-          const match = termos.every(t => title.includes(t) || category.includes(t));
-
-          if (match || query === "") {
-            card.style.display = '';
-            titleEl.innerHTML = titleEl.textContent.replace(new RegExp(`(${query})`, "gi"), "<mark>$1</mark>");
-            catEl.innerHTML = catEl.textContent.replace(new RegExp(`(${query})`, "gi"), "<mark>$1</mark>");
-          } else {
-            card.style.display = 'none';
-            titleEl.innerHTML = titleEl.textContent;
-            catEl.innerHTML = catEl.textContent;
-          }
-        });
-
-        suggestionBox.innerHTML = "";
-        if (query !== "" && suggestions.size > 0) {
-          suggestionBox.style.display = "block";
-          suggestions.forEach(text => {
-            const li = document.createElement('li');
-            li.textContent = text;
-            li.addEventListener('click', () => {
-              searchInput.value = text;
-              suggestionBox.style.display = "none";
-              searchInput.dispatchEvent(new Event('input'));
-            });
-            suggestionBox.appendChild(li);
-          });
-        } else {
-          suggestionBox.style.display = "none";
-        }
-      }, 300);
-    });
-
-    document.addEventListener('click', (e) => {
-      if (e.target !== searchInput) {
-        suggestionBox.style.display = "none";
-      }
-    });
-
-    function toggleMenu() {
-      const nav = document.querySelector("nav ul");
-      nav.classList.toggle("active");
+    function setRealVh() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
     }
 
-    document.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-    });
+    window.addEventListener('resize', setRealVh);
+    window.addEventListener('orientationchange', setRealVh);
+    window.addEventListener('load', setRealVh);
   </script>
+</head>
+<body oncontextmenu="return false">
+
+<div id="videoContainer">
+  <video id="videoPlayer" autoplay playsinline>
+    <source src="https://huggingface.co/datasets/CirosW/RklMTUVT/resolve/main/VmluZ2Fkb3JlcyBHdWVycmEgSW5maW5pdGE.mp4" type="video/mp4">
+    Seu navegador não suporta a tag de vídeo.
+  </video>
+
+  <div id="controlsWrapper">
+    <button id="rewind" class="icon-button" style="background-image: url('Voltar.png');"></button>
+    <button id="playPause" class="icon-button" style="background-image: url('Play.png');"></button>
+    <button id="forward" class="icon-button" style="background-image: url('Avancar.png');"></button>
+    <span id="elapsedTime">00:00</span>
+    <input type="range" id="progressBar" min="0" max="100" value="0">
+    <span id="remainingTime">-00:00:00</span>
+    <input type="range" id="volumeSlider" min="0" step="0.01" max="1" value="1">
+    <button id="fullscreen" class="icon-button" style="background-image: url('Tela cheia.png'); margin-right: 0;"></button>
+  </div>
+</div>
+
+<script>
+  const videoPlayer = document.getElementById('videoPlayer');
+  const playPauseBtn = document.getElementById('playPause');
+  const rewindBtn = document.getElementById('rewind');
+  const forwardBtn = document.getElementById('forward');
+  const progressBar = document.getElementById('progressBar');
+  const remainingTime = document.getElementById('remainingTime');
+  const elapsedTime = document.getElementById('elapsedTime');
+  const volumeSlider = document.getElementById('volumeSlider');
+  const fullscreenBtn = document.getElementById('fullscreen');
+  const controlsWrapper = document.getElementById('controlsWrapper');
+  const videoContainer = document.getElementById('videoContainer');
+
+  function formatTime(time, forceHours = false) {
+    const hrs = Math.floor(time / 3600);
+    const mins = Math.floor((time % 3600) / 60);
+    const secs = Math.floor(time % 60);
+
+    const hh = hrs.toString().padStart(2, '0');
+    const mm = mins.toString().padStart(2, '0');
+    const ss = secs.toString().padStart(2, '0');
+
+    return forceHours || hrs > 0 ? `${hh}:${mm}:${ss}` : `${mm}:${ss}`;
+  }
+
+  function updateTimeDisplays() {
+    if (videoPlayer.duration) {
+      const elapsed = videoPlayer.currentTime;
+      const remaining = videoPlayer.duration - elapsed;
+
+      elapsedTime.textContent = formatTime(elapsed);
+      remainingTime.textContent = '-' + formatTime(remaining, true);
+    }
+  }
+
+  function updateProgressBar() {
+    if (videoPlayer.duration) {
+      const percent = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+      progressBar.value = percent;
+    }
+  }
+
+  progressBar.addEventListener('input', () => {
+    if (videoPlayer.duration) {
+      const seekTime = (progressBar.value / 100) * videoPlayer.duration;
+      videoPlayer.currentTime = seekTime;
+    }
+  });
+
+  videoPlayer.addEventListener('timeupdate', () => {
+    updateProgressBar();
+    updateTimeDisplays();
+  });
+
+  playPauseBtn.addEventListener('click', () => {
+    if (videoPlayer.paused) {
+      videoPlayer.play();
+      playPauseBtn.style.backgroundImage = "url('Pause.png')";
+    } else {
+      videoPlayer.pause();
+      playPauseBtn.style.backgroundImage = "url('Play.png')";
+    }
+  });
+
+  rewindBtn.addEventListener('click', () => {
+    videoPlayer.currentTime = Math.max(0, videoPlayer.currentTime - 10);
+  });
+
+  forwardBtn.addEventListener('click', () => {
+    videoPlayer.currentTime = Math.min(videoPlayer.duration, videoPlayer.currentTime + 10);
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    videoPlayer.volume = volumeSlider.value;
+  });
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      videoContainer.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+
+  videoPlayer.addEventListener('dblclick', () => {
+    if (!document.fullscreenElement) {
+      videoContainer.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !videoPlayer.paused) {
+      const currentTime = videoPlayer.currentTime;
+      videoPlayer.pause();
+      videoPlayer.currentTime = currentTime + 0.001;
+      videoPlayer.play().catch(() => {});
+    }
+  });
+
+  let inactivityTimeout;
+  function hideControls() {
+    controlsWrapper.classList.add('hidden');
+    document.body.style.cursor = 'none';
+  }
+
+  function showControls() {
+    controlsWrapper.classList.remove('hidden');
+    document.body.style.cursor = 'default';
+    clearTimeout(inactivityTimeout);
+    inactivityTimeout = setTimeout(hideControls, 3000);
+  }
+
+  document.addEventListener('mousemove', showControls);
+  document.addEventListener('keydown', showControls);
+  showControls();
+
+  document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+
 </body>
 </html>
