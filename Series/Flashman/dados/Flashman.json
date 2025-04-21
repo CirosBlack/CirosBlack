@@ -1,7 +1,7 @@
 {
   "serie": "Flashman",
   "episodios": [
-    { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/Flashman/001.avi", "title": "A Terra Em Perigo" },
+    { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/Flashman/001.mp4", "title": "A Terra Em Perigo" },
     { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/Flashman/002.mp4", "title": "O Robô Gigante" },
     { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/Flashman/003.mp4", "title": "O Caçador" },
     { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/Flashman/004.mp4", "title": "O Robô Mag" },
