@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tradutor Inteligente</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #ffffff;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+    .language-selectors, .voice-selector {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    select, button {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+      border: 1px solid #444444;
+      padding: 10px;
+      border-radius: 5px;
+      transition: 0.3s;
+    }
+    select:hover, button:hover {
+      background-color: #2a2a2a;
+    }
+    #writing-style-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      background-color: #1e1e1e;
+      border: 1px solid #444444;
+      color: #e0e0e0;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      resize: vertical;
+    }
+    .output {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .output-box {
+      flex: 1;
+      min-width: 300px;
+      background-color: #1e1e1e;
+      border: 1px solid #444444;
+      padding: 15px;
+      border-radius: 5px;
+      transition: transform 0.3s ease, opacity 0.5s ease;
+      opacity: 0;
+    }
+    .output-box.show {
+      opacity: 1;
+    }
+    .output-box:hover {
+      transform: scale(1.02);
+    }
+    .label {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #aaaaaa;
+    }
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .actions button {
+      background-color: #2a2a2a;
+      border: none;
+      color: #e0e0e0;
+      padding: 6px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .actions button:hover {
+      background-color: #444444;
+    }
+    #copy-toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #444444;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tradutor Inteligente</h1>
+    <div class="language-selectors">
+      <select id="input-language"></select>
+      <button onclick="invertLanguages()">⇄</button>
+      <select id="output-language"></select>
+    </div>
+    <div id="writing-style-container" style="display:none;">
+      <label for="writing-style">Forma de escrita:</label>
+      <select id="writing-style"></select>
+    </div>
+    <div class="voice-selector">
+      <label for="voice-selection">Escolher Voz:</label>
+      <select id="voice-selection">
+        <option value="nova">Nova (feminina)</option>
+        <option value="shimmer">Shimmer (feminina)</option>
+        <option value="echo">Echo (masculina)</option>
+        <option value="onyx">Onyx (masculina)</option>
+        <option value="fable">Fable (feminina)</option>
+      </select>
+    </div>
+    <textarea id="input-text" placeholder="Digite seu texto aqui..."></textarea>
+    <div class="output">
+      <div class="output-box" id="corrected-box">
+        <span class="label">Texto Corrigido</span>
+        <div id="corrected-text">...</div>
+        <div class="actions">
+          <button onclick="speakText('corrected-text')">🔊 Ouvir</button>
+          <button onclick="copyText('corrected-text')">📋 Copiar</button>
+        </div>
+      </div>
+      <div class="output-box" id="translated-box">
+        <span class="label">Tradução</span>
+        <div id="translated-text">...</div>
+        <div class="actions">
+          <button onclick="speakText('translated-text')">🔊 Ouvir</button>
+          <button onclick="copyText('translated-text')">📋 Copiar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="copy-toast">COPIADO</div>
+
+  <script>
+    const inputText = document.getElementById('input-text');
+    const correctedTextDiv = document.getElementById('corrected-text');
+    const translatedTextDiv = document.getElementById('translated-text');
+    const inputLang = document.getElementById('input-language');
+    const outputLang = document.getElementById('output-language');
+    const writingStyleContainer = document.getElementById('writing-style-container');
+    const writingStyleSelect = document.getElementById('writing-style');
+    const voiceSelect = document.getElementById('voice-selection');
+    const correctedBox = document.getElementById('corrected-box');
+    const translatedBox = document.getElementById('translated-box');
+
+    const OPENAI_API_KEY = "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";
+
+    const isoLanguages = {
+      pt: "Português", en: "Inglês", es: "Espanhol", ja: "Japonês", zh: "Chinês", ko: "Coreano"
+      // (adicione o resto se necessário)
+    };
+
+    const writingStyles = {
+      ja: [{ value: "kanji", label: "Kanji" }, { value: "hiragana", label: "Hiragana" }, { value: "romaji", label: "Romaji" }],
+      zh: [{ value: "simplified", label: "Simplificado" }, { value: "traditional", label: "Tradicional" }, { value: "pinyin", label: "Pinyin" }],
+      ko: [{ value: "hangul", label: "Hangul" }, { value: "romanized", label: "Romanizado" }]
+    };
+
+    function populateLanguages() {
+      inputLang.add(new Option("Detectar Idioma", "auto"));
+      outputLang.add(new Option("Detectar Idioma", "auto"));
+      for (const [code, name] of Object.entries(isoLanguages)) {
+        inputLang.add(new Option(name, code));
+        outputLang.add(new Option(name, code));
+      }
+      inputLang.value = "pt";
+      outputLang.value = "en";
+    }
+
+    function updateWritingStyles() {
+      const lang = outputLang.value;
+      writingStyleSelect.innerHTML = "";
+      if (writingStyles[lang]) {
+        writingStyles[lang].forEach(style => {
+          writingStyleSelect.add(new Option(style.label, style.value));
+        });
+        writingStyleContainer.style.display = "block";
+      } else {
+        writingStyleContainer.style.display = "none";
+      }
+    }
+
+    async function callOpenAI(messages) {
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({ model: "gpt-4", messages, temperature: 0.5 })
+        });
+        if (!response.ok) throw new Error("Erro na API");
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content.trim() || "Erro na resposta";
+      } catch (error) {
+        console.error(error);
+        return "❌ Erro ao processar. Tente novamente.";
+      }
+    }
+
+    async function processText() {
+      const text = inputText.value.trim();
+      if (!text) {
+        correctedTextDiv.textContent = "...";
+        translatedTextDiv.textContent = "...";
+        return;
+      }
+
+      const sourceLang = inputLang.value;
+      const targetLang = outputLang.value;
+      const style = writingStyleSelect.value;
+      let writingNote = "";
+
+      if (targetLang === "ja") writingNote = style === "romaji" ? "Use apenas romaji." : style === "hiragana" ? "Use apenas hiragana." : "Use kanji.";
+      if (targetLang === "zh") writingNote = style === "pinyin" ? "Use apenas pinyin." : style === "traditional" ? "Use caracteres tradicionais." : "Use caracteres simplificados.";
+      if (targetLang === "ko") writingNote = style === "romanized" ? "Use romanização." : "Use hangul.";
+
+      correctedTextDiv.textContent = "Corrigindo...";
+      correctedBox.classList.remove("show");
+      translatedBox.classList.remove("show");
+
+      const correction = await callOpenAI([
+        { role: "system", content: "Corrija ortografia, gramática e estilo. Se estiver correto, apenas repita." },
+        { role: "user", content: `Corrija este texto (${sourceLang}): "${text}"` }
+      ]);
+
+      const normOriginal = text.replace(/\s+/g, " ").trim().toLowerCase();
+      const normCorrected = correction.replace(/\s+/g, " ").trim().toLowerCase();
+      correctedTextDiv.textContent = normOriginal === normCorrected ? text : correction;
+      correctedBox.classList.add("show");
+
+      translatedTextDiv.textContent = "Traduzindo...";
+      const translation = await callOpenAI([
+        { role: "system", content: "Traduza com precisão mantendo o estilo." },
+        { role: "user", content: `Traduza para ${targetLang}. ${writingNote}\n\n"${correctedTextDiv.textContent}"` }
+      ]);
+      translatedTextDiv.textContent = translation;
+      translatedBox.classList.add("show");
+    }
+
+    function invertLanguages() {
+      const temp = inputLang.value;
+      inputLang.value = outputLang.value;
+      outputLang.value = temp;
+      updateWritingStyles();
+      const translated = translatedTextDiv.textContent.trim();
+      if (translated && translated !== "..." && translated !== "Traduzindo...") {
+        inputText.value = translated;
+        processText();
+      }
+    }
+
+    async function speakText(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      if (!text || text.includes("...") || text.includes("Corrigindo") || text.includes("Traduzindo")) return;
+      try {
+        const response = await fetch("https://api.openai.com/v1/audio/speech", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${OPENAI_API_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "tts-1",
+            input: text,
+            voice: voiceSelect.value,
+            response_format: "mp3"
+          })
+        });
+        if (!response.ok) throw new Error("Erro ao gerar áudio");
+        const blob = await response.blob();
+        const audioUrl = URL.createObjectURL(blob);
+        new Audio(audioUrl).play();
+      } catch (error) {
+        console.error("Erro ao reproduzir voz:", error);
+      }
+    }
+
+    function copyText(elementId) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const toast = document.getElementById('copy-toast');
+        toast.style.opacity = '1';
+        setTimeout(() => toast.style.opacity = '0', 1000);
+      });
+    }
+
+    // Debounce para evitar chamadas excessivas
+    let debounceTimer;
+    inputText.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(processText, 500);
+    });
+    inputLang.addEventListener('change', processText);
+    outputLang.addEventListener('change', () => {
+      updateWritingStyles();
+      processText();
+    });
+    writingStyleSelect.addEventListener('change', processText);
+
+    populateLanguages();
+    updateWritingStyles();
+  </script>
+</body>
+</html>
