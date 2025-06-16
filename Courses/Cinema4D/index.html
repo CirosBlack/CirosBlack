@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Minha Série</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <div class="video-container" id="videoContainer">
     <video 
       id="videoPlayer"
@@ -22,17 +23,10 @@
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
-            <button id="prevBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
-            </button>
-            <button id="playPauseBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play" />
-            </button>
-            <button id="nextBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
-            </button>
+            <button id="prevBtn"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior"></button>
+            <button id="playPauseBtn"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play"></button>
+            <button id="nextBtn"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo"></button>
           </div>
-
           <div class="middle-controls">
             <div class="progress-wrapper">
               <div class="progress-container" id="progressContainer">
@@ -42,17 +36,10 @@
               <span id="timeRemaining">00:00</span>
             </div>
           </div>
-
           <div class="right-buttons">
-            <button id="fullscreenBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
-            </button>
-            <button id="pipBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/pip.png" alt="PiP" style="width:35px; height:35px;" />
-            </button>
-            <button id="toggleDownloadsBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
-            </button>
+            <button id="fullscreenBtn"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia"></button>
+            <button id="pipBtn"><img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/pip.png" alt="PiP" style="width:35px; height:35px;"></button>
+            <button id="toggleDownloadsBtn"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;"></button>
           </div>
         </div>
       </div>
@@ -60,8 +47,24 @@
   </div>
 
   <div class="playlist-container" id="playlistContainer">
-    <h2 id="videoTitle">Carregando...</h2>
-    <ul id="playlist"></ul>
+    <div class="tabs">
+      <button class="tab-button active" data-tab="playlistTab">Layout Inicial</button>
+      <button class="tab-button" data-tab="downloadsTab">Download dos Arquivos</button>
+    </div>
+
+    <div id="playlistTab" class="tab-content active">
+      <h2 id="videoTitle">Carregando...</h2>
+      <ul id="playlist"></ul>
+    </div>
+
+    <div id="downloadsTab" class="tab-content">
+      <h2>Arquivos para Download</h2>
+      <ul>
+        <li><a href="#">1</a></li>
+        <li><a href="#">2</a></li>
+        <li><a href="#">3</a></li>
+      </ul>
+    </div>
   </div>
 
   <script>
@@ -100,10 +103,7 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
-        li.innerHTML = ` 
-          <span class="episode-title">${video.title}</span>
-          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
-        `;
+        li.innerHTML = `<span class="episode-title">${video.title}</span><a href="${video.src}?download=true" class="download-btn" download>Download</a>`;
         playlist.appendChild(li);
       });
     }
@@ -111,7 +111,7 @@
     function updatePlayPauseButton() {
       const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
       const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}">`;
     }
 
     function loadVideoByIndex(index) {
@@ -164,39 +164,14 @@
       updateProgress();
     }
 
-    progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      scrub(e);
-    });
+    progressContainer.addEventListener('mousedown', (e) => { isDragging = true; scrub(e); });
+    progressContainer.addEventListener('mousemove', (e) => { if (isDragging) scrub(e); });
+    progressContainer.addEventListener('mouseup', () => { isDragging = false; });
+    progressContainer.addEventListener('mouseleave', () => { isDragging = false; });
 
-    progressContainer.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
-    });
-
-    progressContainer.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('mouseleave', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      scrub(e.touches[0]);
-    }, { passive: false });
-
-    progressContainer.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        scrub(e.touches[0]);
-      }
-    }, { passive: false });
-
-    progressContainer.addEventListener('touchend', () => {
-      isDragging = false;
-    });
+    progressContainer.addEventListener('touchstart', (e) => { isDragging = true; scrub(e.touches[0]); }, { passive: false });
+    progressContainer.addEventListener('touchmove', (e) => { if (isDragging) scrub(e.touches[0]); }, { passive: false });
+    progressContainer.addEventListener('touchend', () => { isDragging = false; });
 
     window.addEventListener('load', () => {
       fetch('dados/cinema.json')
@@ -209,17 +184,6 @@
           }
           generatePlaylist();
           loadVideoByIndex(0);
-
-          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
-            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
-            videoPlayer.muted = true;
-            videoPlayer.play().then(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
-            }).catch(() => {
-              console.log('Erro ao tentar iniciar o vídeo automaticamente');
-            });
-          });
         });
     });
 
@@ -244,13 +208,8 @@
       }
     });
 
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
-    });
-
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
-    });
+    prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideoByIndex(currentIndex - 1); });
+    nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1); });
 
     playPauseBtn.addEventListener('click', () => {
       videoPlayer.muted = false;
@@ -272,22 +231,10 @@
 
     pipBtn.addEventListener('click', () => {
       if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => {
-          console.error("Erro ao ativar o PiP:", error);
-        });
+        videoPlayer.requestPictureInPicture().catch(error => {});
       } else {
-        document.exitPictureInPicture().catch(error => {
-          console.error("Erro ao sair do PiP:", error);
-        });
+        document.exitPictureInPicture().catch(error => {});
       }
-    });
-
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
@@ -316,9 +263,9 @@
 
     videoPlayer.addEventListener('dblclick', () => {
       if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+        videoContainer.requestFullscreen();
       } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        document.exitFullscreen();
       }
     });
 
@@ -332,6 +279,19 @@
         }, 50);
       }
     });
+
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+        button.classList.add('active');
+        document.getElementById(button.getAttribute('data-tab')).classList.add('active');
+      });
+    });
   </script>
+
 </body>
 </html>
