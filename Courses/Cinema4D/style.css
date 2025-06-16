@@ -315,37 +315,6 @@ body {
 }
 
 @media (orientation: portrait) {
-  html, body {
-    overflow: hidden; /* Evita o scroll da página inteira */
-  }
-
-  body {
-    height: 100vh; /* Ocupa a altura total da tela */
-    flex-direction: column;
-  }
-
-  .video-container {
-    width: 100%;
-    /* Define uma altura fixa para o vídeo, por exemplo 40% da altura da tela */
-    height: 40vh; 
-    padding-top: 0;
-    flex-shrink: 0; /* Impede que o container do vídeo encolha */
-  }
-
-  #videoPlayer {
-    height: 100%;
-    width: 100%;
-    object-fit: contain;
-  }
-  
-  .playlist-section {
-    flex-grow: 1; /* Ocupa o espaço restante */
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto; /* Adiciona a barra de rolagem apenas na seção da playlist */
-    height: calc(60vh - 50px); /* Ajusta a altura considerando a altura do player e das abas */
-  }
-
   .playlist-container {
     height: 100%;
     overflow-y: auto;
@@ -353,6 +322,31 @@ body {
     padding: 0;
     border-radius: 0;
   }
+}
+
+@media (max-width: 600px) {
+  #timeRemaining {
+    font-size: 0.9rem;
+  }
+  .controls-container {
+    flex-wrap: wrap;
+  }
+  .controls-container button {
+    margin-top: 5px;
+  }
+}
+
+.playlist-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+  background: #0000;
+  border-radius: 10px;
 }
 
 .hidden-cursor {
