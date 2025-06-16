@@ -1,0 +1,409 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+  /* MODIFICAÇÃO: Garante que a página não role */
+  overflow: hidden;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 */
+  background-color: #111;
+  overflow: hidden;
+}
+
+#videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+  outline: none;
+}
+
+.controls-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.4s;
+  pointer-events: auto;
+}
+
+.controls-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bottom-controls {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.left-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+#nextBtn {
+  margin-right: 10px;
+}
+
+.middle-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  gap: 10px;
+}
+
+.right-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+}
+
+#fullscreenBtn {
+  margin-left: 10px;
+}
+
+.controls-container button {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  padding: 2px 2px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 10px;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.controls-container button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.controls-container button img {
+  margin-bottom: 0;
+  width: 35px;
+  height: 35px;
+  transition: transform 0.2s ease;
+}
+
+.controls-container button:hover img {
+  transform: scale(1.2);
+}
+
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.progress-container {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  background-color: #444;
+  border-radius: 4px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+#progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: red;
+  transition: width 0.1s linear;
+}
+
+#progressHandle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  left: 0%;
+}
+
+#timeRemaining {
+  font-size: 1.0rem;
+  color: #ccc;
+  min-width: 45px;
+  text-align: right;
+  font-weight: bold;
+}
+
+/* NOVO: Wrapper da coluna da direita */
+.playlist-section {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.playlist-container {
+  width: 100%;
+  background-color: #111;
+  padding: 15px;
+  border-radius: 5px;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  /* NOVO: Adicionado para que a playlist ocupe o espaço restante na coluna */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+#videoTitle {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.playlist-container ul {
+  list-style: none;
+  width: 100%;
+}
+
+.playlist-container li {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #222;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.playlist-container li:hover {
+  background-color: #333;
+}
+
+.playlist-container li.playing {
+  background-color: #444;
+}
+
+.download-btn {
+  display: none;
+  color: #fff;
+  text-decoration: none;
+  background-color: #444;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  transition: background-color 0.3s;
+}
+
+.download-btn:hover {
+  background-color: red;
+}
+
+.playlist-container.show-downloads .download-btn {
+  display: inline-block;
+}
+
+:fullscreen .video-container {
+  width: 100%;
+  height: 0;
+  padding-top: 56.25%;
+  background-color: #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:fullscreen .controls-overlay {
+  display: flex;
+}
+
+:fullscreen #videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+}
+
+@media (orientation: landscape) {
+  html, body {
+    overflow: hidden;
+  }
+  body {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .video-container {
+    width: 70%;
+    height: 100%;
+    padding-top: 0;
+  }
+  #videoPlayer {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* MODIFICADO: Agora o wrapper da playlist ocupa a coluna da direita */
+  .playlist-section {
+    width: 30%;
+    height: 100%;
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  /* MODIFICADO: A playlist agora apenas preenche o seu wrapper */
+  .playlist-container {
+    height: 100%;
+    margin: 0;
+    padding: 15px;
+    border-radius: 0;
+  }
+}
+
+/* SUBSTITUA ESTE BLOCO INTEIRO NO SEU CSS */
+@media (orientation: portrait) {
+  body {
+    /* Garante que o layout em coluna seja aplicado */
+    flex-direction: column;
+  }
+
+  .video-container {
+    /* Mantém a proporção de 4:3 e não permite que encolha */
+    width: 100%;
+    padding-top: 75%; /* 4:3 Aspect Ratio */
+    flex-shrink: 0;
+  }
+
+  .playlist-section {
+    /* Faz a seção da playlist ocupar todo o espaço restante */
+    flex-grow: 1;
+    width: 100%;
+    /* Garante que a seção possa lidar com seu próprio conteúdo */
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Correção importante para o flexbox em alguns navegadores */
+  }
+
+  .playlist-container {
+    /* Faz a lista de episódios crescer e ocupar o espaço disponível, ativando a rolagem interna */
+    flex-grow: 1;
+    overflow-y: auto;
+    height: auto; /* Remove a altura fixa para permitir o crescimento */
+  }
+}
+
+@media (max-width: 600px) {
+  #timeRemaining {
+    font-size: 0.9rem;
+  }
+  .controls-container {
+    flex-wrap: wrap;
+  }
+  .controls-container button {
+    margin-top: 5px;
+  }
+}
+
+.playlist-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+  background: #0000;
+  border-radius: 10px;
+}
+
+.hidden-cursor {
+  cursor: none;
+}
+
+/* Estilos para as Abas */
+.tabs-container {
+  display: flex;
+  width: 100%;
+  background-color: #111;
+  flex-shrink: 0; /* Impede que as abas encolham */
+}
+
+.tab-btn {
+  flex-grow: 1;
+  padding: 12px 10px;
+  background-color: #222;
+  color: #ccc;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.tab-btn.active {
+  background-color: #111;
+  color: #fff;
+  border-bottom: 3px solid red;
+}
