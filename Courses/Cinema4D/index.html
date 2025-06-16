@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="video-container" id="videoContainer">
-    <video 
+    <video
       id="videoPlayer"
       preload="auto"
       playsinline
@@ -59,12 +59,22 @@
     </div>
   </div>
 
+  <div class="tabs-container">
+    <button id="episodesTab" class="tab-btn active">Episódios</button>
+    <button id="downloadsTab" class="tab-btn">Downloads</button>
+  </div>
   <div class="playlist-container" id="playlistContainer">
     <h2 id="videoTitle">Carregando...</h2>
     <ul id="playlist"></ul>
   </div>
 
+  <div class="playlist-container" id="downloadListContainer" style="display: none;">
+    <h2>Arquivos para Download</h2>
+    <ul id="downloadList"></ul>
+  </div>
+
   <script>
+    // Referências aos elementos do DOM
     const videoPlayer = document.getElementById('videoPlayer');
     const videoTitle = document.getElementById('videoTitle');
     const playlist = document.getElementById('playlist');
@@ -82,11 +92,37 @@
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
 
+    // NOVOS Elementos para as Abas
+    const episodesTab = document.getElementById('episodesTab');
+    const downloadsTab = document.getElementById('downloadsTab');
+    const downloadListContainer = document.getElementById('downloadListContainer');
+    const downloadList = document.getElementById('downloadList');
+
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
+
+    // DADOS PARA A LISTA DE DOWNLOADS (Exemplo - altere para seus arquivos)
+    const downloadFiles = [
+        { title: "Trilha Sonora Completa (.zip)", src: "caminho/para/trilha_sonora.zip" },
+        { title: "Artbook Oficial (.pdf)", src: "caminho/para/artbook.pdf" },
+        { title: "Pacote de Wallpapers (.rar)", src: "caminho/para/wallpapers.rar" }
+    ];
+
+    // Função para gerar a lista de downloads
+    function generateDownloadList() {
+        downloadList.innerHTML = "";
+        downloadFiles.forEach(file => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <span class="episode-title">${file.title}</span>
+              <a href="${file.src}" class="download-btn" download style="display: inline-block;">Download</a>
+            `;
+            downloadList.appendChild(li);
+        });
+    }
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -100,7 +136,7 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
-        li.innerHTML = ` 
+        li.innerHTML = `
           <span class="episode-title">${video.title}</span>
           <a href="${video.src}?download=true" class="download-btn" download>Download</a>
         `;
@@ -208,6 +244,7 @@
             videoTitle.textContent = data.serie;
           }
           generatePlaylist();
+          generateDownloadList(); // Gera a lista de downloads
           loadVideoByIndex(0);
 
           videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
@@ -244,6 +281,21 @@
       }
     });
 
+    // Lógica para alternar entre as abas
+    episodesTab.addEventListener('click', () => {
+        episodesTab.classList.add('active');
+        downloadsTab.classList.remove('active');
+        playlistContainer.style.display = 'block';
+        downloadListContainer.style.display = 'none';
+    });
+
+    downloadsTab.addEventListener('click', () => {
+        downloadsTab.classList.add('active');
+        episodesTab.classList.remove('active');
+        playlistContainer.style.display = 'none';
+        downloadListContainer.style.display = 'block';
+    });
+
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
     });
@@ -261,6 +313,7 @@
       }
       updatePlayPauseButton();
     });
+
 
     fullscreenBtn.addEventListener('click', () => {
       if (!document.fullscreenElement) {
