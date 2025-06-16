@@ -50,10 +50,7 @@
             <button id="pipBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/pip.png" alt="PiP" style="width:35px; height:35px;" />
             </button>
-            <button id="toggleDownloadsBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
-            </button>
-          </div>
+            </div>
         </div>
       </div>
     </div>
@@ -61,7 +58,21 @@
 
   <div class="playlist-container" id="playlistContainer">
     <h2 id="videoTitle">Carregando...</h2>
-    <ul id="playlist"></ul>
+    
+    <div class="tabs">
+      <button class="tab-button active" data-tab="playlist">Playlist</button>
+      <button class="tab-button" data-tab="downloads">Downloads</button>
+    </div>
+
+    <div class="tab-content-container">
+      <div id="playlist-content" class="tab-content active">
+        <ul id="playlist"></ul>
+      </div>
+
+      <div id="downloads-content" class="tab-content">
+        <ul id="download-playlist"></ul>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -73,7 +84,6 @@
     const nextBtn = document.getElementById('nextBtn');
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const pipBtn = document.getElementById('pipBtn');
-    const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
     const playlistContainer = document.getElementById('playlistContainer');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
@@ -82,17 +92,48 @@
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
 
+    // Elementos das Abas
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const downloadPlaylist = document.getElementById('download-playlist');
+
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
 
-    function resetControlsTimeout() {
-      clearTimeout(controlsTimeout);
-      controlsTimeout = setTimeout(() => {
-        controlsOverlay.classList.add('hidden');
-      }, 3000);
+    // --- Lógica para as Abas ---
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove a classe ativa de todos os botões e conteúdos
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(content => content.classList.remove('active'));
+
+        // Adiciona a classe ativa ao botão clicado e ao conteúdo correspondente
+        button.classList.add('active');
+        const targetTab = button.getAttribute('data-tab');
+        document.getElementById(`${targetTab}-content`).classList.add('active');
+      });
+    });
+
+    // --- Geração das Playlists ---
+    const downloadFiles = [
+      { title: "Arquivo de Teste 1.zip", url: "#" },
+      { title: "Documento de Teste 2.pdf", url: "#" },
+      { title: "Imagem de Teste 3.jpg", url: "#" }
+    ];
+
+    function generateDownloadPlaylist() {
+      downloadPlaylist.innerHTML = "";
+      downloadFiles.forEach(file => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span class="episode-title">${file.title}</span>
+          <a href="${file.url}" class="download-btn" download>Download</a>
+        `;
+        downloadPlaylist.appendChild(li);
+      });
     }
 
     function generatePlaylist() {
@@ -135,7 +176,7 @@
     function scrollPlaylistToCurrent() {
       const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
       if (currentItem) {
-        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        currentItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
 
@@ -153,7 +194,7 @@
       progressHandle.style.left = `calc(${percent}% - 7px)`;
       timeRemaining.textContent = formatTime(duration - currentTime);
     }
-
+    
     function scrub(e) {
       const rect = progressContainer.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
@@ -164,40 +205,6 @@
       updateProgress();
     }
 
-    progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      scrub(e);
-    });
-
-    progressContainer.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
-    });
-
-    progressContainer.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('mouseleave', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      scrub(e.touches[0]);
-    }, { passive: false });
-
-    progressContainer.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        scrub(e.touches[0]);
-      }
-    }, { passive: false });
-
-    progressContainer.addEventListener('touchend', () => {
-      isDragging = false;
-    });
-
     window.addEventListener('load', () => {
       fetch('dados/cinema.json')
         .then(res => res.json())
@@ -205,53 +212,34 @@
           videos = data.episodios || [];
           if (data.serie) {
             document.title = data.serie;
-            videoTitle.textContent = data.serie;
           }
           generatePlaylist();
           loadVideoByIndex(0);
-
-          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
-            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
-            videoPlayer.muted = true;
-            videoPlayer.play().then(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
-            }).catch(() => {
-              console.log('Erro ao tentar iniciar o vídeo automaticamente');
-            });
-          });
         });
+      
+      generateDownloadPlaylist();
     });
 
+    // --- Event Listeners ---
     playlist.addEventListener('click', (e) => {
-      const downloadBtn = e.target.closest('.download-btn');
-      if (downloadBtn) {
-        e.preventDefault();
-        const url = downloadBtn.href;
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.download = '';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        return;
-      }
-
-      const li = e.target.closest('li');
-      if (li && li.dataset.index) {
+      const li = e.target.closest('li[data-index]');
+      if (li) {
         loadVideoByIndex(parseInt(li.dataset.index));
         videoPlayer.play();
       }
     });
+    
+    progressContainer.addEventListener('mousedown', (e) => { isDragging = true; scrub(e); });
+    progressContainer.addEventListener('mousemove', (e) => { if (isDragging) { scrub(e); } });
+    progressContainer.addEventListener('mouseup', () => { isDragging = false; });
+    progressContainer.addEventListener('mouseleave', () => { isDragging = false; });
+    progressContainer.addEventListener('touchstart', (e) => { isDragging = true; scrub(e.touches[0]); }, { passive: false });
+    progressContainer.addEventListener('touchmove', (e) => { if (isDragging) { scrub(e.touches[0]); } }, { passive: false });
+    progressContainer.addEventListener('touchend', () => { isDragging = false; });
 
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
-    });
-
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
-    });
-
+    prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideoByIndex(currentIndex - 1); });
+    nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1); });
+    
     playPauseBtn.addEventListener('click', () => {
       videoPlayer.muted = false;
       if (videoPlayer.paused) {
@@ -272,30 +260,16 @@
 
     pipBtn.addEventListener('click', () => {
       if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => {
-          console.error("Erro ao ativar o PiP:", error);
-        });
+        videoPlayer.requestPictureInPicture().catch(error => console.error("Erro ao ativar o PiP:", error));
       } else {
-        document.exitPictureInPicture().catch(error => {
-          console.error("Erro ao sair do PiP:", error);
-        });
+        document.exitPictureInPicture().catch(error => console.error("Erro ao sair do PiP:", error));
       }
-    });
-
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
-    });
-
-    toggleDownloadsBtn.addEventListener('click', () => {
-      playlistContainer.classList.toggle('show-downloads');
     });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
+    videoPlayer.addEventListener('play', updatePlayPauseButton);
+    videoPlayer.addEventListener('pause', updatePlayPauseButton);
 
     videoPlayer.addEventListener('ended', () => {
       if (currentIndex + 1 < videos.length) {
@@ -306,30 +280,15 @@
 
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout();
-      videoContainer.classList.remove('hidden-cursor');
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => {
-        videoContainer.classList.add('hidden-cursor');
-      }, 3000);
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => controlsOverlay.classList.add('hidden'), 3000);
     });
 
     videoPlayer.addEventListener('dblclick', () => {
       if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+        videoContainer.requestFullscreen?.();
       } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-      }
-    });
-
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && !videoPlayer.paused) {
-        const currentTime = videoPlayer.currentTime;
-        videoPlayer.pause();
-        setTimeout(() => {
-          videoPlayer.currentTime = currentTime;
-          videoPlayer.play().catch(() => {});
-        }, 50);
+        document.exitFullscreen?.();
       }
     });
   </script>
