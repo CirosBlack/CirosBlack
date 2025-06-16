@@ -20,7 +20,7 @@
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/017.mp4", "title": "Deformadores (Projection, Morph, Mesh)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/018.mp4", "title": "Termos, Regras e Erros Comuns em Modelagem" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/019.mp4", "title": "Ferramentas de Modelagem (Knife Tool)" },
-    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/020.mp4", "title": "Ferramentas de Modelagem (Extrude Tool)" }
+    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/020.mp4", "title": "Ferramentas de Modelagem (Extrude Tool)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/021.mp4", "title": "Ferramentas de Modelagem (Inset e Bridge Tool)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/022.mp4", "title": "Ferramentas de Modelagem (Slide Tool)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/023.mp4", "title": "Ferramentas de Modelagem (Close Polygon Hole, Smooth Edges, Iron)" },
@@ -40,7 +40,7 @@
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/037.mp4", "title": "Ferramentas (Lathe)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/038.mp4", "title": "Ferramentas (Sweep)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/039.mp4", "title": "Ferramentas (Loft)" },
-    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/040.mp4", "title": "Ferramentas - (Atom Array e Instance)" }
+    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/040.mp4", "title": "Ferramentas - (Atom Array e Instance)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/041.mp4", "title": "Ferramentas (Thicken)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/042.mp4", "title": "Ferramentas (Boole)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/043.mp4", "title": "Ferramentas (Polygon Reduction)" },
@@ -60,7 +60,7 @@
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/057.mp4", "title": "Materiais (parte 01)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/058.mp4", "title": "Materiais (parte 02)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/059.mp4", "title": "Materiais (parte 03)" },
-    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/060.mp4", "title": "Materiais Parte 04 (Canal Reflectance Parte 01)" }
+    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/060.mp4", "title": "Materiais Parte 04 (Canal Reflectance Parte 01)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/061.mp4", "title": "Materiais Parte 05 (Canal Reflectance Parte 02)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/062.mp4", "title": "Materiais Parte 06 (Canal Reflectance Parte 03)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/063.mp4", "title": "Materiais Parte 07 (Bump, Normal, Displacement)" },
@@ -80,7 +80,7 @@
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/077.mp4", "title": "Tags (Compositing Tag - Parte 02)" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/078.mp4", "title": "Elementos de Integração e Iluminação do Ambiente" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/079.mp4", "title": "Ambient Occlusion (Efeito e Shader)" },
-    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/080.mp4", "title": "Aula Prática - Modelagem de Bolinhas de Natal" }
+    { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/080.mp4", "title": "Aula Prática - Modelagem de Bolinhas de Natal" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/081.mp4", "title": "Aula Prática - Texturização e Iluminação de Bolinhas de Natal" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/082.mp4", "title": "Global Illumination" },
     { "src": "https://huggingface.co/datasets/CirosW/Y291cnNlcw/resolve/main/Q2luZW1hIDREIEEgSm9ybmFkYSBkbyBJbmljaWFudGUgYW8gRXhwZXJ0/083.mp4", "title": "Tags - Vibrate Tag" },
