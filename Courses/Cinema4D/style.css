@@ -10,7 +10,8 @@ html, body {
   height: 100%;
   background-color: #000;
   color: #fff;
-  overflow: auto;
+  /* MODIFICAÇÃO: Garante que a página não role */
+  overflow: hidden;
 }
 
 body {
@@ -314,13 +315,35 @@ body {
   }
 }
 
+/* SUBSTITUA ESTE BLOCO INTEIRO NO SEU CSS */
 @media (orientation: portrait) {
+  body {
+    /* Garante que o layout em coluna seja aplicado */
+    flex-direction: column;
+  }
+
+  .video-container {
+    /* Mantém a proporção de 4:3 e não permite que encolha */
+    width: 100%;
+    padding-top: 75%; /* 4:3 Aspect Ratio */
+    flex-shrink: 0;
+  }
+
+  .playlist-section {
+    /* Faz a seção da playlist ocupar todo o espaço restante */
+    flex-grow: 1;
+    width: 100%;
+    /* Garante que a seção possa lidar com seu próprio conteúdo */
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Correção importante para o flexbox em alguns navegadores */
+  }
+
   .playlist-container {
-    height: 100%;
+    /* Faz a lista de episódios crescer e ocupar o espaço disponível, ativando a rolagem interna */
+    flex-grow: 1;
     overflow-y: auto;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
+    height: auto; /* Remove a altura fixa para permitir o crescimento */
   }
 }
 
