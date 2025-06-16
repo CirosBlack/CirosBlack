@@ -78,29 +78,29 @@ body {
 .left-buttons {
   display: flex;
   align-items: center;
-  gap: 1px; /* Espaço entre os botões da esquerda */
+  gap: 1px;
 }
 
 #nextBtn {
-  margin-right: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-right: 10px;
 }
 
 .middle-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
-  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  flex-grow: 1;
+  gap: 10px;
 }
 
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 1px; /* Espaço entre os botões da direita */
+  gap: 1px;
 }
 
 #fullscreenBtn {
-  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-left: 10px;
 }
 
 .controls-container button {
@@ -132,11 +132,10 @@ body {
   transform: scale(1.2);
 }
 
-/* Barra de progresso e tempo */
 .progress-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  gap: 10px;
   flex: 1;
 }
 
@@ -178,19 +177,28 @@ body {
   color: #ccc;
   min-width: 45px;
   text-align: right;
-  font-weight: bold; /* Este comando já coloca o texto em negrito */
+  font-weight: bold;
 }
 
+/* NOVO: Wrapper da coluna da direita */
+.playlist-section {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
 
-/* Playlist container e outros estilos */
 .playlist-container {
   width: 100%;
   background-color: #111;
   padding: 15px;
   border-radius: 5px;
-  margin-top: 0; /* Alterado de 10px para 0 para juntar com as abas */
   scroll-behavior: smooth;
   overflow-y: auto;
+  /* NOVO: Adicionado para que a playlist ocupe o espaço restante na coluna */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 #videoTitle {
@@ -288,12 +296,21 @@ body {
     height: 100%;
     object-fit: contain;
   }
-  .playlist-container {
+
+  /* MODIFICADO: Agora o wrapper da playlist ocupa a coluna da direita */
+  .playlist-section {
     width: 30%;
+    height: 100%;
     margin-top: 0;
     margin-left: 0;
+  }
+
+  /* MODIFICADO: A playlist agora apenas preenche o seu wrapper */
+  .playlist-container {
     height: 100%;
-    overflow-y: auto;
+    margin: 0;
+    padding: 15px;
+    border-radius: 0;
   }
 }
 
@@ -309,13 +326,8 @@ body {
 
 @media (max-width: 600px) {
   #timeRemaining {
-  font-size: 0.9rem;
-  color: #ccc;
-  min-width: 45px;
-  text-align: right;
-  font-weight: bold; /* Este comando já coloca o texto em negrito */
-}
-
+    font-size: 0.9rem;
+  }
   .controls-container {
     flex-wrap: wrap;
   }
@@ -337,17 +349,16 @@ body {
   border-radius: 10px;
 }
 
-/* Classe para esconder o cursor */
 .hidden-cursor {
   cursor: none;
 }
 
-/* --- INÍCIO: NOVOS ESTILOS PARA AS ABAS --- */
-
+/* Estilos para as Abas */
 .tabs-container {
   display: flex;
   width: 100%;
   background-color: #111;
+  flex-shrink: 0; /* Impede que as abas encolham */
 }
 
 .tab-btn {
