@@ -59,19 +59,23 @@
     </div>
   </div>
 
-  <div class="tabs-container">
-    <button id="episodesTab" class="tab-btn active">Episódios</button>
-    <button id="downloadsTab" class="tab-btn">Downloads</button>
-  </div>
-  <div class="playlist-container" id="playlistContainer">
-    <h2 id="videoTitle">Carregando...</h2>
-    <ul id="playlist"></ul>
+  <div class="playlist-section">
+    <div class="tabs-container">
+      <button id="episodesTab" class="tab-btn active">Episódios</button>
+      <button id="downloadsTab" class="tab-btn">Downloads</button>
+    </div>
+
+    <div class="playlist-container" id="playlistContainer">
+      <h2 id="videoTitle">Carregando...</h2>
+      <ul id="playlist"></ul>
+    </div>
+
+    <div class="playlist-container" id="downloadListContainer" style="display: none;">
+      <h2>Arquivos para Download</h2>
+      <ul id="downloadList"></ul>
+    </div>
   </div>
 
-  <div class="playlist-container" id="downloadListContainer" style="display: none;">
-    <h2>Arquivos para Download</h2>
-    <ul id="downloadList"></ul>
-  </div>
 
   <script>
     // Referências aos elementos do DOM
@@ -285,7 +289,7 @@
     episodesTab.addEventListener('click', () => {
         episodesTab.classList.add('active');
         downloadsTab.classList.remove('active');
-        playlistContainer.style.display = 'block';
+        playlistContainer.style.display = 'flex'; // Usar flex para preencher o espaço
         downloadListContainer.style.display = 'none';
     });
 
@@ -293,7 +297,7 @@
         downloadsTab.classList.add('active');
         episodesTab.classList.remove('active');
         playlistContainer.style.display = 'none';
-        downloadListContainer.style.display = 'block';
+        downloadListContainer.style.display = 'flex'; // Usar flex para preencher o espaço
     });
 
     prevBtn.addEventListener('click', () => {
