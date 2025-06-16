@@ -314,34 +314,15 @@ body {
   }
 }
 
-/* CÓDIGO ATUALIZADO PARA MODO RETRATO */
 @media (orientation: portrait) {
-  .video-container {
-    position: -webkit-sticky; /* Para compatibilidade com Safari */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    /* Redefinindo a margem para evitar espaçamento extra */
-    margin-top: 0;
-  }
-
-  .playlist-section {
-    /* A altura é calculada para preencher o espaço restante abaixo do vídeo.
-       75vw é a altura do vídeo, baseada no padding-top: 75% */
-    height: calc(100% - 75vw); 
-    overflow-y: auto; /* Adiciona rolagem apenas à seção da playlist */
-  }
-
   .playlist-container {
-    /* Ajustes para garantir que a playlist use o espaço corretamente */
-    height: auto;
-    overflow-y: initial; /* A rolagem agora é controlada pelo pai (.playlist-section) */
+    height: 100%;
+    overflow-y: auto;
     margin: 0;
-    padding: 15px;
+    padding: 0;
     border-radius: 0;
   }
 }
-
 
 @media (max-width: 600px) {
   #timeRemaining {
