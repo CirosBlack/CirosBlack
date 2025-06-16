@@ -96,7 +96,7 @@
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
 
-    // NOVOS Elementos para as Abas
+    // Elementos para as Abas
     const episodesTab = document.getElementById('episodesTab');
     const downloadsTab = document.getElementById('downloadsTab');
     const downloadListContainer = document.getElementById('downloadListContainer');
@@ -140,10 +140,29 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
+
+        // Pega o título e a URL do vídeo do objeto de dados
+        const episodeTitle = video.title;
+        const videoSrc = video.src;
+
+        // Extrai a extensão do arquivo (ex: "mp4") da URL do vídeo.
+        // Isso funciona mesmo que a URL tenha parâmetros como "?token=..."
+        const pathWithoutQuery = videoSrc.split('?')[0];
+        const extension = pathWithoutQuery.split('.').pop();
+
+        // Limpa o título para ser um nome de arquivo válido,
+        // substituindo caracteres inválidos por um underscore '_'
+        const sanitizedTitle = episodeTitle.replace(/[\\/:*?"<>|]/g, '_').trim();
+
+        // Cria o nome de arquivo final, juntando o título limpo e a extensão
+        const downloadFilename = `${sanitizedTitle}.${extension}`;
+
+        // Cria o item da lista (li) com o atributo 'download' preenchido
         li.innerHTML = `
-          <span class="episode-title">${video.title}</span>
-          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
+          <span class="episode-title">${episodeTitle}</span>
+          <a href="${videoSrc}?download=true" class="download-btn" download="${downloadFilename}">Download</a>
         `;
+        
         playlist.appendChild(li);
       });
     }
@@ -248,7 +267,7 @@
             videoTitle.textContent = data.serie;
           }
           generatePlaylist();
-          generateDownloadList(); // Gera a lista de downloads
+          generateDownloadList();
           loadVideoByIndex(0);
 
           videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
@@ -267,14 +286,7 @@
     playlist.addEventListener('click', (e) => {
       const downloadBtn = e.target.closest('.download-btn');
       if (downloadBtn) {
-        e.preventDefault();
-        const url = downloadBtn.href;
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.download = '';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
+        // A lógica de download agora é gerenciada pelo atributo 'download' no HTML
         return;
       }
 
@@ -289,7 +301,7 @@
     episodesTab.addEventListener('click', () => {
         episodesTab.classList.add('active');
         downloadsTab.classList.remove('active');
-        playlistContainer.style.display = 'flex'; // Usar flex para preencher o espaço
+        playlistContainer.style.display = 'flex';
         downloadListContainer.style.display = 'none';
     });
 
@@ -297,7 +309,7 @@
         downloadsTab.classList.add('active');
         episodesTab.classList.remove('active');
         playlistContainer.style.display = 'none';
-        downloadListContainer.style.display = 'flex'; // Usar flex para preencher o espaço
+        downloadListContainer.style.display = 'flex';
     });
 
     prevBtn.addEventListener('click', () => {
