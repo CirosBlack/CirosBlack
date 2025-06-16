@@ -78,29 +78,29 @@ body {
 .left-buttons {
   display: flex;
   align-items: center;
-  gap: 1px; /* Espaço entre os botões da esquerda */
+  gap: 1px;
 }
 
 #nextBtn {
-  margin-right: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-right: 10px;
 }
 
 .middle-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
-  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  flex-grow: 1;
+  gap: 10px;
 }
 
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 1px; /* Espaço entre os botões da direita */
+  gap: 1px;
 }
 
 #fullscreenBtn {
-  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-left: 10px;
 }
 
 .controls-container button {
@@ -132,11 +132,10 @@ body {
   transform: scale(1.2);
 }
 
-/* Barra de progresso e tempo */
 .progress-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  gap: 10px;
   flex: 1;
 }
 
@@ -178,19 +177,28 @@ body {
   color: #ccc;
   min-width: 45px;
   text-align: right;
-  font-weight: bold; /* Este comando já coloca o texto em negrito */
+  font-weight: bold;
 }
 
+/* NOVO: Wrapper da coluna da direita */
+.playlist-section {
+    width: 100%;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+}
 
-/* Playlist container e outros estilos */
 .playlist-container {
   width: 100%;
   background-color: #111;
   padding: 15px;
   border-radius: 5px;
-  margin-top: 10px;
   scroll-behavior: smooth;
   overflow-y: auto;
+  /* NOVO: Adicionado para que a playlist ocupe o espaço restante na coluna */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 #videoTitle {
@@ -288,34 +296,57 @@ body {
     height: 100%;
     object-fit: contain;
   }
-  .playlist-container {
+
+  /* MODIFICADO: Agora o wrapper da playlist ocupa a coluna da direita */
+  .playlist-section {
     width: 30%;
+    height: 100%;
     margin-top: 0;
     margin-left: 0;
-    height: 100%;
-    overflow-y: auto;
   }
-}
 
-@media (orientation: portrait) {
+  /* MODIFICADO: A playlist agora apenas preenche o seu wrapper */
   .playlist-container {
     height: 100%;
-    overflow-y: auto;
     margin: 0;
-    padding: 0;
+    padding: 15px;
     border-radius: 0;
   }
 }
 
-@media (max-width: 600px) {
-  #timeRemaining {
-  font-size: 0.9rem;
-  color: #ccc;
-  min-width: 45px;
-  text-align: right;
-  font-weight: bold; /* Este comando já coloca o texto em negrito */
+/* CÓDIGO ATUALIZADO PARA MODO RETRATO */
+@media (orientation: portrait) {
+  .video-container {
+    position: -webkit-sticky; /* Para compatibilidade com Safari */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    /* Redefinindo a margem para evitar espaçamento extra */
+    margin-top: 0;
+  }
+
+  .playlist-section {
+    /* A altura é calculada para preencher o espaço restante abaixo do vídeo.
+       75vw é a altura do vídeo, baseada no padding-top: 75% */
+    height: calc(100% - 75vw); 
+    overflow-y: auto; /* Adiciona rolagem apenas à seção da playlist */
+  }
+
+  .playlist-container {
+    /* Ajustes para garantir que a playlist use o espaço corretamente */
+    height: auto;
+    overflow-y: initial; /* A rolagem agora é controlada pelo pai (.playlist-section) */
+    margin: 0;
+    padding: 15px;
+    border-radius: 0;
+  }
 }
 
+
+@media (max-width: 600px) {
+  #timeRemaining {
+    font-size: 0.9rem;
+  }
   .controls-container {
     flex-wrap: wrap;
   }
@@ -337,7 +368,38 @@ body {
   border-radius: 10px;
 }
 
-/* Classe para esconder o cursor */
 .hidden-cursor {
   cursor: none;
+}
+
+/* Estilos para as Abas */
+.tabs-container {
+  display: flex;
+  width: 100%;
+  background-color: #111;
+  flex-shrink: 0; /* Impede que as abas encolham */
+}
+
+.tab-btn {
+  flex-grow: 1;
+  padding: 12px 10px;
+  background-color: #222;
+  color: #ccc;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s, color 0.3s;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn:hover {
+  background-color: #333;
+  color: #fff;
+}
+
+.tab-btn.active {
+  background-color: #111;
+  color: #fff;
+  border-bottom: 3px solid red;
 }
