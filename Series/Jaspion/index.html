@@ -2,68 +2,59 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Minha Série</title>
+  <title>Jaspion</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <div class="video-container" id="videoContainer">
+<body class="bg-black text-white flex flex-col lg:flex-row h-screen overflow-hidden font-sans">
+
+  <!-- Vídeo -->
+  <div id="videoContainer" class="relative w-full lg:w-3/4 aspect-video bg-zinc-900 shadow-lg">
     <video 
       id="videoPlayer"
+      class="w-full h-full object-contain"
       preload="auto"
       playsinline
-      webkit-playsinline
-      x-webkit-airplay="allow"
-      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
       muted
+      controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
     ></video>
 
-    <div class="controls-overlay" id="controlsOverlay">
-      <div class="bottom-controls">
-        <div class="controls-container">
-          <div class="left-buttons">
-            <button id="prevBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" alt="Anterior" />
-            </button>
-            <button id="playPauseBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" alt="Play" />
-            </button>
-            <button id="nextBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
-            </button>
-          </div>
+    <!-- Controles -->
+    <div id="controlsOverlay" class="absolute bottom-0 w-full bg-gradient-to-t from-black/70 to-transparent p-3 transition-opacity duration-300 flex flex-col gap-2">
+      <div class="flex justify-between items-center gap-4 flex-wrap">
+        <!-- Esquerda -->
+        <div class="flex gap-2">
+          <button id="prevBtn" class="hover:scale-110 transition"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Voltar.png" class="w-8 h-8" /></button>
+          <button id="playPauseBtn" class="hover:scale-110 transition"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png" class="w-8 h-8" /></button>
+          <button id="nextBtn" class="hover:scale-110 transition"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" class="w-8 h-8" /></button>
+        </div>
 
-          <div class="middle-controls">
-            <div class="progress-wrapper">
-              <div class="progress-container" id="progressContainer">
-                <div class="progress-bar" id="progressBar"></div>
-                <div class="progress-handle" id="progressHandle"></div>
-              </div>
-              <span id="timeRemaining">00:00</span>
-            </div>
+        <!-- Meio -->
+        <div class="flex flex-1 items-center gap-3 min-w-[200px]">
+          <div id="progressContainer" class="relative flex-1 h-2 bg-zinc-600 rounded cursor-pointer">
+            <div id="progressBar" class="absolute top-0 left-0 h-full bg-red-500 rounded transition-all duration-150"></div>
+            <div id="progressHandle" class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow"></div>
           </div>
+          <span id="timeRemaining" class="text-sm font-bold min-w-[48px] text-right">00:00</span>
+        </div>
 
-          <div class="right-buttons">
-            <button id="fullscreenBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
-            </button>
-            <button id="pipBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/pip.png" alt="PiP" style="width:35px; height:35px;" />
-            </button>
-            <button id="toggleDownloadsBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" alt="Mostrar Downloads" style="width:35px; height:35px;">
-            </button>
-          </div>
+        <!-- Direita -->
+        <div class="flex gap-2">
+          <button id="fullscreenBtn" class="hover:scale-110 transition"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" class="w-8 h-8" /></button>
+          <button id="pipBtn" class="hover:scale-110 transition"><img src="https://raw.githubusercontent.com/CirosBlack/CirosBlack/refs/heads/main/pip.png" class="w-8 h-8" /></button>
+          <button id="toggleDownloadsBtn" class="hover:scale-110 transition"><img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/down.png" class="w-8 h-8" /></button>
         </div>
       </div>
     </div>
   </div>
 
-  <div class="playlist-container" id="playlistContainer">
-    <h2 id="videoTitle">Carregando...</h2>
-    <ul id="playlist"></ul>
-  </div>
+  <!-- Playlist -->
+  <aside id="playlistContainer" class="w-full lg:w-1/4 bg-zinc-800 p-4 overflow-y-auto">
+    <h2 id="videoTitle" class="text-xl font-semibold mb-4">Carregando...</h2>
+    <ul id="playlist" class="space-y-2"></ul>
+  </aside>
 
+  <!-- Script -->
   <script>
     const videoPlayer = document.getElementById('videoPlayer');
     const videoTitle = document.getElementById('videoTitle');
@@ -84,60 +75,7 @@
 
     let videos = [];
     let currentIndex = 0;
-    let controlsTimeout;
-    let mouseTimeout;
     let isDragging = false;
-
-    function resetControlsTimeout() {
-      clearTimeout(controlsTimeout);
-      controlsTimeout = setTimeout(() => {
-        controlsOverlay.classList.add('hidden');
-      }, 3000);
-    }
-
-    function generatePlaylist() {
-      playlist.innerHTML = "";
-      videos.forEach((video, index) => {
-        const li = document.createElement('li');
-        li.dataset.index = index;
-        li.innerHTML = ` 
-          <span class="episode-title">${video.title}</span>
-          <a href="${video.src}?download=true" class="download-btn" download>Download</a>
-        `;
-        playlist.appendChild(li);
-      });
-    }
-
-    function updatePlayPauseButton() {
-      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
-    }
-
-    function loadVideoByIndex(index) {
-      if (index < 0 || index >= videos.length) return;
-      currentIndex = index;
-      videoPlayer.src = videos[index].src;
-      videoTitle.textContent = videos[index].title;
-      highlightCurrentItem();
-      scrollPlaylistToCurrent();
-      updatePlayPauseButton();
-      videoPlayer.play().catch(() => {});
-    }
-
-    function highlightCurrentItem() {
-      const items = playlist.querySelectorAll('li');
-      items.forEach(li => li.classList.remove('playing'));
-      const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-      if (current) current.classList.add('playing');
-    }
-
-    function scrollPlaylistToCurrent() {
-      const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-      if (currentItem) {
-        currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }
 
     function formatTime(seconds) {
       const m = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -150,7 +88,7 @@
       const currentTime = videoPlayer.currentTime || 0;
       const percent = (currentTime / duration) * 100;
       progressBar.style.width = percent + '%';
-      progressHandle.style.left = `calc(${percent}% - 7px)`;
+      progressHandle.style.left = `calc(${percent}% - 8px)`;
       timeRemaining.textContent = formatTime(duration - currentTime);
     }
 
@@ -164,84 +102,53 @@
       updateProgress();
     }
 
-    progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      scrub(e);
+    function generatePlaylist() {
+      playlist.innerHTML = "";
+      videos.forEach((video, index) => {
+        const li = document.createElement('li');
+        li.className = `flex justify-between items-center p-3 rounded bg-zinc-700 hover:bg-zinc-600 transition cursor-pointer`;
+        li.dataset.index = index;
+        li.innerHTML = `
+          <span>${video.title}</span>
+          <a href="${video.src}?download=true" class="text-xs bg-zinc-600 hover:bg-red-600 text-white px-2 py-1 rounded hidden download-btn">Download</a>
+        `;
+        playlist.appendChild(li);
+      });
+    }
+
+    function highlightCurrentItem() {
+      playlist.querySelectorAll('li').forEach((li, i) => {
+        li.classList.remove("ring", "ring-red-500", "bg-zinc-600");
+        if (i === currentIndex) li.classList.add("ring", "ring-red-500", "bg-zinc-600");
+      });
+    }
+
+    function loadVideoByIndex(index) {
+      if (index < 0 || index >= videos.length) return;
+      currentIndex = index;
+      videoPlayer.src = videos[index].src;
+      videoTitle.textContent = videos[index].title;
+      highlightCurrentItem();
+      videoPlayer.play().catch(() => {});
+    }
+
+    playPauseBtn.addEventListener('click', () => {
+      videoPlayer.muted = false;
+      if (videoPlayer.paused) videoPlayer.play();
+      else videoPlayer.pause();
+      updatePlayPauseButton();
     });
 
-    progressContainer.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
-    });
-
-    progressContainer.addEventListener('mouseup', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('mouseleave', () => {
-      isDragging = false;
-    });
-
-    progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      scrub(e.touches[0]);
-    }, { passive: false });
-
-    progressContainer.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        scrub(e.touches[0]);
-      }
-    }, { passive: false });
-
-    progressContainer.addEventListener('touchend', () => {
-      isDragging = false;
-    });
-
-    window.addEventListener('load', () => {
-      fetch('dados/jaspion.json')
-        .then(res => res.json())
-        .then(data => {
-          videos = data.episodios || [];
-          if (data.serie) {
-            document.title = data.serie;
-            videoTitle.textContent = data.serie;
-          }
-          generatePlaylist();
-          loadVideoByIndex(0);
-
-          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
-            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
-            videoPlayer.muted = true;
-            videoPlayer.play().then(() => {
-              videoPlayer.muted = false;
-              videoPlayer.volume = 1.0;
-            }).catch(() => {
-              console.log('Erro ao tentar iniciar o vídeo automaticamente');
-            });
-          });
-        });
-    });
+    function updatePlayPauseButton() {
+      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" class="w-8 h-8" />`;
+    }
 
     playlist.addEventListener('click', (e) => {
-      const downloadBtn = e.target.closest('.download-btn');
-      if (downloadBtn) {
-        e.preventDefault();
-        const url = downloadBtn.href;
-        const tempLink = document.createElement('a');
-        tempLink.href = url;
-        tempLink.download = '';
-        document.body.appendChild(tempLink);
-        tempLink.click();
-        document.body.removeChild(tempLink);
-        return;
-      }
-
+      if (e.target.closest('.download-btn')) return;
       const li = e.target.closest('li');
-      if (li && li.dataset.index) {
-        loadVideoByIndex(parseInt(li.dataset.index));
-        videoPlayer.play();
-      }
+      if (li && li.dataset.index) loadVideoByIndex(parseInt(li.dataset.index));
     });
 
     prevBtn.addEventListener('click', () => {
@@ -252,85 +159,43 @@
       if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
     });
 
-    playPauseBtn.addEventListener('click', () => {
-      videoPlayer.muted = false;
-      if (videoPlayer.paused) {
-        videoPlayer.play();
-      } else {
-        videoPlayer.pause();
-      }
-      updatePlayPauseButton();
-    });
-
     fullscreenBtn.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen().catch(() => {});
-      }
+      if (!document.fullscreenElement) videoContainer.requestFullscreen();
+      else document.exitFullscreen();
     });
 
     pipBtn.addEventListener('click', () => {
-      if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => {
-          console.error("Erro ao ativar o PiP:", error);
-        });
-      } else {
-        document.exitPictureInPicture().catch(error => {
-          console.error("Erro ao sair do PiP:", error);
-        });
-      }
-    });
-
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
+      if (videoPlayer !== document.pictureInPictureElement) videoPlayer.requestPictureInPicture();
+      else document.exitPictureInPicture();
     });
 
     toggleDownloadsBtn.addEventListener('click', () => {
-      playlistContainer.classList.toggle('show-downloads');
+      playlistContainer.querySelectorAll('.download-btn').forEach(btn => btn.classList.toggle('hidden'));
     });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
-    videoPlayer.addEventListener('loadedmetadata', updateProgress);
 
-    videoPlayer.addEventListener('ended', () => {
-      if (currentIndex + 1 < videos.length) {
-        loadVideoByIndex(currentIndex + 1);
-        videoPlayer.play();
-      }
-    });
+    ["mousedown", "touchstart"].forEach(evt =>
+      progressContainer.addEventListener(evt, e => { isDragging = true; scrub(e.touches ? e.touches[0] : e); }, { passive: true })
+    );
 
-    videoContainer.addEventListener('mousemove', () => {
-      controlsOverlay.classList.remove('hidden');
-      resetControlsTimeout();
-      videoContainer.classList.remove('hidden-cursor');
-      clearTimeout(mouseTimeout);
-      mouseTimeout = setTimeout(() => {
-        videoContainer.classList.add('hidden-cursor');
-      }, 3000);
-    });
+    ["mousemove", "touchmove"].forEach(evt =>
+      progressContainer.addEventListener(evt, e => { if (isDragging) scrub(e.touches ? e.touches[0] : e); }, { passive: true })
+    );
 
-    videoPlayer.addEventListener('dblclick', () => {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
-      } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-      }
-    });
+    ["mouseup", "touchend", "mouseleave"].forEach(evt =>
+      progressContainer.addEventListener(evt, () => { isDragging = false; }, { passive: true })
+    );
 
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && !videoPlayer.paused) {
-        const currentTime = videoPlayer.currentTime;
-        videoPlayer.pause();
-        setTimeout(() => {
-          videoPlayer.currentTime = currentTime;
-          videoPlayer.play().catch(() => {});
-        }, 50);
-      }
+    window.addEventListener('load', () => {
+      fetch('dados/jaspion.json')
+        .then(res => res.json())
+        .then(data => {
+          videos = data.episodios || [];
+          document.title = data.serie || "Minha Série";
+          generatePlaylist();
+          loadVideoByIndex(0);
+        });
     });
   </script>
 </body>
