@@ -1,0 +1,343 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  color: #fff;
+  overflow: auto;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  padding-top: 75%; /* 4:3 */
+  background-color: #111;
+  overflow: hidden;
+}
+
+#videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+  outline: none;
+}
+
+.controls-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.4s;
+  pointer-events: auto;
+}
+
+.controls-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.bottom-controls {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.left-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px; /* Espaço entre os botões da esquerda */
+}
+
+#nextBtn {
+  margin-right: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
+
+.middle-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+}
+
+.right-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1px; /* Espaço entre os botões da direita */
+}
+
+#fullscreenBtn {
+  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+}
+
+.controls-container button {
+  background-color: transparent;
+  color: #fff;
+  border: none;
+  padding: 2px 2px;
+  margin: 0;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 10px;
+  position: relative;
+  transition: background-color 0.3s;
+}
+
+.controls-container button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.controls-container button img {
+  margin-bottom: 0;
+  width: 35px;
+  height: 35px;
+  transition: transform 0.2s ease;
+}
+
+.controls-container button:hover img {
+  transform: scale(1.2);
+}
+
+/* Barra de progresso e tempo */
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  flex: 1;
+}
+
+.progress-container {
+  position: relative;
+  flex: 1;
+  height: 10px;
+  background-color: #444;
+  border-radius: 4px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+#progressBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: red;
+  transition: width 0.1s linear;
+}
+
+#progressHandle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+  border-radius: 50%;
+  pointer-events: auto;
+  cursor: pointer;
+  left: 0%;
+}
+
+#timeRemaining {
+  font-size: 1.0rem;
+  color: #ccc;
+  min-width: 45px;
+  text-align: right;
+  font-weight: bold; /* Este comando já coloca o texto em negrito */
+}
+
+
+/* Playlist container e outros estilos */
+.playlist-container {
+  width: 100%;
+  background-color: #111;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+  scroll-behavior: smooth;
+  overflow-y: auto;
+}
+
+#videoTitle {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.playlist-container ul {
+  list-style: none;
+  width: 100%;
+}
+
+.playlist-container li {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #222;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.playlist-container li:hover {
+  background-color: #333;
+}
+
+.playlist-container li.playing {
+  background-color: #444;
+}
+
+.download-btn {
+  display: none;
+  color: #fff;
+  text-decoration: none;
+  background-color: #444;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  transition: background-color 0.3s;
+}
+
+.download-btn:hover {
+  background-color: red;
+}
+
+.playlist-container.show-downloads .download-btn {
+  display: inline-block;
+}
+
+:fullscreen .video-container {
+  width: 100%;
+  height: 0;
+  padding-top: 56.25%;
+  background-color: #000;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:fullscreen .controls-overlay {
+  display: flex;
+}
+
+:fullscreen #videoPlayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+}
+
+@media (orientation: landscape) {
+  html, body {
+    overflow: hidden;
+  }
+  body {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .video-container {
+    width: 70%;
+    height: 100%;
+    padding-top: 0;
+  }
+  #videoPlayer {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .playlist-container {
+    width: 30%;
+    margin-top: 0;
+    margin-left: 0;
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+
+@media (orientation: portrait) {
+  .playlist-container {
+    height: 100%;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  #timeRemaining {
+  font-size: 0.9rem;
+  color: #ccc;
+  min-width: 45px;
+  text-align: right;
+  font-weight: bold; /* Este comando já coloca o texto em negrito */
+}
+
+  .controls-container {
+    flex-wrap: wrap;
+  }
+  .controls-container button {
+    margin-top: 5px;
+  }
+}
+
+.playlist-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.playlist-container::-webkit-scrollbar-track {
+  background: #000;
+}
+
+.playlist-container::-webkit-scrollbar-thumb {
+  background: #0000;
+  border-radius: 10px;
+}
+
+/* Classe para esconder o cursor */
+.hidden-cursor {
+  cursor: none;
+}
