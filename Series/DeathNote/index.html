@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="video-container" id="videoContainer">
-    <video 
+    <video
       id="videoPlayer"
       preload="auto"
       playsinline
@@ -17,6 +17,8 @@
       controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
       muted
     ></video>
+
+    <button id="skipIntroBtn">Pular intro</button>
 
     <div class="controls-overlay" id="controlsOverlay">
       <div class="bottom-controls">
@@ -81,12 +83,14 @@
     const timeRemaining = document.getElementById('timeRemaining');
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
+    const skipIntroBtn = document.getElementById('skipIntroBtn');
 
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
+    let skipIntroTimeout;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -100,7 +104,7 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
-        li.innerHTML = ` 
+        li.innerHTML = `
           <span class="episode-title">${video.title}</span>
           <a href="${video.src}?download=true" class="download-btn" download>Download</a>
         `;
@@ -122,6 +126,10 @@
       highlightCurrentItem();
       scrollPlaylistToCurrent();
       updatePlayPauseButton();
+
+      skipIntroBtn.style.display = 'none';
+      clearTimeout(skipIntroTimeout);
+
       videoPlayer.play().catch(() => {});
     }
 
@@ -282,16 +290,23 @@
       }
     });
 
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
-    });
-
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
+    });
+
+    skipIntroBtn.addEventListener('click', () => {
+      videoPlayer.currentTime = 80;
+      skipIntroBtn.style.display = 'none';
+      clearTimeout(skipIntroTimeout);
+    });
+
+    videoPlayer.addEventListener('playing', () => {
+      if (videoPlayer.currentTime < 5) {
+        skipIntroBtn.style.display = 'block';
+        skipIntroTimeout = setTimeout(() => {
+          skipIntroBtn.style.display = 'none';
+        }, 5000);
+      }
     });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
