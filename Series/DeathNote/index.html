@@ -341,17 +341,24 @@
       }, 3000);
     });
 
-    videoPlayer.addEventListener('click', () => {
+    // Evento de clique para Play/Pause e Tela Cheia
+    videoContainer.addEventListener('click', (e) => {
+      // Ignora cliques nos botões de controle e na barra de progresso
+      if (e.target.closest('.bottom-controls') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn')) {
+        return;
+      }
+
       if (clickTimeout !== null) {
         clearTimeout(clickTimeout);
         clickTimeout = null;
-
+        // Lógica do clique duplo (Tela Cheia)
         if (!document.fullscreenElement) {
           videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
         } else {
           document.exitFullscreen?.() || document.webkitExitFullscreen?.();
         }
       } else {
+        // Lógica do clique único (Play/Pause)
         clickTimeout = setTimeout(() => {
           if (videoPlayer.paused) {
             videoPlayer.play();
