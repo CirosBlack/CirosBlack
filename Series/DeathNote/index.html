@@ -18,9 +18,9 @@
       muted
     ></video>
 
-    <button id="skipIntroBtn">Pular intro</button>
-
     <div class="controls-overlay" id="controlsOverlay">
+      <button id="skipIntroBtn">Pular intro</button>
+
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -90,7 +90,6 @@
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
-    let skipIntroTimeout;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -126,10 +125,6 @@
       highlightCurrentItem();
       scrollPlaylistToCurrent();
       updatePlayPauseButton();
-
-      skipIntroBtn.style.display = 'none';
-      clearTimeout(skipIntroTimeout);
-
       videoPlayer.play().catch(() => {});
     }
 
@@ -160,6 +155,13 @@
       progressBar.style.width = percent + '%';
       progressHandle.style.left = `calc(${percent}% - 7px)`;
       timeRemaining.textContent = formatTime(duration - currentTime);
+
+      // Mostra ou esconde o botão "Pular intro"
+      if (currentTime < 81) {
+        skipIntroBtn.style.display = 'block';
+      } else {
+        skipIntroBtn.style.display = 'none';
+      }
     }
 
     function scrub(e) {
@@ -295,18 +297,7 @@
     });
 
     skipIntroBtn.addEventListener('click', () => {
-      videoPlayer.currentTime = 80;
-      skipIntroBtn.style.display = 'none';
-      clearTimeout(skipIntroTimeout);
-    });
-
-    videoPlayer.addEventListener('playing', () => {
-      if (videoPlayer.currentTime < 5) {
-        skipIntroBtn.style.display = 'block';
-        skipIntroTimeout = setTimeout(() => {
-          skipIntroBtn.style.display = 'none';
-        }, 5000);
-      }
+      videoPlayer.currentTime = 81; // Pula para 1 minuto e 21 segundos
     });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
