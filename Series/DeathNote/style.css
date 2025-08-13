@@ -178,7 +178,6 @@ body {
   height: 10px;
   background-color: #444;
   border-radius: 4px;
-  margin-right: 10px;
   cursor: pointer;
 }
 
@@ -205,11 +204,11 @@ body {
   left: 0%;
 }
 
-#timeRemaining {
+#currentTime, #timeRemaining {
   font-size: 1.0rem;
   color: #ccc;
   min-width: 45px;
-  text-align: right;
+  text-align: center;
   font-weight: bold;
 }
 
