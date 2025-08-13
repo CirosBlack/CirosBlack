@@ -8,7 +8,7 @@
 </head>
 <body>
   <div class="video-container" id="videoContainer">
-    <video 
+    <video
       id="videoPlayer"
       preload="auto"
       playsinline
@@ -19,6 +19,8 @@
     ></video>
 
     <div class="controls-overlay" id="controlsOverlay">
+      <h2 id="episodeTitle"></h2>
+
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -34,13 +36,14 @@
           </div>
 
           <div class="middle-controls">
+            <span id="currentTime">00:00</span>
             <div class="progress-wrapper">
               <div class="progress-container" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
                 <div class="progress-handle" id="progressHandle"></div>
               </div>
-              <span id="timeRemaining">00:00</span>
             </div>
+            <span id="timeRemaining">00:00</span>
           </div>
 
           <div class="right-buttons">
@@ -79,14 +82,18 @@
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
+    const currentTime = document.getElementById('currentTime');
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
+    const episodeTitle = document.getElementById('episodeTitle');
+
 
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
+    let clickTimeout = null;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -100,7 +107,7 @@
       videos.forEach((video, index) => {
         const li = document.createElement('li');
         li.dataset.index = index;
-        li.innerHTML = ` 
+        li.innerHTML = `
           <span class="episode-title">${video.title}</span>
           <a href="${video.src}?download=true" class="download-btn" download>Download</a>
         `;
@@ -119,6 +126,7 @@
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       videoTitle.textContent = videos[index].title;
+      episodeTitle.textContent = videos[index].title;
       highlightCurrentItem();
       scrollPlaylistToCurrent();
       updatePlayPauseButton();
@@ -147,11 +155,12 @@
 
     function updateProgress() {
       const duration = videoPlayer.duration || 0;
-      const currentTime = videoPlayer.currentTime || 0;
-      const percent = (currentTime / duration) * 100;
+      const current = videoPlayer.currentTime || 0;
+      const percent = (current / duration) * 100;
       progressBar.style.width = percent + '%';
       progressHandle.style.left = `calc(${percent}% - 7px)`;
-      timeRemaining.textContent = formatTime(duration - currentTime);
+      timeRemaining.textContent = formatTime(duration - current);
+      currentTime.textContent = formatTime(current);
     }
 
     function scrub(e) {
@@ -199,7 +208,7 @@
     });
 
     window.addEventListener('load', () => {
-      fetch('dados/DeathNote.json')
+      fetch('dados/Bleach.json')
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
@@ -282,14 +291,6 @@
       }
     });
 
-    videoPlayer.addEventListener('enterpictureinpicture', () => {
-      console.log('PiP ativado');
-    });
-
-    videoPlayer.addEventListener('leavepictureinpicture', () => {
-      console.log('PiP desativado');
-    });
-
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
     });
@@ -314,11 +315,30 @@
       }, 3000);
     });
 
-    videoPlayer.addEventListener('dblclick', () => {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+    videoContainer.addEventListener('click', (e) => {
+      if (e.target.closest('.bottom-controls')) {
+        return;
+      }
+
+      if (clickTimeout !== null) {
+        clearTimeout(clickTimeout);
+        clickTimeout = null;
+
+        if (!document.fullscreenElement) {
+          videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+        } else {
+          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        }
       } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        clickTimeout = setTimeout(() => {
+          if (videoPlayer.paused) {
+            videoPlayer.play();
+          } else {
+            videoPlayer.pause();
+          }
+          updatePlayPauseButton();
+          clickTimeout = null;
+        }, 250);
       }
     });
 
