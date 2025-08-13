@@ -21,6 +21,7 @@
     <button id="nextEpisodeBtn">Próximo Episódio</button>
 
     <div class="controls-overlay" id="controlsOverlay">
+      <h2 id="episodeTitle"></h2>
       <button id="skipIntroBtn">Pular intro</button>
 
       <div class="bottom-controls">
@@ -87,12 +88,15 @@
     const videoContainer = document.getElementById('videoContainer');
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
+    const episodeTitle = document.getElementById('episodeTitle');
+
 
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
+    let clickTimeout = null;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -125,6 +129,7 @@
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       videoTitle.textContent = videos[index].title;
+      episodeTitle.textContent = videos[index].title;
       highlightCurrentItem();
       scrollPlaylistToCurrent();
       updatePlayPauseButton();
@@ -336,11 +341,26 @@
       }, 3000);
     });
 
-    videoPlayer.addEventListener('dblclick', () => {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+    videoPlayer.addEventListener('click', () => {
+      if (clickTimeout !== null) {
+        clearTimeout(clickTimeout);
+        clickTimeout = null;
+
+        if (!document.fullscreenElement) {
+          videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+        } else {
+          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        }
       } else {
-        document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        clickTimeout = setTimeout(() => {
+          if (videoPlayer.paused) {
+            videoPlayer.play();
+          } else {
+            videoPlayer.pause();
+          }
+          updatePlayPauseButton();
+          clickTimeout = null;
+        }, 250);
       }
     });
 
