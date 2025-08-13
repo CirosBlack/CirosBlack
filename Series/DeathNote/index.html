@@ -39,13 +39,14 @@
           </div>
 
           <div class="middle-controls">
+            <span id="currentTime">00:00</span>
             <div class="progress-wrapper">
               <div class="progress-container" id="progressContainer">
                 <div class="progress-bar" id="progressBar"></div>
                 <div class="progress-handle" id="progressHandle"></div>
               </div>
-              <span id="timeRemaining">00:00</span>
             </div>
+            <span id="timeRemaining">00:00</span>
           </div>
 
           <div class="right-buttons">
@@ -84,6 +85,7 @@
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
+    const currentTime = document.getElementById('currentTime');
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
     const skipIntroBtn = document.getElementById('skipIntroBtn');
@@ -158,21 +160,23 @@
 
     function updateProgress() {
       const duration = videoPlayer.duration || 0;
-      const currentTime = videoPlayer.currentTime || 0;
-      const percent = (currentTime / duration) * 100;
+      const current = videoPlayer.currentTime || 0;
+      const percent = (current / duration) * 100;
       progressBar.style.width = percent + '%';
       progressHandle.style.left = `calc(${percent}% - 7px)`;
-      timeRemaining.textContent = formatTime(duration - currentTime);
+      timeRemaining.textContent = formatTime(duration - current);
+      currentTime.textContent = formatTime(current);
+
 
       // Mostra ou esconde o botão "Pular intro"
-      if (currentTime > 0 && currentTime < 81) {
+      if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
       // Mostra ou esconde o botão "Próximo Episódio"
-      if (currentTime >= 1292) { // 21 minutos e 32 segundos
+      if (current >= 1292) { // 21 minutos e 32 segundos
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
@@ -341,9 +345,7 @@
       }, 3000);
     });
 
-    // Evento de clique para Play/Pause e Tela Cheia
     videoContainer.addEventListener('click', (e) => {
-      // Ignora cliques nos botões de controle e na barra de progresso
       if (e.target.closest('.bottom-controls') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn')) {
         return;
       }
@@ -351,14 +353,13 @@
       if (clickTimeout !== null) {
         clearTimeout(clickTimeout);
         clickTimeout = null;
-        // Lógica do clique duplo (Tela Cheia)
+
         if (!document.fullscreenElement) {
           videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
         } else {
           document.exitFullscreen?.() || document.webkitExitFullscreen?.();
         }
       } else {
-        // Lógica do clique único (Play/Pause)
         clickTimeout = setTimeout(() => {
           if (videoPlayer.paused) {
             videoPlayer.play();
