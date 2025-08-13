@@ -20,6 +20,7 @@
 
     <div class="controls-overlay" id="controlsOverlay">
       <button id="skipIntroBtn">Pular intro</button>
+      <button id="nextEpisodeBtn">Próximo Episódio</button>
 
       <div class="bottom-controls">
         <div class="controls-container">
@@ -84,6 +85,7 @@
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
     const skipIntroBtn = document.getElementById('skipIntroBtn');
+    const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
 
     let videos = [];
     let currentIndex = 0;
@@ -157,10 +159,17 @@
       timeRemaining.textContent = formatTime(duration - currentTime);
 
       // Mostra ou esconde o botão "Pular intro"
-      if (currentTime < 81) {
+      if (currentTime > 0 && currentTime < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
+      }
+
+      // Mostra ou esconde o botão "Próximo Episódio"
+      if (currentTime >= 1292) { // 21 minutos e 32 segundos
+        nextEpisodeBtn.style.display = 'block';
+      } else {
+        nextEpisodeBtn.style.display = 'none';
       }
     }
 
@@ -297,7 +306,13 @@
     });
 
     skipIntroBtn.addEventListener('click', () => {
-      videoPlayer.currentTime = 81; // Pula para 1 minuto e 21 segundos
+      videoPlayer.currentTime = 81;
+    });
+
+    nextEpisodeBtn.addEventListener('click', () => {
+      if (currentIndex < videos.length - 1) {
+        loadVideoByIndex(currentIndex + 1);
+      }
     });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
