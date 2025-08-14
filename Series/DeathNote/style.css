@@ -10,7 +10,7 @@ html, body {
   height: 100%;
   background-color: #000;
   color: #fff;
-  overflow: auto;
+  overflow: hidden; /* Prevenir scroll duplo */
 }
 
 body {
@@ -23,8 +23,8 @@ body {
 .video-container {
   position: relative;
   width: 100%;
-  padding-top: 75%; /* 4:3 */
-  background-color: #111;
+  padding-top: 56.25%; /* 16:9 */
+  background-color: #000;
   overflow: hidden;
 }
 
@@ -83,22 +83,22 @@ body {
   align-items: center;
   opacity: 1;
   transition: opacity 0.4s;
-  pointer-events: auto;
+  pointer-events: none; /* Alterado para none por padrão */
 }
 
 .controls-overlay.hidden {
   opacity: 0;
-  pointer-events: none;
 }
 
 .bottom-controls {
   position: relative;
   width: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 5px;
+  pointer-events: auto; /* Apenas os controles podem receber cliques */
 }
 
 .controls-container {
@@ -108,14 +108,10 @@ body {
   width: 100%;
 }
 
-.left-buttons {
+.left-buttons, .right-buttons {
   display: flex;
   align-items: center;
-  gap: 1px;
-}
-
-#nextBtn {
-  margin-right: 10px;
+  gap: 5px;
 }
 
 .middle-controls {
@@ -124,45 +120,29 @@ body {
   justify-content: center;
   flex-grow: 1;
   gap: 10px;
-}
-
-.right-buttons {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-}
-
-#fullscreenBtn {
-  margin-left: 10px;
+  min-width: 0;
 }
 
 .controls-container button {
   background-color: transparent;
   color: #fff;
   border: none;
-  padding: 2px 2px;
+  padding: 2px;
   margin: 0;
   cursor: pointer;
-  font-size: 1rem;
   border-radius: 10px;
-  position: relative;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .controls-container button:hover {
   background-color: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .controls-container button img {
-  margin-bottom: 0;
   width: 35px;
   height: 35px;
-  transition: transform 0.2s ease;
-}
-
-.controls-container button:hover img {
-  transform: scale(1.2);
+  display: block;
 }
 
 .progress-wrapper {
@@ -175,10 +155,15 @@ body {
 .progress-container {
   position: relative;
   flex: 1;
-  height: 10px;
-  background-color: #444;
+  height: 8px;
+  background-color: rgba(255, 255, 255, 0.3);
   border-radius: 4px;
   cursor: pointer;
+  transition: height 0.2s;
+}
+
+.progress-container:hover {
+  height: 10px;
 }
 
 #progressBar {
@@ -188,13 +173,13 @@ body {
   height: 100%;
   width: 0%;
   background-color: red;
-  transition: width 0.1s linear;
+  border-radius: 4px;
 }
 
 #progressHandle {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) scale(0);
   width: 14px;
   height: 14px;
   background-color: #fff;
@@ -202,25 +187,29 @@ body {
   pointer-events: auto;
   cursor: pointer;
   left: 0%;
+  transition: transform 0.2s;
+}
+
+.progress-container:hover #progressHandle {
+  transform: translateY(-50%) scale(1);
 }
 
 #currentTime, #timeRemaining {
-  font-size: 1.0rem;
-  color: #ccc;
-  min-width: 45px;
+  font-size: 1rem;
+  color: #fff;
+  min-width: 50px;
   text-align: center;
   font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
 }
-
 
 .playlist-container {
   width: 100%;
   background-color: #111;
   padding: 15px;
-  border-radius: 5px;
-  margin-top: 10px;
   scroll-behavior: smooth;
   overflow-y: auto;
+  flex-grow: 1;
 }
 
 #videoTitle {
@@ -231,11 +220,11 @@ body {
 
 .playlist-container ul {
   list-style: none;
-  width: 100%;
+  padding: 0;
 }
 
 .playlist-container li {
-  padding: 10px;
+  padding: 12px;
   margin-bottom: 5px;
   background-color: #222;
   cursor: pointer;
@@ -252,7 +241,8 @@ body {
 }
 
 .playlist-container li.playing {
-  background-color: #444;
+  background-color: #500;
+  font-weight: bold;
 }
 
 .download-btn {
@@ -274,122 +264,65 @@ body {
   display: inline-block;
 }
 
-:fullscreen .video-container {
-  width: 100%;
-  height: 0;
-  padding-top: 56.25%;
-  background-color: #000;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.hidden-cursor {
+  cursor: none;
 }
 
-:fullscreen .controls-overlay {
-  display: flex;
+/* --- ESTILOS PARA TELA CHEIA E ANIMAÇÃO --- */
+
+#togglePlaylistBtn {
+  display: none; /* Escondido por padrão */
 }
 
-:fullscreen #videoPlayer {
-  position: absolute;
+body.fullscreen-active #togglePlaylistBtn {
+  display: block; /* Visível em tela cheia */
+}
+
+body.fullscreen-active .playlist-container {
+  position: fixed;
   top: 0;
-  left: 0;
-  width: 100%;
+  right: -320px; /* Começa fora da tela (largura + um pouco) */
+  width: 300px; /* Largura da playlist */
   height: 100%;
-  object-fit: contain;
-  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.85); /* Fundo para melhor leitura */
+  z-index: 1001; /* Fica acima do vídeo */
+  transition: right 0.4s ease-in-out; /* Animação suave */
+  border-left: 1px solid #444;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.5);
 }
 
-@media (orientation: landscape) {
-  html, body {
-    overflow: hidden;
-  }
+body.fullscreen-active .playlist-container.show {
+  right: 0; /* Desliza para dentro da tela */
+}
+
+
+/* --- LAYOUT RESPONSIVO --- */
+
+@media (min-width: 900px) and (orientation: landscape) {
   body {
     flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
   }
   .video-container {
     width: 70%;
     height: 100%;
     padding-top: 0;
   }
-  #videoPlayer {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
   .playlist-container {
     width: 30%;
-    margin-top: 0;
-    margin-left: 0;
     height: 100%;
-    overflow-y: auto;
-  }
-}
-
-@media (orientation: portrait) {
-  .playlist-container {
-    height: 100%;
-    overflow-y: auto;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
-  }
-}
-
-@media (max-width: 600px) {
-  #timeRemaining {
-  font-size: 0.9rem;
-  color: #ccc;
-  min-width: 45px;
-  text-align: right;
-  font-weight: bold;
-}
-
-  .controls-container {
-    flex-wrap: wrap;
-  }
-  .controls-container button {
-    margin-top: 5px;
   }
 }
 
 .playlist-container::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
-
 .playlist-container::-webkit-scrollbar-track {
-  background: #000;
+  background: #111;
 }
-
 .playlist-container::-webkit-scrollbar-thumb {
-  background: #0000;
+  background: #555;
   border-radius: 10px;
 }
-
-.hidden-cursor {
-  cursor: none;
-}
-
-
-#togglePlaylistBtn {
-  display: none;
-}
-
-:fullscreen #togglePlaylistBtn {
-  display: block;
-}
-
-:fullscreen .playlist-container {
-  position: fixed;
-  right: -300px;
-  top: 0;
-  width: 300px;
-  height: 100%;
-  transition: right 0.5s ease-in-out;
-  z-index: 1001;
-}
-
-:fullscreen .playlist-container.show {
-  right: 0;
+.playlist-container::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }
