@@ -108,7 +108,7 @@ body {
   width: 100%;
 }
 
-.left-buttons {
+.left-buttons, .right-buttons {
   display: flex;
   align-items: center;
   gap: 1px;
@@ -124,12 +124,6 @@ body {
   justify-content: center;
   flex-grow: 1;
   gap: 10px;
-}
-
-.right-buttons {
-  display: flex;
-  align-items: center;
-  gap: 1px;
 }
 
 #fullscreenBtn {
@@ -211,7 +205,6 @@ body {
   text-align: center;
   font-weight: bold;
 }
-
 
 .playlist-container {
   width: 100%;
@@ -324,7 +317,6 @@ body {
   text-align: right;
   font-weight: bold;
 }
-
   .controls-container {
     flex-wrap: wrap;
   }
@@ -336,31 +328,29 @@ body {
 .playlist-container::-webkit-scrollbar {
   width: 6px;
 }
-
 .playlist-container::-webkit-scrollbar-track {
   background: #000;
 }
-
 .playlist-container::-webkit-scrollbar-thumb {
   background: #0000;
   border-radius: 10px;
 }
 
 
-/* --- ESTILOS PARA PLAYLIST EM TELA CHEIA --- */
+/* --- ESTILOS CORRIGIDOS PARA PLAYLIST EM TELA CHEIA --- */
 
-/* Esconde o botão da playlist por padrão */
+/* Por padrão, o botão da playlist fica escondido */
 #togglePlaylistBtn {
     display: none;
 }
   
-/* Mostra o botão apenas quando o video-container está em tela cheia */
-.video-container:fullscreen #togglePlaylistBtn {
+/* Quando o body tiver a classe .fullscreen-active, o botão aparece */
+body.fullscreen-active #togglePlaylistBtn {
     display: block;
 }
 
-/* Estiliza o container da playlist em tela cheia */
-.video-container:fullscreen ~ .playlist-container {
+/* Quando em tela cheia, a playlist é posicionada fora da tela */
+body.fullscreen-active .playlist-container {
     position: fixed;
     top: 0;
     right: -320px; /* Começa fora da tela */
@@ -371,13 +361,12 @@ body {
     transition: right 0.4s ease-in-out;
     border-left: 1px solid #333;
     box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-    /* Mantém os estilos de layout e rolagem */
     margin-top: 0; 
     border-radius: 0;
     overflow-y: auto;
 }
   
-/* Anima a playlist para dentro da tela quando a classe .show é adicionada */
-.video-container:fullscreen ~ .playlist-container.show {
+/* Quando tiver a classe .show, a playlist desliza para dentro */
+body.fullscreen-active .playlist-container.show {
     right: 0;
 }
