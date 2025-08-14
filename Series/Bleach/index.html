@@ -112,6 +112,7 @@
     let isDragging = false;
     let clickTimeout = null;
     let lastVolume = 1;
+    let wasPausedBeforeDrag = false;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -240,37 +241,51 @@
 
 
     progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      scrub(e);
+        isDragging = true;
+        wasPausedBeforeDrag = videoPlayer.paused;
+        videoPlayer.pause();
+        scrub(e);
     });
 
     document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
+        if (isDragging) {
+            scrub(e);
+        }
     });
 
     document.addEventListener('mouseup', () => {
-      isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            if (!wasPausedBeforeDrag) {
+                videoPlayer.play();
+            }
+        }
     });
 
     progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      scrub(e);
+        isDragging = true;
+        wasPausedBeforeDrag = videoPlayer.paused;
+        videoPlayer.pause();
+        scrub(e);
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
+        if (isDragging) {
+            scrub(e);
+        }
     }, { passive: false });
 
     document.addEventListener('touchend', () => {
-      isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            if (!wasPausedBeforeDrag) {
+                videoPlayer.play();
+            }
+        }
     });
 
     window.addEventListener('load', () => {
-      fetch('dados/Bleach.json')
+      fetch('dados/DeathNote.json')
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
@@ -441,4 +456,3 @@
   </script>
 </body>
 </html>
-
