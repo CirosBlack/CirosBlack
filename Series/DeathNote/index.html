@@ -51,7 +51,7 @@
 
           <div class="right-buttons">
             <button id="togglePlaylistBtn">
-                <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/playlist.png" alt="Playlist" style="width:35px; height:35px;" />
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/playlist.png" alt="Playlist" style="width:35px; height:35px;" />
             </button>
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
@@ -83,7 +83,6 @@
     const fullscreenBtn = document.getElementById('fullscreenBtn');
     const pipBtn = document.getElementById('pipBtn');
     const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
-    const playlistContainer = document.getElementById('playlistContainer');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
@@ -94,8 +93,6 @@
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
     const episodeTitle = document.getElementById('episodeTitle');
-    const togglePlaylistBtn = document.getElementById('togglePlaylistBtn');
-
 
     let videos = [];
     let currentIndex = 0;
@@ -172,13 +169,15 @@
       currentTime.textContent = formatTime(current);
 
 
+      // Mostra ou esconde o botão "Pular intro"
       if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
-      if (current >= 1292) {
+      // Mostra ou esconde o botão "Próximo Episódio"
+      if (current >= 1292) { // 21 minutos e 32 segundos
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
@@ -195,13 +194,39 @@
       updateProgress();
     }
 
-    progressContainer.addEventListener('mousedown', (e) => { isDragging = true; scrub(e); });
-    progressContainer.addEventListener('mousemove', (e) => { if (isDragging) scrub(e); });
-    progressContainer.addEventListener('mouseup', () => { isDragging = false; });
-    progressContainer.addEventListener('mouseleave', () => { isDragging = false; });
-    progressContainer.addEventListener('touchstart', (e) => { isDragging = true; scrub(e.touches[0]); }, { passive: false });
-    progressContainer.addEventListener('touchmove', (e) => { if (isDragging) scrub(e.touches[0]); }, { passive: false });
-    progressContainer.addEventListener('touchend', () => { isDragging = false; });
+    progressContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      scrub(e);
+    });
+
+    progressContainer.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        scrub(e);
+      }
+    });
+
+    progressContainer.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    progressContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+    });
+
+    progressContainer.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      scrub(e.touches[0]);
+    }, { passive: false });
+
+    progressContainer.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        scrub(e.touches[0]);
+      }
+    }, { passive: false });
+
+    progressContainer.addEventListener('touchend', () => {
+      isDragging = false;
+    });
 
     window.addEventListener('load', () => {
       fetch('dados/DeathNote.json')
@@ -245,12 +270,16 @@
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
-        playlistContainer.classList.remove('show');
       }
     });
 
-    prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideoByIndex(currentIndex - 1); });
-    nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1); });
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
+    });
 
     playPauseBtn.addEventListener('click', () => {
       videoPlayer.muted = false;
@@ -272,20 +301,39 @@
 
     pipBtn.addEventListener('click', () => {
       if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => console.error("Erro ao ativar o PiP:", error));
+        videoPlayer.requestPictureInPicture().catch(error => {
+          console.error("Erro ao ativar o PiP:", error);
+        });
       } else {
-        document.exitPictureInPicture().catch(error => console.error("Erro ao sair do PiP:", error));
+        document.exitPictureInPicture().catch(error => {
+          console.error("Erro ao sair do PiP:", error);
+        });
       }
     });
 
-    toggleDownloadsBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show-downloads'); });
-    skipIntroBtn.addEventListener('click', () => { videoPlayer.currentTime = 81; });
-    nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1); });
-    togglePlaylistBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show'); });
+    toggleDownloadsBtn.addEventListener('click', () => {
+      document.querySelector('.playlist-container').classList.toggle('show-downloads');
+    });
+
+    skipIntroBtn.addEventListener('click', () => {
+      videoPlayer.currentTime = 81;
+    });
+
+    nextEpisodeBtn.addEventListener('click', () => {
+      if (currentIndex < videos.length - 1) {
+        loadVideoByIndex(currentIndex + 1);
+      }
+    });
 
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
-    videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideoByIndex(currentIndex + 1); });
+
+    videoPlayer.addEventListener('ended', () => {
+      if (currentIndex + 1 < videos.length) {
+        loadVideoByIndex(currentIndex + 1);
+        videoPlayer.play();
+      }
+    });
 
     videoContainer.addEventListener('mousemove', () => {
       controlsOverlay.classList.remove('hidden');
@@ -324,18 +372,39 @@
       }
     });
 
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !videoPlayer.paused) {
+        const currentTime = videoPlayer.currentTime;
+        videoPlayer.pause();
+        setTimeout(() => {
+          videoPlayer.currentTime = currentTime;
+          videoPlayer.play().catch(() => {});
+        }, 50);
+      }
+    });
+
+    // --- CÓDIGO PARA A NOVA FUNCIONALIDADE DA PLAYLIST ---
+    const togglePlaylistBtn = document.getElementById('togglePlaylistBtn');
+    const playlistContainer = document.querySelector('.playlist-container');
+
     function handleFullscreenChange() {
-        if (document.fullscreenElement || document.webkitFullscreenElement) {
-            document.body.classList.add('fullscreen-active');
-        } else {
-            document.body.classList.remove('fullscreen-active');
-            playlistContainer.classList.remove('show');
-        }
+      if (document.fullscreenElement === videoContainer || document.webkitFullscreenElement === videoContainer) {
+        // Não faz nada ao entrar, o CSS cuida disso
+      } else {
+        // Garante que a playlist feche ao sair da tela cheia
+        playlistContainer.classList.remove('show');
+      }
     }
+
+    togglePlaylistBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Impede que o clique no botão acione o play/pause do vídeo
+        playlistContainer.classList.toggle('show');
+    });
 
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-
+    // --- FIM DO CÓDIGO DA NOVA FUNCIONALIDADE ---
+    
   </script>
 </body>
 </html>
