@@ -291,6 +291,12 @@ body {
     color: white;
     padding: 20px;
     overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.fullscreen-playlist-container::-webkit-scrollbar {
+    display: none;
 }
 
 .fullscreen-playlist-container.visible {
