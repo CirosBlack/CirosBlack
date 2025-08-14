@@ -335,8 +335,10 @@
 
     document.addEventListener('fullscreenchange', () => {
         if (document.fullscreenElement) {
+            document.body.classList.add('video-fullscreen');
             playlistBtn.style.display = 'block';
         } else {
+            document.body.classList.remove('video-fullscreen');
             playlistBtn.style.display = 'none';
             playlistContainer.classList.remove('show-in-fullscreen');
         }
