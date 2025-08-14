@@ -202,14 +202,14 @@
       currentTime.textContent = formatTime(current);
 
       // Mostra ou esconde o botão "Pular intro"
-      if (current > 10 && current < 81) { // Exibe entre 10s e 1m21s
+      if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
       // Mostra ou esconde o botão "Próximo Episódio"
-      if (duration > 0 && (duration - current) <= 90) { // Exibe nos últimos 90 segundos
+      if (current >= 1292) { // 21 minutos e 32 segundos
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
