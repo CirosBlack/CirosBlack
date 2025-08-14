@@ -458,10 +458,21 @@
         }
       } else {
         clickTimeout = setTimeout(() => {
-          if (videoPlayer.paused) {
-            videoPlayer.play();
-          } else {
-            videoPlayer.pause();
+          const rect = videoContainer.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          const clickY = e.clientY - rect.top;
+
+          const centerXStart = rect.width * 0.375;
+          const centerXEnd = rect.width * 0.625;
+          const centerYStart = rect.height * 0.375;
+          const centerYEnd = rect.height * 0.625;
+
+          if (clickX >= centerXStart && clickX <= centerXEnd && clickY >= centerYStart && clickY <= centerYEnd) {
+            if (videoPlayer.paused) {
+              videoPlayer.play();
+            } else {
+              videoPlayer.pause();
+            }
           }
           clickTimeout = null;
         }, 250);
