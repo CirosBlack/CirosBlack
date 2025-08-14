@@ -50,6 +50,9 @@
           </div>
 
           <div class="right-buttons">
+            <button id="togglePlaylistBtn">
+              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/playlist.png" alt="Playlist" style="width:35px; height:35px;" />
+            </button>
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
             </button>
@@ -91,6 +94,7 @@
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
     const episodeTitle = document.getElementById('episodeTitle');
+    const togglePlaylistBtn = document.getElementById('togglePlaylistBtn');
 
 
     let videos = [];
@@ -380,6 +384,16 @@
           videoPlayer.currentTime = currentTime;
           videoPlayer.play().catch(() => {});
         }, 50);
+      }
+    });
+
+    togglePlaylistBtn.addEventListener('click', () => {
+      playlistContainer.classList.toggle('show');
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        playlistContainer.classList.remove('show');
       }
     });
   </script>
