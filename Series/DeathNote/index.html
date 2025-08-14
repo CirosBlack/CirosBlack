@@ -19,6 +19,7 @@
     ></video>
 
     <div class="fullscreen-playlist-container" id="fullscreenPlaylistContainer">
+        <h2>Episódios</h2>
         <ul id="fullscreenPlaylist"></ul>
     </div>
 
@@ -54,9 +55,7 @@
           </div>
 
           <div class="right-buttons">
-            <button id="fullscreenPlaylistBtn">
-                <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Playlist.png" alt="Playlist" />
-            </button>
+            <button id="playlistBtn"><img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/Playlist.png" alt="Playlist" style="width:35px; height:35px;"></button>
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
             </button>
@@ -81,7 +80,6 @@
     const videoPlayer = document.getElementById('videoPlayer');
     const videoTitle = document.getElementById('videoTitle');
     const playlist = document.getElementById('playlist');
-    const fullscreenPlaylist = document.getElementById('fullscreenPlaylist');
     const prevBtn = document.getElementById('prevBtn');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const nextBtn = document.getElementById('nextBtn');
@@ -89,8 +87,6 @@
     const pipBtn = document.getElementById('pipBtn');
     const toggleDownloadsBtn = document.getElementById('toggleDownloadsBtn');
     const playlistContainer = document.getElementById('playlistContainer');
-    const fullscreenPlaylistContainer = document.getElementById('fullscreenPlaylistContainer');
-    const fullscreenPlaylistBtn = document.getElementById('fullscreenPlaylistBtn');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
     const progressHandle = document.getElementById('progressHandle');
@@ -101,6 +97,9 @@
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
     const episodeTitle = document.getElementById('episodeTitle');
+    const playlistBtn = document.getElementById('playlistBtn');
+    const fullscreenPlaylistContainer = document.getElementById('fullscreenPlaylistContainer');
+    const fullscreenPlaylist = document.getElementById('fullscreenPlaylist');
 
 
     let videos = [];
@@ -114,6 +113,7 @@
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
         controlsOverlay.classList.add('hidden');
+        fullscreenPlaylistContainer.classList.remove('visible');
       }, 3000);
     }
 
@@ -140,7 +140,6 @@
         });
     }
 
-
     function updatePlayPauseButton() {
       const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
       const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
@@ -164,11 +163,6 @@
       items.forEach(li => li.classList.remove('playing'));
       const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
       if (current) current.classList.add('playing');
-
-      const fsItems = fullscreenPlaylist.querySelectorAll('li');
-        fsItems.forEach(li => li.classList.remove('playing'));
-        const fsCurrent = fullscreenPlaylist.querySelector(`li[data-index="${currentIndex}"]`);
-        if (fsCurrent) fsCurrent.classList.add('playing');
     }
 
     function scrollPlaylistToCurrent() {
@@ -299,12 +293,11 @@
         videoPlayer.play();
       }
     });
-
+    
     fullscreenPlaylist.addEventListener('click', (e) => {
         const li = e.target.closest('li');
         if (li && li.dataset.index) {
-            loadVideoByIndex(parseInt(li.dataset.index));
-            videoPlayer.play();
+            loadVideoByIndex(parseInt(li.dataset.index, 10));
         }
     });
 
@@ -324,6 +317,10 @@
         videoPlayer.pause();
       }
       updatePlayPauseButton();
+    });
+    
+    playlistBtn.addEventListener('click', () => {
+        fullscreenPlaylistContainer.classList.toggle('visible');
     });
 
     fullscreenBtn.addEventListener('click', () => {
@@ -348,19 +345,6 @@
 
     toggleDownloadsBtn.addEventListener('click', () => {
       playlistContainer.classList.toggle('show-downloads');
-    });
-
-    fullscreenPlaylistBtn.addEventListener('click', () => {
-        fullscreenPlaylistContainer.classList.toggle('visible');
-    });
-
-    document.addEventListener('fullscreenchange', () => {
-        if (document.fullscreenElement) {
-            fullscreenPlaylistBtn.style.display = 'block';
-        } else {
-            fullscreenPlaylistBtn.style.display = 'none';
-            fullscreenPlaylistContainer.classList.remove('visible');
-        }
     });
 
     skipIntroBtn.addEventListener('click', () => {
