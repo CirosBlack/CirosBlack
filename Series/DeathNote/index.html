@@ -41,6 +41,12 @@
             <button id="nextBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Avancar.png" alt="Próximo" />
             </button>
+            <div class="volume-container">
+              <button id="volumeBtn">
+                  <img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-alto.png" alt="Volume">
+              </button>
+              <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+            </div>
           </div>
 
           <div class="middle-controls">
@@ -100,6 +106,8 @@
     const playlistBtn = document.getElementById('playlistBtn');
     const fullscreenPlaylistContainer = document.getElementById('fullscreenPlaylistContainer');
     const fullscreenPlaylist = document.getElementById('fullscreenPlaylist');
+    const volumeBtn = document.getElementById('volumeBtn');
+    const volumeSlider = document.getElementById('volumeSlider');
 
 
     let videos = [];
@@ -218,6 +226,33 @@
       updateProgress();
     }
 
+    function toggleMute() {
+        videoPlayer.muted = !videoPlayer.muted;
+    }
+
+    function handleVolumeChange() {
+        videoPlayer.volume = volumeSlider.value;
+        if (videoPlayer.volume === 0) {
+            videoPlayer.muted = true;
+        } else {
+            videoPlayer.muted = false;
+        }
+    }
+
+    function updateVolumeUI() {
+        if (videoPlayer.muted || videoPlayer.volume === 0) {
+            volumeSlider.value = 0;
+            volumeBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-mudo.png" alt="Mudo">`;
+        } else {
+            volumeSlider.value = videoPlayer.volume;
+            if (videoPlayer.volume > 0.5) {
+                volumeBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-alto.png" alt="Volume Alto">`;
+            } else {
+                volumeBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-baixo.png" alt="Volume Baixo">`;
+            }
+        }
+    }
+
     progressContainer.addEventListener('mousedown', (e) => {
       isDragging = true;
       scrub(e);
@@ -260,6 +295,7 @@
           generatePlaylist();
           generateFullscreenPlaylist();
           loadVideoByIndex(0);
+          updateVolumeUI();
 
           videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
             videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
@@ -362,6 +398,9 @@
     videoPlayer.addEventListener('pause', updatePlayPauseButton);
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
+    videoPlayer.addEventListener('volumechange', updateVolumeUI);
+    volumeBtn.addEventListener('click', toggleMute);
+    volumeSlider.addEventListener('input', handleVolumeChange);
 
     videoPlayer.addEventListener('ended', () => {
       if (currentIndex + 1 < videos.length) {
