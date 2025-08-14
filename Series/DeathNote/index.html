@@ -23,11 +23,11 @@
         <ul id="fullscreenPlaylist"></ul>
     </div>
 
+    <button id="skipIntroBtn">Pular Intro</button>
     <button id="nextEpisodeBtn">Próximo Episódio</button>
 
     <div class="controls-overlay" id="controlsOverlay">
       <h2 id="episodeTitle"></h2>
-      <button id="skipIntroBtn">Pular intro</button>
 
       <div class="bottom-controls">
         <div class="controls-container">
@@ -100,14 +100,14 @@
     const currentTime = document.getElementById('currentTime');
     const controlsOverlay = document.getElementById('controlsOverlay');
     const videoContainer = document.getElementById('videoContainer');
-    const skipIntroBtn = document.getElementById('skipIntroBtn');
-    const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
     const episodeTitle = document.getElementById('episodeTitle');
     const playlistBtn = document.getElementById('playlistBtn');
     const fullscreenPlaylistContainer = document.getElementById('fullscreenPlaylistContainer');
     const fullscreenPlaylist = document.getElementById('fullscreenPlaylist');
     const volumeBtn = document.getElementById('volumeBtn');
     const volumeSlider = document.getElementById('volumeSlider');
+    const skipIntroBtn = document.getElementById('skipIntroBtn');
+    const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
 
 
     let videos = [];
@@ -116,6 +116,8 @@
     let mouseTimeout;
     let isDragging = false;
     let clickTimeout = null;
+    let lastVolume = 1;
+    let wasPausedBeforeDrag = false;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -199,16 +201,15 @@
       timeRemaining.textContent = formatTime(duration - current);
       currentTime.textContent = formatTime(current);
 
-
       // Mostra ou esconde o botão "Pular intro"
-      if (current > 0 && current < 81) {
+      if (current > 10 && current < 81) { // Exibe entre 10s e 1m21s
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
       // Mostra ou esconde o botão "Próximo Episódio"
-      if (current >= 1292) { // 21 minutos e 32 segundos
+      if (duration > 0 && (duration - current) <= 90) { // Exibe nos últimos 90 segundos
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
@@ -227,7 +228,14 @@
     }
 
     function toggleMute() {
-        videoPlayer.muted = !videoPlayer.muted;
+        if (videoPlayer.muted) {
+            videoPlayer.muted = false;
+            videoPlayer.volume = lastVolume;
+        } else {
+            lastVolume = videoPlayer.volume;
+            videoPlayer.muted = true;
+            videoPlayer.volume = 0;
+        }
     }
 
     function handleVolumeChange() {
@@ -252,33 +260,47 @@
 
 
     progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      scrub(e);
+        isDragging = true;
+        wasPausedBeforeDrag = videoPlayer.paused;
+        videoPlayer.pause();
+        scrub(e);
     });
 
     document.addEventListener('mousemove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
+        if (isDragging) {
+            scrub(e);
+        }
     });
 
     document.addEventListener('mouseup', () => {
-      isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            if (!wasPausedBeforeDrag) {
+                videoPlayer.play();
+            }
+        }
     });
 
     progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      scrub(e);
+        isDragging = true;
+        wasPausedBeforeDrag = videoPlayer.paused;
+        videoPlayer.pause();
+        scrub(e);
     }, { passive: false });
 
     document.addEventListener('touchmove', (e) => {
-      if (isDragging) {
-        scrub(e);
-      }
+        if (isDragging) {
+            scrub(e);
+        }
     }, { passive: false });
 
     document.addEventListener('touchend', () => {
-      isDragging = false;
+        if (isDragging) {
+            isDragging = false;
+            if (!wasPausedBeforeDrag) {
+                videoPlayer.play();
+            }
+        }
     });
 
     window.addEventListener('load', () => {
@@ -382,13 +404,13 @@
     });
 
     skipIntroBtn.addEventListener('click', () => {
-      videoPlayer.currentTime = 81;
+        videoPlayer.currentTime = 81;
     });
 
     nextEpisodeBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) {
-        loadVideoByIndex(currentIndex + 1);
-      }
+        if (currentIndex < videos.length - 1) {
+            loadVideoByIndex(currentIndex + 1);
+        }
     });
 
     videoPlayer.addEventListener('play', updatePlayPauseButton);
@@ -420,7 +442,7 @@
 
 
     videoContainer.addEventListener('click', (e) => {
-      if (e.target.closest('.bottom-controls') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn') || e.target.closest('.fullscreen-playlist-container')) {
+      if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn')) {
         resetControlsTimeout();
         return;
       }
