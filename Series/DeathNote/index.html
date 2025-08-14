@@ -51,7 +51,7 @@
 
           <div class="right-buttons">
             <button id="togglePlaylistBtn">
-              <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/playlist.png" alt="Playlist" style="width:35px; height:35px;" />
+                <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/main/playlist.png" alt="Playlist" style="width:35px; height:35px;" />
             </button>
             <button id="fullscreenBtn">
               <img src="https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Tela.png" alt="Tela Cheia" />
@@ -107,9 +107,7 @@
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
       controlsTimeout = setTimeout(() => {
-        if (!videoPlayer.paused) {
-          controlsOverlay.classList.add('hidden');
-        }
+        controlsOverlay.classList.add('hidden');
       }, 3000);
     }
 
@@ -173,13 +171,14 @@
       timeRemaining.textContent = formatTime(duration - current);
       currentTime.textContent = formatTime(current);
 
+
       if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
-      if (duration > 0 && current >= duration - 30) {
+      if (current >= 1292) {
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
@@ -197,12 +196,12 @@
     }
 
     progressContainer.addEventListener('mousedown', (e) => { isDragging = true; scrub(e); });
-    progressContainer.addEventListener('mousemove', (e) => { if (isDragging) { scrub(e); } });
-    window.addEventListener('mouseup', () => { isDragging = false; });
-    window.addEventListener('mouseleave', () => { isDragging = false; });
+    progressContainer.addEventListener('mousemove', (e) => { if (isDragging) scrub(e); });
+    progressContainer.addEventListener('mouseup', () => { isDragging = false; });
+    progressContainer.addEventListener('mouseleave', () => { isDragging = false; });
     progressContainer.addEventListener('touchstart', (e) => { isDragging = true; scrub(e.touches[0]); }, { passive: false });
-    progressContainer.addEventListener('touchmove', (e) => { if (isDragging) { scrub(e.touches[0]); } }, { passive: false });
-    window.addEventListener('touchend', () => { isDragging = false; });
+    progressContainer.addEventListener('touchmove', (e) => { if (isDragging) scrub(e.touches[0]); }, { passive: false });
+    progressContainer.addEventListener('touchend', () => { isDragging = false; });
 
     window.addEventListener('load', () => {
       fetch('dados/DeathNote.json')
@@ -215,34 +214,53 @@
           }
           generatePlaylist();
           loadVideoByIndex(0);
+
+          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
+            videoPlayer.muted = true;
+            videoPlayer.play().then(() => {
+              videoPlayer.muted = false;
+              videoPlayer.volume = 1.0;
+            }).catch(() => {
+              console.log('Erro ao tentar iniciar o vídeo automaticamente');
+            });
+          });
         });
     });
 
     playlist.addEventListener('click', (e) => {
       const downloadBtn = e.target.closest('.download-btn');
       if (downloadBtn) {
-        e.stopPropagation();
+        e.preventDefault();
+        const url = downloadBtn.href;
+        const tempLink = document.createElement('a');
+        tempLink.href = url;
+        tempLink.download = '';
+        document.body.appendChild(tempLink);
+        tempLink.click();
+        document.body.removeChild(tempLink);
         return;
       }
 
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
+        playlistContainer.classList.remove('show');
       }
     });
 
     prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideoByIndex(currentIndex - 1); });
     nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1); });
+
     playPauseBtn.addEventListener('click', () => {
+      videoPlayer.muted = false;
       if (videoPlayer.paused) {
         videoPlayer.play();
       } else {
         videoPlayer.pause();
       }
+      updatePlayPauseButton();
     });
-
-    videoPlayer.addEventListener('play', updatePlayPauseButton);
-    videoPlayer.addEventListener('pause', updatePlayPauseButton);
 
     fullscreenBtn.addEventListener('click', () => {
       if (!document.fullscreenElement) {
@@ -253,23 +271,18 @@
     });
 
     pipBtn.addEventListener('click', () => {
-      if (document.pictureInPictureElement) {
-        document.exitPictureInPicture();
+      if (videoPlayer !== document.pictureInPictureElement) {
+        videoPlayer.requestPictureInPicture().catch(error => console.error("Erro ao ativar o PiP:", error));
       } else {
-        videoPlayer.requestPictureInPicture();
+        document.exitPictureInPicture().catch(error => console.error("Erro ao sair do PiP:", error));
       }
     });
 
-    toggleDownloadsBtn.addEventListener('click', () => {
-      playlistContainer.classList.toggle('show-downloads');
-    });
-    
-    togglePlaylistBtn.addEventListener('click', () => {
-        playlistContainer.classList.toggle('show');
-    });
-
+    toggleDownloadsBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show-downloads'); });
     skipIntroBtn.addEventListener('click', () => { videoPlayer.currentTime = 81; });
     nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1); });
+    togglePlaylistBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show'); });
+
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
     videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideoByIndex(currentIndex + 1); });
@@ -288,10 +301,26 @@
       if (e.target.closest('.bottom-controls') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn')) {
         return;
       }
-      if (videoPlayer.paused) {
-        videoPlayer.play();
+
+      if (clickTimeout !== null) {
+        clearTimeout(clickTimeout);
+        clickTimeout = null;
+
+        if (!document.fullscreenElement) {
+          videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+        } else {
+          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        }
       } else {
-        videoPlayer.pause();
+        clickTimeout = setTimeout(() => {
+          if (videoPlayer.paused) {
+            videoPlayer.play();
+          } else {
+            videoPlayer.pause();
+          }
+          updatePlayPauseButton();
+          clickTimeout = null;
+        }, 250);
       }
     });
 
