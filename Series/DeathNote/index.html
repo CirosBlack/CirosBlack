@@ -43,7 +43,7 @@
             </button>
             <div class="volume-container">
               <button id="volumeBtn">
-                  <img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-alto.png" alt="Volume">
+                  <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png" alt="Volume">
               </button>
               <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
             </div>
@@ -116,6 +116,7 @@
     let mouseTimeout;
     let isDragging = false;
     let clickTimeout = null;
+    let lastVolume = 1;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -227,31 +228,36 @@
     }
 
     function toggleMute() {
-        videoPlayer.muted = !videoPlayer.muted;
+        if (videoPlayer.muted) {
+            videoPlayer.muted = false;
+            videoPlayer.volume = lastVolume;
+        } else {
+            lastVolume = videoPlayer.volume;
+            videoPlayer.muted = true;
+            videoPlayer.volume = 0;
+        }
     }
 
     function handleVolumeChange() {
         videoPlayer.volume = volumeSlider.value;
-        if (videoPlayer.volume === 0) {
-            videoPlayer.muted = true;
-        } else {
+        if (videoPlayer.volume > 0) {
             videoPlayer.muted = false;
         }
     }
 
     function updateVolumeUI() {
+        const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume-mudo.png";
+        const volumeIcon = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png";
+
         if (videoPlayer.muted || videoPlayer.volume === 0) {
             volumeSlider.value = 0;
-            volumeBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-mudo.png" alt="Mudo">`;
+            volumeBtn.innerHTML = `<img src="${volumeIconMute}" alt="Mudo">`;
         } else {
             volumeSlider.value = videoPlayer.volume;
-            if (videoPlayer.volume > 0.5) {
-                volumeBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-alto.png" alt="Volume Alto">`;
-            } else {
-                volumeBtn.innerHTML = `<img src="https://raw.githubusercontent.com/CirosBlack/public/main/capas/volume-baixo.png" alt="Volume Baixo">`;
-            }
+            volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
         }
     }
+
 
     progressContainer.addEventListener('mousedown', (e) => {
       isDragging = true;
@@ -347,7 +353,6 @@
     });
 
     playPauseBtn.addEventListener('click', () => {
-      videoPlayer.muted = false;
       if (videoPlayer.paused) {
         videoPlayer.play();
       } else {
