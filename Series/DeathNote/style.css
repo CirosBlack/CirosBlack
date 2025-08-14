@@ -37,7 +37,57 @@ body {
   object-fit: contain;
   background-color: #000;
   outline: none;
+  z-index: 1;
 }
+
+/* --- ESTILOS DO POP-UP DE PLAYLIST EM TELA CHEIA --- */
+.fullscreen-playlist {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 300px;
+  max-width: 80%;
+  height: 100%;
+  background-color: rgba(10, 10, 10, 0.9);
+  backdrop-filter: blur(5px);
+  z-index: 100;
+  transform: translateX(100%);
+  transition: transform 0.4s ease-in-out;
+  visibility: hidden;
+  overflow-y: auto;
+  border-left: 1px solid #444;
+}
+
+.fullscreen-playlist.visible {
+  transform: translateX(0);
+  visibility: visible;
+}
+
+.fullscreen-playlist ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fullscreen-playlist li {
+  padding: 15px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #333;
+  font-size: 0.9rem;
+}
+
+.fullscreen-playlist li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.fullscreen-playlist li.playing {
+  background-color: red;
+  font-weight: bold;
+  padding-left: 30px;
+}
+/* --- FIM DOS ESTILOS DO POP-UP --- */
+
 
 #episodeTitle {
   position: absolute;
@@ -83,12 +133,16 @@ body {
   align-items: center;
   opacity: 1;
   transition: opacity 0.4s;
-  pointer-events: auto;
+  pointer-events: none; /* Apenas os botões devem ter eventos */
+  z-index: 10;
+}
+
+.controls-overlay > * {
+  pointer-events: auto; /* Reativa eventos para os filhos */
 }
 
 .controls-overlay.hidden {
   opacity: 0;
-  pointer-events: none;
 }
 
 .bottom-controls {
@@ -108,14 +162,10 @@ body {
   width: 100%;
 }
 
-.left-buttons {
+.left-buttons, .right-buttons {
   display: flex;
   align-items: center;
   gap: 1px;
-}
-
-#nextBtn {
-  margin-right: 10px;
 }
 
 .middle-controls {
@@ -126,21 +176,11 @@ body {
   gap: 10px;
 }
 
-.right-buttons {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-}
-
-#fullscreenBtn {
-  margin-left: 10px;
-}
-
 .controls-container button {
   background-color: transparent;
   color: #fff;
   border: none;
-  padding: 2px 2px;
+  padding: 2px;
   margin: 0;
   cursor: pointer;
   font-size: 1rem;
@@ -155,14 +195,10 @@ body {
 }
 
 .controls-container button img {
-  margin-bottom: 0;
   width: 35px;
   height: 35px;
   transition: transform 0.2s ease;
-}
-
-.controls-container button:hover img {
-  transform: scale(1.2);
+  vertical-align: middle;
 }
 
 .progress-wrapper {
@@ -212,7 +248,6 @@ body {
   font-weight: bold;
 }
 
-
 .playlist-container {
   width: 100%;
   background-color: #111;
@@ -229,12 +264,13 @@ body {
   color: #fff;
 }
 
-.playlist-container ul {
+#playlist ul {
   list-style: none;
   width: 100%;
+  padding: 0;
 }
 
-.playlist-container li {
+#playlist li {
   padding: 10px;
   margin-bottom: 5px;
   background-color: #222;
@@ -247,11 +283,11 @@ body {
   justify-content: space-between;
 }
 
-.playlist-container li:hover {
+#playlist li:hover {
   background-color: #333;
 }
 
-.playlist-container li.playing {
+#playlist li.playing {
   background-color: #444;
 }
 
@@ -274,126 +310,33 @@ body {
   display: inline-block;
 }
 
-/* Estilos para o modo de TELA CHEIA usando a classe no BODY */
-body.video-fullscreen .video-container {
-  width: 100%;
-  height: 100%;
+:fullscreen, :-webkit-full-screen {
+  background-color: #000;
+}
+
+:fullscreen .video-container, :-webkit-full-screen .video-container {
   padding-top: 0;
-  background-color: #000;
-  position: fixed;
-  top: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-
-body.video-fullscreen .controls-overlay {
-  display: flex;
-}
-
-body.video-fullscreen #videoPlayer {
-  position: static;
+  height: 100%;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background-color: #000;
 }
 
-/* Estilos da Playlist em Tela Cheia */
-body.video-fullscreen .playlist-container {
-  position: fixed;
-  top: 0;
-  right: -300px; /* Começa fora da tela para desktop */
-  width: 300px;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
-  transition: right 0.5s ease-in-out;
-  z-index: 1000; /* Garante que a playlist fique sobre o vídeo */
-}
-
-body.video-fullscreen .playlist-container.show-in-fullscreen {
-  right: 0; /* Anima para dentro da tela */
-}
-
-
-@media (orientation: landscape) {
+@media (orientation: landscape) and (min-width: 601px) {
   html, body {
     overflow: hidden;
   }
-  body {
+  body:not(:-webkit-full-screen):not(:fullscreen) {
     flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
   }
   .video-container {
     width: 70%;
     height: 100%;
-    padding-top: 0;
-  }
-  #videoPlayer {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
   .playlist-container {
     width: 30%;
+    height: 100%;
     margin-top: 0;
     margin-left: 0;
-    height: 100%;
-    overflow-y: auto;
   }
-}
-
-@media (orientation: portrait) {
-  .playlist-container {
-    height: 100%;
-    overflow-y: auto;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
-  }
-}
-
-@media (max-width: 600px) {
-  #timeRemaining {
-    font-size: 0.9rem;
-    color: #ccc;
-    min-width: 45px;
-    text-align: right;
-    font-weight: bold;
-  }
-
-  .controls-container {
-    flex-wrap: wrap;
-  }
-  .controls-container button {
-    margin-top: 5px;
-  }
-
-  /* Ajustes da playlist para telas menores em modo tela cheia */
-  body.video-fullscreen .playlist-container {
-    width: 100%;
-    right: -100%; /* Começa fora da tela para mobile */
-  }
-
-  body.video-fullscreen .playlist-container.show-in-fullscreen {
-    right: 0;
-  }
-}
-
-.playlist-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.playlist-container::-webkit-scrollbar-track {
-  background: #000;
-}
-
-.playlist-container::-webkit-scrollbar-thumb {
-  background: #0000;
-  border-radius: 10px;
 }
 
 .hidden-cursor {
