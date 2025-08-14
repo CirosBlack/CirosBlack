@@ -106,6 +106,7 @@
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
+    let playlistHideTimeout;
     let isDragging = false;
     let clickTimeout = null;
 
@@ -298,6 +299,7 @@
         const li = e.target.closest('li');
         if (li && li.dataset.index) {
             loadVideoByIndex(parseInt(li.dataset.index, 10));
+            fullscreenPlaylistContainer.classList.remove('visible');
         }
     });
 
@@ -321,6 +323,23 @@
     
     playlistBtn.addEventListener('click', () => {
         fullscreenPlaylistContainer.classList.toggle('visible');
+        if (fullscreenPlaylistContainer.classList.contains('visible')) {
+            playlistHideTimeout = setTimeout(() => {
+                fullscreenPlaylistContainer.classList.remove('visible');
+            }, 1000);
+        } else {
+            clearTimeout(playlistHideTimeout);
+        }
+    });
+    
+    fullscreenPlaylistContainer.addEventListener('mouseenter', () => {
+        clearTimeout(playlistHideTimeout);
+    });
+
+    fullscreenPlaylistContainer.addEventListener('mouseleave', () => {
+        playlistHideTimeout = setTimeout(() => {
+            fullscreenPlaylistContainer.classList.remove('visible');
+        }, 1000);
     });
 
     fullscreenBtn.addEventListener('click', () => {
