@@ -116,7 +116,6 @@
     let mouseTimeout;
     let isDragging = false;
     let clickTimeout = null;
-    let lastVolume = 1;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -228,14 +227,7 @@
     }
 
     function toggleMute() {
-        if (videoPlayer.muted) {
-            videoPlayer.muted = false;
-            videoPlayer.volume = lastVolume;
-        } else {
-            lastVolume = videoPlayer.volume;
-            videoPlayer.muted = true;
-            videoPlayer.volume = 0;
-        }
+        videoPlayer.muted = !videoPlayer.muted;
     }
 
     function handleVolumeChange() {
@@ -246,7 +238,7 @@
     }
 
     function updateVolumeUI() {
-        const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume-mudo.png";
+        const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/mudo.png";
         const volumeIcon = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png";
 
         if (videoPlayer.muted || videoPlayer.volume === 0) {
