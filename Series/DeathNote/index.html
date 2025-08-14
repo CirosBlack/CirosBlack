@@ -154,7 +154,6 @@
       episodeTitle.textContent = videos[index].title;
       highlightCurrentItem();
       scrollPlaylistToCurrent();
-      updatePlayPauseButton();
       videoPlayer.play().catch(() => {});
     }
 
@@ -292,7 +291,6 @@
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
-        videoPlayer.play();
       }
     });
     
@@ -319,7 +317,6 @@
       } else {
         videoPlayer.pause();
       }
-      updatePlayPauseButton();
     });
     
     playlistBtn.addEventListener('click', () => {
@@ -361,13 +358,14 @@
       }
     });
 
+    videoPlayer.addEventListener('play', updatePlayPauseButton);
+    videoPlayer.addEventListener('pause', updatePlayPauseButton);
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
 
     videoPlayer.addEventListener('ended', () => {
       if (currentIndex + 1 < videos.length) {
         loadVideoByIndex(currentIndex + 1);
-        videoPlayer.play();
       }
     });
 
@@ -407,7 +405,6 @@
           } else {
             videoPlayer.pause();
           }
-          updatePlayPauseButton();
           clickTimeout = null;
         }, 250);
       }
