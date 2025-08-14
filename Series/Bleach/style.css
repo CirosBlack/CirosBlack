@@ -192,6 +192,59 @@ body {
   font-weight: bold;
 }
 
+.volume-container {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+  margin-right: 25px;
+}
+
+#volumeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  margin-left: 8px;
+}
+
+#volumeSlider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  background: #444;
+  border-radius: 4px;
+}
+
+#volumeSlider::-moz-range-track {
+  width: 100%;
+  height: 10px;
+  background: #444;
+  border-radius: 4px;
+}
+
+#volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -2.5px;
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+#volumeSlider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+#volumeBtn img {
+  width: 30px;
+  height: 30px;
+}
+
 
 .playlist-container {
   width: 100%;
@@ -201,6 +254,7 @@ body {
   margin-top: 10px;
   scroll-behavior: smooth;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 #videoTitle {
@@ -252,6 +306,58 @@ body {
 
 .playlist-container.show-downloads .download-btn {
   display: inline-block;
+}
+
+#playlistBtn {
+    display: none;
+}
+
+.fullscreen-playlist-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 30;
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.fullscreen-playlist-container::-webkit-scrollbar {
+    display: none;
+}
+
+.fullscreen-playlist-container.visible {
+    transform: translateX(0);
+}
+
+.fullscreen-playlist-container h2 {
+    margin-bottom: 15px;
+}
+
+.fullscreen-playlist-container ul {
+    list-style: none;
+}
+
+.fullscreen-playlist-container li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #444;
+}
+
+.fullscreen-playlist-container li:hover {
+    background-color: #333;
+}
+
+
+:fullscreen #playlistBtn {
+    display: block;
 }
 
 :fullscreen .video-container {
@@ -328,9 +434,16 @@ body {
 
   .controls-container {
     flex-wrap: wrap;
+    justify-content: center;
   }
   .controls-container button {
     margin-top: 5px;
+  }
+  .volume-container {
+      margin-left: 5px;
+  }
+  #volumeSlider {
+      width: 50px;
   }
 }
 
