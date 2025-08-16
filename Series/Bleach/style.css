@@ -85,6 +85,10 @@ body {
   opacity: 1;
   transition: opacity 0.4s;
   pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .controls-overlay.hidden {
