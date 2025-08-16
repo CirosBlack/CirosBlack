@@ -39,6 +39,27 @@ body {
   outline: none;
 }
 
+.pause-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 21;
+  display: none;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.pause-icon img {
+  width: 80px;
+  height: 80px;
+  transition: transform 0.2s ease;
+}
+
+.pause-icon:hover img {
+    transform: scale(1.1);
+}
+
 #episodeTitle {
   position: absolute;
   top: 15px;
@@ -245,7 +266,6 @@ body {
   height: 30px;
 }
 
-
 .playlist-container {
   width: 100%;
   background-color: #111;
@@ -355,7 +375,6 @@ body {
     background-color: #333;
 }
 
-
 :fullscreen #playlistBtn {
     display: block;
 }
@@ -462,24 +481,4 @@ body {
 
 .hidden-cursor {
   cursor: none;
-}
-
-/* Estilos para o ícone de pause central */
-.pause-icon {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
-  z-index: 20;
-  cursor: pointer;
-  pointer-events: auto;
-  transition: opacity 0.2s ease-in-out;
-  opacity: 1;
-}
-
-.pause-icon.hidden {
-  opacity: 0;
-  pointer-events: none;
 }
