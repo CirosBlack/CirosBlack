@@ -18,6 +18,10 @@
       muted
     ></video>
 
+    <div id="pauseIcon" class="pause-icon">
+      <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/pausetela.png" alt="Play">
+    </div>
+
     <div class="fullscreen-playlist-container" id="fullscreenPlaylistContainer">
         <h2>Episódios</h2>
         <ul id="fullscreenPlaylist"></ul>
@@ -108,7 +112,7 @@
     const volumeSlider = document.getElementById('volumeSlider');
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
-
+    const pauseIcon = document.getElementById('pauseIcon');
 
     let videos = [];
     let currentIndex = 0;
@@ -151,9 +155,9 @@
     }
 
     function updatePlayPauseButton() {
-      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+      const playIconURL = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIconURL = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIconURL : pauseIconURL}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
     }
 
     function loadVideoByIndex(index) {
@@ -201,15 +205,13 @@
       timeRemaining.textContent = formatTime(duration - current);
       currentTime.textContent = formatTime(current);
 
-      // Mostra ou esconde o botão "Pular intro"
       if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
-      // Mostra ou esconde o botão "Próximo Episódio"
-      if (current >= 1292) { // 21 minutos e 32 segundos
+      if (current >= 1292) {
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
@@ -257,7 +259,6 @@
             volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
         }
     }
-
 
     progressContainer.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -412,9 +413,19 @@
             loadVideoByIndex(currentIndex + 1);
         }
     });
+    
+    pauseIcon.addEventListener('click', () => {
+      videoPlayer.play();
+    });
 
-    videoPlayer.addEventListener('play', updatePlayPauseButton);
-    videoPlayer.addEventListener('pause', updatePlayPauseButton);
+    videoPlayer.addEventListener('play', () => {
+        updatePlayPauseButton();
+        pauseIcon.style.display = 'none';
+    });
+    videoPlayer.addEventListener('pause', () => {
+        updatePlayPauseButton();
+        pauseIcon.style.display = 'block';
+    });
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
     videoPlayer.addEventListener('volumechange', updateVolumeUI);
@@ -440,9 +451,8 @@
     videoContainer.addEventListener('mousemove', showControlsAndReset);
     videoContainer.addEventListener('touchstart', showControlsAndReset);
 
-
     videoContainer.addEventListener('click', (e) => {
-      if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn')) {
+      if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn') || e.target.closest('#pauseIcon')) {
         resetControlsTimeout();
         return;
       }
@@ -458,19 +468,18 @@
         }
       } else {
         clickTimeout = setTimeout(() => {
-          const rect = videoContainer.getBoundingClientRect();
-          const clickX = e.clientX - rect.left;
-          const clickY = e.clientY - rect.top;
+          if (!videoPlayer.paused) {
+            const rect = videoContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
 
-          const centerXStart = rect.width * 0.375;
-          const centerXEnd = rect.width * 0.625;
-          const centerYStart = rect.height * 0.375;
-          const centerYEnd = rect.height * 0.625;
+            const areaSideLength = Math.sqrt(0.20);
+            const xStart = rect.width * (1 - areaSideLength) / 2;
+            const xEnd = rect.width - xStart;
+            const yStart = rect.height * (1 - areaSideLength) / 2;
+            const yEnd = rect.height - yStart;
 
-          if (clickX >= centerXStart && clickX <= centerXEnd && clickY >= centerYStart && clickY <= centerYEnd) {
-            if (videoPlayer.paused) {
-              videoPlayer.play();
-            } else {
+            if (clickX >= xStart && clickX <= xEnd && clickY >= yStart && clickY <= yEnd) {
               videoPlayer.pause();
             }
           }
