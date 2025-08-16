@@ -122,6 +122,7 @@
     let clickTimeout = null;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
+    let justLoaded = false;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -156,11 +157,12 @@
 
     function updatePlayPauseButton() {
       const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+      const pauseIconUrl = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIconUrl}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
     }
 
     function loadVideoByIndex(index) {
+      justLoaded = true;
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
@@ -420,11 +422,14 @@
 
     videoPlayer.addEventListener('play', () => {
         updatePlayPauseButton();
-        pauseIcon.style.display = 'none';
+        pauseIcon.classList.remove('visible');
+        justLoaded = false;
     });
     videoPlayer.addEventListener('pause', () => {
         updatePlayPauseButton();
-        pauseIcon.style.display = 'block';
+        if (!isDragging && !justLoaded) {
+          pauseIcon.classList.add('visible');
+        }
     });
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
@@ -506,4 +511,3 @@
   </script>
 </body>
 </html>
-
