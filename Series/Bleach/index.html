@@ -17,8 +17,10 @@
       controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
       muted
     ></video>
-    
-    <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/pausetela.png" alt="Pause" id="pauseIcon" class="pause-icon hidden">
+
+    <div id="pauseIcon" class="pause-icon">
+      <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/pausetela.png" alt="Play">
+    </div>
 
     <div class="fullscreen-playlist-container" id="fullscreenPlaylistContainer">
         <h2>Episódios</h2>
@@ -117,10 +119,9 @@
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
+    let clickTimeout = null;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
-    let clicks = 0;
-    let clickTimeout = null;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -154,16 +155,9 @@
     }
 
     function updatePlayPauseButton() {
-      const playIconSrc = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIconSrc = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIconSrc : pauseIconSrc}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
-
-      if (videoPlayer.paused) {
-        // Mostra o ícone central apenas se o vídeo foi pausado
-        // A lógica de clique controlará quando ele deve aparecer
-      } else {
-        pauseIcon.classList.add('hidden');
-      }
+      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
     }
 
     function loadVideoByIndex(index) {
@@ -211,8 +205,17 @@
       timeRemaining.textContent = formatTime(duration - current);
       currentTime.textContent = formatTime(current);
 
-      skipIntroBtn.style.display = (current > 0 && current < 81) ? 'block' : 'none';
-      nextEpisodeBtn.style.display = (current >= 1292) ? 'block' : 'none';
+      if (current > 0 && current < 81) {
+        skipIntroBtn.style.display = 'block';
+      } else {
+        skipIntroBtn.style.display = 'none';
+      }
+
+      if (current >= 1292) {
+        nextEpisodeBtn.style.display = 'block';
+      } else {
+        nextEpisodeBtn.style.display = 'none';
+      }
     }
 
     function scrub(e) {
@@ -227,64 +230,78 @@
     }
 
     function toggleMute() {
-      if (videoPlayer.muted) {
-        videoPlayer.muted = false;
-        videoPlayer.volume = lastVolume;
-      } else {
-        lastVolume = videoPlayer.volume;
-        videoPlayer.muted = true;
-        videoPlayer.volume = 0;
-      }
+        if (videoPlayer.muted) {
+            videoPlayer.muted = false;
+            videoPlayer.volume = lastVolume;
+        } else {
+            lastVolume = videoPlayer.volume;
+            videoPlayer.muted = true;
+            videoPlayer.volume = 0;
+        }
     }
 
     function handleVolumeChange() {
-      videoPlayer.volume = volumeSlider.value;
-      if (videoPlayer.volume > 0) {
-        videoPlayer.muted = false;
-      }
+        videoPlayer.volume = volumeSlider.value;
+        if (videoPlayer.volume > 0) {
+            videoPlayer.muted = false;
+        }
     }
 
     function updateVolumeUI() {
-      const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/mudo.png";
-      const volumeIcon = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png";
-      if (videoPlayer.muted || videoPlayer.volume === 0) {
-        volumeSlider.value = 0;
-        volumeBtn.innerHTML = `<img src="${volumeIconMute}" alt="Mudo">`;
-      } else {
-        volumeSlider.value = videoPlayer.volume;
-        volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
-      }
+        const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/mudo.png";
+        const volumeIcon = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png";
+
+        if (videoPlayer.muted || videoPlayer.volume === 0) {
+            volumeSlider.value = 0;
+            volumeBtn.innerHTML = `<img src="${volumeIconMute}" alt="Mudo">`;
+        } else {
+            volumeSlider.value = videoPlayer.volume;
+            volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
+        }
     }
 
     progressContainer.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      wasPausedBeforeDrag = videoPlayer.paused;
-      videoPlayer.pause();
-      scrub(e);
+        isDragging = true;
+        wasPausedBeforeDrag = videoPlayer.paused;
+        videoPlayer.pause();
+        scrub(e);
     });
+
     document.addEventListener('mousemove', (e) => {
-      if (isDragging) scrub(e);
+        if (isDragging) {
+            scrub(e);
+        }
     });
+
     document.addEventListener('mouseup', () => {
-      if (isDragging) {
-        isDragging = false;
-        if (!wasPausedBeforeDrag) videoPlayer.play();
-      }
+        if (isDragging) {
+            isDragging = false;
+            if (!wasPausedBeforeDrag) {
+                videoPlayer.play();
+            }
+        }
     });
+
     progressContainer.addEventListener('touchstart', (e) => {
-      isDragging = true;
-      wasPausedBeforeDrag = videoPlayer.paused;
-      videoPlayer.pause();
-      scrub(e);
+        isDragging = true;
+        wasPausedBeforeDrag = videoPlayer.paused;
+        videoPlayer.pause();
+        scrub(e);
     }, { passive: false });
+
     document.addEventListener('touchmove', (e) => {
-      if (isDragging) scrub(e);
+        if (isDragging) {
+            scrub(e);
+        }
     }, { passive: false });
+
     document.addEventListener('touchend', () => {
-      if (isDragging) {
-        isDragging = false;
-        if (!wasPausedBeforeDrag) videoPlayer.play();
-      }
+        if (isDragging) {
+            isDragging = false;
+            if (!wasPausedBeforeDrag) {
+                videoPlayer.play();
+            }
+        }
     });
 
     window.addEventListener('load', () => {
@@ -300,6 +317,17 @@
           generateFullscreenPlaylist();
           loadVideoByIndex(0);
           updateVolumeUI();
+
+          videoPlayer.addEventListener('loadedmetadata', function autoStartOnce() {
+            videoPlayer.removeEventListener('loadedmetadata', autoStartOnce);
+            videoPlayer.muted = true;
+            videoPlayer.play().then(() => {
+              videoPlayer.muted = false;
+              videoPlayer.volume = 1.0;
+            }).catch(() => {
+              console.log('Erro ao tentar iniciar o vídeo automaticamente');
+            });
+          });
         });
     });
 
@@ -316,38 +344,42 @@
         document.body.removeChild(tempLink);
         return;
       }
+
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
         loadVideoByIndex(parseInt(li.dataset.index));
       }
     });
-
+    
     fullscreenPlaylist.addEventListener('click', (e) => {
-      const li = e.target.closest('li');
-      if (li && li.dataset.index) {
-        loadVideoByIndex(parseInt(li.dataset.index, 10));
-        fullscreenPlaylistContainer.classList.remove('visible');
-      }
+        const li = e.target.closest('li');
+        if (li && li.dataset.index) {
+            loadVideoByIndex(parseInt(li.dataset.index, 10));
+            fullscreenPlaylistContainer.classList.remove('visible');
+        }
     });
 
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
     });
+
     nextBtn.addEventListener('click', () => {
       if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
     });
+
     playPauseBtn.addEventListener('click', () => {
       if (videoPlayer.paused) {
         videoPlayer.play();
       } else {
         videoPlayer.pause();
-        pauseIcon.classList.remove('hidden');
       }
     });
+    
     playlistBtn.addEventListener('click', () => {
       fullscreenPlaylistContainer.classList.toggle('visible');
       resetControlsTimeout();
     });
+
     fullscreenBtn.addEventListener('click', () => {
       if (!document.fullscreenElement) {
         videoContainer.requestFullscreen().catch(() => {});
@@ -355,34 +387,51 @@
         document.exitFullscreen().catch(() => {});
       }
     });
+
     pipBtn.addEventListener('click', () => {
-      if (document.pictureInPictureElement) {
-        document.exitPictureInPicture().catch(console.error);
+      if (videoPlayer !== document.pictureInPictureElement) {
+        videoPlayer.requestPictureInPicture().catch(error => {
+          console.error("Erro ao ativar o PiP:", error);
+        });
       } else {
-        videoPlayer.requestPictureInPicture().catch(console.error);
-      }
-    });
-    toggleDownloadsBtn.addEventListener('click', () => {
-      playlistContainer.classList.toggle('show-downloads');
-    });
-    skipIntroBtn.addEventListener('click', () => {
-      videoPlayer.currentTime = 81;
-    });
-    nextEpisodeBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) {
-        loadVideoByIndex(currentIndex + 1);
+        document.exitPictureInPicture().catch(error => {
+          console.error("Erro ao sair do PiP:", error);
+        });
       }
     });
 
+    toggleDownloadsBtn.addEventListener('click', () => {
+      playlistContainer.classList.toggle('show-downloads');
+    });
+
+    skipIntroBtn.addEventListener('click', () => {
+        videoPlayer.currentTime = 81;
+    });
+
+    nextEpisodeBtn.addEventListener('click', () => {
+        if (currentIndex < videos.length - 1) {
+            loadVideoByIndex(currentIndex + 1);
+        }
+    });
+    
     pauseIcon.addEventListener('click', () => {
       videoPlayer.play();
     });
 
-    videoPlayer.addEventListener('play', updatePlayPauseButton);
-    videoPlayer.addEventListener('pause', updatePlayPauseButton);
+    videoPlayer.addEventListener('play', () => {
+        updatePlayPauseButton();
+        pauseIcon.style.display = 'none';
+    });
+    videoPlayer.addEventListener('pause', () => {
+        updatePlayPauseButton();
+        pauseIcon.style.display = 'block';
+    });
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
     videoPlayer.addEventListener('volumechange', updateVolumeUI);
+    volumeBtn.addEventListener('click', toggleMute);
+    volumeSlider.addEventListener('input', handleVolumeChange);
+
     videoPlayer.addEventListener('ended', () => {
       if (currentIndex + 1 < videos.length) {
         loadVideoByIndex(currentIndex + 1);
@@ -402,51 +451,51 @@
     videoContainer.addEventListener('mousemove', showControlsAndReset);
     videoContainer.addEventListener('touchstart', showControlsAndReset);
 
-    // --- LÓGICA DE CLIQUE CORRIGIDA ---
     videoContainer.addEventListener('click', (e) => {
-      if (e.target.closest('.controls-overlay') || e.target.id === 'pauseIcon') {
+      if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn') || e.target.closest('#pauseIcon')) {
+        resetControlsTimeout();
         return;
       }
-      
-      clicks++;
-      
-      if (clicks === 1) {
-        clickTimeout = setTimeout(() => {
-          clicks = 0;
-          // Ação de clique único
-          const rect = videoContainer.getBoundingClientRect();
-          const clickX = e.clientX - rect.left;
-          const clickY = e.clientY - rect.top;
 
-          // Área central é de 40% a 60% da largura/altura (ou seja, 20% central)
-          const isCentralClick = 
-            clickX > rect.width * 0.4 && clickX < rect.width * 0.6 &&
-            clickY > rect.height * 0.4 && clickY < rect.height * 0.6;
-            
-          if (isCentralClick) {
-            if (videoPlayer.paused) {
-              videoPlayer.play();
-            } else {
+      if (clickTimeout !== null) {
+        clearTimeout(clickTimeout);
+        clickTimeout = null;
+
+        if (!document.fullscreenElement) {
+          videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
+        } else {
+          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        }
+      } else {
+        clickTimeout = setTimeout(() => {
+          if (!videoPlayer.paused) {
+            const rect = videoContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            const areaSideLength = Math.sqrt(0.20); // approx 0.447
+            const xStart = rect.width * (1 - areaSideLength) / 2;
+            const xEnd = rect.width - xStart;
+            const yStart = rect.height * (1 - areaSideLength) / 2;
+            const yEnd = rect.height - yStart;
+
+            if (clickX >= xStart && clickX <= xEnd && clickY >= yStart && clickY <= yEnd) {
               videoPlayer.pause();
-              pauseIcon.classList.remove('hidden');
             }
           }
-        }, 250); // Aumentar o tempo pode ajudar a detectar melhor o duplo clique
-      } else {
-        // Ação de clique duplo
-        clearTimeout(clickTimeout);
-        clicks = 0;
-        if (!document.fullscreenElement) {
-          videoContainer.requestFullscreen().catch(() => {});
-        } else {
-          document.exitFullscreen().catch(() => {});
-        }
+          clickTimeout = null;
+        }, 250);
       }
     });
 
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && !videoPlayer.paused) {
+      if (!document.hidden && !videoPlayer.paused) {
+        const currentTime = videoPlayer.currentTime;
         videoPlayer.pause();
+        setTimeout(() => {
+          videoPlayer.currentTime = currentTime;
+          videoPlayer.play().catch(() => {});
+        }, 50);
       }
     });
 
