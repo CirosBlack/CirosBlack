@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF--8" />
+  <meta charset="UTF-8" />
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
@@ -119,6 +119,8 @@
     let isDragging = false;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
+    let clickTimer = null;
+    const doubleClickDelay = 250; 
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -157,7 +159,9 @@
       playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIconSrc : pauseIconSrc}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
 
       if (videoPlayer.paused) {
-        pauseIcon.classList.remove('hidden');
+        if (!document.querySelector('.pause-icon:not(.hidden)')) {
+            pauseIcon.classList.remove('hidden');
+        }
       } else {
         pauseIcon.classList.add('hidden');
       }
@@ -353,7 +357,7 @@
         loadVideoByIndex(parseInt(li.dataset.index));
       }
     });
-    
+
     fullscreenPlaylist.addEventListener('click', (e) => {
         const li = e.target.closest('li');
         if (li && li.dataset.index) {
@@ -377,7 +381,7 @@
         videoPlayer.pause();
       }
     });
-    
+
     playlistBtn.addEventListener('click', () => {
       fullscreenPlaylistContainer.classList.toggle('visible');
       resetControlsTimeout();
@@ -448,8 +452,6 @@
     videoContainer.addEventListener('mousemove', showControlsAndReset);
     videoContainer.addEventListener('touchstart', showControlsAndReset);
 
-    let clickTimer = null;
-
     videoContainer.addEventListener('click', (e) => {
         if (e.target.closest('.controls-overlay') || e.target.id === 'pauseIcon') {
             return;
@@ -458,12 +460,23 @@
         if (clickTimer === null) {
             clickTimer = setTimeout(() => {
                 clickTimer = null;
-                if (videoPlayer.paused) {
-                    videoPlayer.play();
-                } else {
-                    videoPlayer.pause();
+                const videoRect = videoPlayer.getBoundingClientRect();
+                const clickX = e.clientX - videoRect.left;
+                const clickY = e.clientY - videoRect.top;
+                const centralWidthStart = videoRect.width * 0.4;
+                const centralWidthEnd = videoRect.width * 0.6;
+                const centralHeightStart = videoRect.height * 0.4;
+                const centralHeightEnd = videoRect.height * 0.6;
+
+                if (clickX >= centralWidthStart && clickX <= centralWidthEnd &&
+                    clickY >= centralHeightStart && clickY <= centralHeightEnd) {
+                    if (videoPlayer.paused) {
+                        videoPlayer.play();
+                    } else {
+                        videoPlayer.pause();
+                    }
                 }
-            }, 250);
+            }, doubleClickDelay);
         } else {
             clearTimeout(clickTimer);
             clickTimer = null;
