@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF--8" />
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
@@ -17,9 +17,8 @@
       controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
       muted
     ></video>
-
-    <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/playtela.png" class="overlay-icon" id="playIconOverlay" alt="Play">
-    <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/pausetela.png" class="overlay-icon" id="pauseIconOverlay" alt="Pause">
+    
+    <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/pausetela.png" alt="Pause" id="pauseIcon" class="pause-icon hidden">
 
     <div class="fullscreen-playlist-container" id="fullscreenPlaylistContainer">
         <h2>Episódios</h2>
@@ -111,25 +110,15 @@
     const volumeSlider = document.getElementById('volumeSlider');
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
-    const playIconOverlay = document.getElementById('playIconOverlay');
-    const pauseIconOverlay = document.getElementById('pauseIconOverlay');
-
+    const pauseIcon = document.getElementById('pauseIcon');
 
     let videos = [];
     let currentIndex = 0;
     let controlsTimeout;
     let mouseTimeout;
     let isDragging = false;
-    let clickTimeout = null;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
-
-    function showOverlayIcon(icon) {
-        icon.style.opacity = '1';
-        setTimeout(() => {
-            icon.style.opacity = '0';
-        }, 500);
-    }
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -163,9 +152,15 @@
     }
 
     function updatePlayPauseButton() {
-      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIcon}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+      const playIconSrc = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIconSrc = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIconSrc : pauseIconSrc}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+
+      if (videoPlayer.paused) {
+        pauseIcon.classList.remove('hidden');
+      } else {
+        pauseIcon.classList.add('hidden');
+      }
     }
 
     function loadVideoByIndex(index) {
@@ -267,7 +262,6 @@
             volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
         }
     }
-
 
     progressContainer.addEventListener('mousedown', (e) => {
         isDragging = true;
@@ -423,6 +417,10 @@
         }
     });
 
+    pauseIcon.addEventListener('click', () => {
+      videoPlayer.play();
+    });
+
     videoPlayer.addEventListener('play', updatePlayPauseButton);
     videoPlayer.addEventListener('pause', updatePlayPauseButton);
     videoPlayer.addEventListener('timeupdate', updateProgress);
@@ -450,45 +448,31 @@
     videoContainer.addEventListener('mousemove', showControlsAndReset);
     videoContainer.addEventListener('touchstart', showControlsAndReset);
 
+    let clickTimer = null;
 
     videoContainer.addEventListener('click', (e) => {
-      if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn')) {
-        resetControlsTimeout();
-        return;
-      }
-
-      if (clickTimeout !== null) {
-        clearTimeout(clickTimeout);
-        clickTimeout = null;
-
-        if (!document.fullscreenElement) {
-          videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
-        } else {
-          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+        if (e.target.closest('.controls-overlay') || e.target.id === 'pauseIcon') {
+            return;
         }
-      } else {
-        clickTimeout = setTimeout(() => {
-          const rect = videoContainer.getBoundingClientRect();
-          const clickX = e.clientX - rect.left;
-          const clickY = e.clientY - rect.top;
 
-          const centerXStart = rect.width * 0.375;
-          const centerXEnd = rect.width * 0.625;
-          const centerYStart = rect.height * 0.375;
-          const centerYEnd = rect.height * 0.625;
-
-          if (clickX >= centerXStart && clickX <= centerXEnd && clickY >= centerYStart && clickY <= centerYEnd) {
-            if (videoPlayer.paused) {
-              videoPlayer.play();
-              showOverlayIcon(pauseIconOverlay);
+        if (clickTimer === null) {
+            clickTimer = setTimeout(() => {
+                clickTimer = null;
+                if (videoPlayer.paused) {
+                    videoPlayer.play();
+                } else {
+                    videoPlayer.pause();
+                }
+            }, 250);
+        } else {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            if (!document.fullscreenElement) {
+                videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
             } else {
-              videoPlayer.pause();
-              showOverlayIcon(playIconOverlay);
+                document.exitFullscreen?.() || document.webkitExitFullscreen?.();
             }
-          }
-          clickTimeout = null;
-        }, 250);
-      }
+        }
     });
 
     document.addEventListener('visibilitychange', () => {
