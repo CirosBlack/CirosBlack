@@ -69,6 +69,7 @@ body {
 .pause-icon:focus,
 .pause-icon:active {
   outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #episodeTitle {
@@ -168,6 +169,7 @@ body {
 .controls-container button:focus,
 .controls-container button:active {
   outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .controls-container button:hover {
