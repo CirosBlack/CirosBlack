@@ -28,19 +28,6 @@ body {
   overflow: hidden;
 }
 
-.overlay-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
-    opacity: 0;
-    transition: opacity 0.3s ease-out;
-    pointer-events: none;
-    z-index: 20;
-}
-
 #videoPlayer {
   position: absolute;
   top: 0;
@@ -475,4 +462,24 @@ body {
 
 .hidden-cursor {
   cursor: none;
+}
+
+/* Estilos para o ícone de pause central */
+.pause-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  z-index: 20;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+.pause-icon.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
