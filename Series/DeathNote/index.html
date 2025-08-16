@@ -502,6 +502,8 @@
     playlistContainer.addEventListener('touchmove', function(e) {
       e.stopPropagation();
     });
+    document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
+
