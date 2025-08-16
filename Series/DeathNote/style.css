@@ -119,7 +119,8 @@ body {
 .bottom-controls {
   position: relative;
   width: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  /* Aumentei o valor de rgba(0, 0, 0, 0.7) para rgba(0, 0, 0, 0.9) */
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
   display: flex;
   justify-content: space-between;
   align-items: center;
