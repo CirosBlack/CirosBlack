@@ -45,14 +45,20 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 21;
-  display: none;
   cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.pause-icon.visible {
+  opacity: 1;
   pointer-events: auto;
 }
 
 .pause-icon img {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   transition: transform 0.2s ease;
 }
 
