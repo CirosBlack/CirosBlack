@@ -72,6 +72,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+.pause-icon img:focus,
+.pause-icon img:active {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 #episodeTitle {
   position: absolute;
   top: 15px;
