@@ -18,6 +18,9 @@
       muted
     ></video>
 
+    <img src="playtela.png" class="overlay-icon" id="playIconOverlay" alt="Play">
+    <img src="pausetela.png" class="overlay-icon" id="pauseIconOverlay" alt="Pause">
+
     <div class="fullscreen-playlist-container" id="fullscreenPlaylistContainer">
         <h2>Episódios</h2>
         <ul id="fullscreenPlaylist"></ul>
@@ -108,6 +111,8 @@
     const volumeSlider = document.getElementById('volumeSlider');
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
+    const playIconOverlay = document.getElementById('playIconOverlay');
+    const pauseIconOverlay = document.getElementById('pauseIconOverlay');
 
 
     let videos = [];
@@ -118,6 +123,13 @@
     let clickTimeout = null;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
+
+    function showOverlayIcon(icon) {
+        icon.style.opacity = '1';
+        setTimeout(() => {
+            icon.style.opacity = '0';
+        }, 500);
+    }
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -201,15 +213,13 @@
       timeRemaining.textContent = formatTime(duration - current);
       currentTime.textContent = formatTime(current);
 
-      // Mostra ou esconde o botão "Pular intro"
       if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
       } else {
         skipIntroBtn.style.display = 'none';
       }
 
-      // Mostra ou esconde o botão "Próximo Episódio"
-      if (current >= 1292) { // 21 minutos e 32 segundos
+      if (current >= 1292) {
         nextEpisodeBtn.style.display = 'block';
       } else {
         nextEpisodeBtn.style.display = 'none';
@@ -470,8 +480,10 @@
           if (clickX >= centerXStart && clickX <= centerXEnd && clickY >= centerYStart && clickY <= centerYEnd) {
             if (videoPlayer.paused) {
               videoPlayer.play();
+              showOverlayIcon(pauseIconOverlay);
             } else {
               videoPlayer.pause();
+              showOverlayIcon(playIconOverlay);
             }
           }
           clickTimeout = null;
