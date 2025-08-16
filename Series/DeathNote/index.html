@@ -27,10 +27,10 @@
         <ul id="fullscreenPlaylist"></ul>
     </div>
 
-    <button id="skipIntroBtn">Pular Intro</button>
     <button id="nextEpisodeBtn">Próximo Episódio</button>
 
     <div class="controls-overlay" id="controlsOverlay">
+      <button id="skipIntroBtn">Pular Intro</button>
       <h2 id="episodeTitle"></h2>
 
       <div class="bottom-controls">
@@ -122,7 +122,6 @@
     let clickTimeout = null;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
-    let justLoaded = false;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -156,13 +155,12 @@
     }
 
     function updatePlayPauseButton() {
-      const playIcon = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
-      const pauseIconUrl = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
-      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIconUrl}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
+      const playIconURL = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Play.png";
+      const pauseIconURL = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
+      playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIconURL : pauseIconURL}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
     }
 
     function loadVideoByIndex(index) {
-      justLoaded = true;
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
@@ -307,7 +305,7 @@
     });
 
     window.addEventListener('load', () => {
-      fetch('dados/Bleach.json')
+      fetch('dados/DeathNote.json')
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
@@ -422,14 +420,11 @@
 
     videoPlayer.addEventListener('play', () => {
         updatePlayPauseButton();
-        pauseIcon.classList.remove('visible');
-        justLoaded = false;
+        pauseIcon.style.display = 'none';
     });
     videoPlayer.addEventListener('pause', () => {
         updatePlayPauseButton();
-        if (!isDragging && !justLoaded) {
-          pauseIcon.classList.add('visible');
-        }
+        pauseIcon.style.display = 'block';
     });
     videoPlayer.addEventListener('timeupdate', updateProgress);
     videoPlayer.addEventListener('loadedmetadata', updateProgress);
@@ -478,7 +473,7 @@
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
 
-            const areaSideLength = Math.sqrt(0.20); // approx 0.447
+            const areaSideLength = Math.sqrt(0.20);
             const xStart = rect.width * (1 - areaSideLength) / 2;
             const xEnd = rect.width - xStart;
             const yStart = rect.height * (1 - areaSideLength) / 2;
@@ -507,7 +502,6 @@
     playlistContainer.addEventListener('touchmove', function(e) {
       e.stopPropagation();
     });
-    document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
