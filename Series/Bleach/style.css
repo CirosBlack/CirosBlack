@@ -66,6 +66,11 @@ body {
     transform: scale(1.1);
 }
 
+.pause-icon:focus,
+.pause-icon:active {
+  outline: none;
+}
+
 #episodeTitle {
   position: absolute;
   top: 15px;
@@ -158,6 +163,11 @@ body {
   border-radius: 10px;
   position: relative;
   transition: background-color 0.3s;
+}
+
+.controls-container button:focus,
+.controls-container button:active {
+  outline: none;
 }
 
 .controls-container button:hover {
