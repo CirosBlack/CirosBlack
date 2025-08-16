@@ -1,7 +1,11 @@
 {
   "serie": "DeathNote",
   "episodios": [
-    { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/DEATHNOTE/001.mp4", "title": "Renascimento" },
+    { 
+      "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/DEATHNOTE/001.mp4", 
+      "src_alt": "https://ia802303.us.archive.org/9/items/death-note-completo-ptbr/Death%20Note%20-%20S01E01%20-%20Rebirth.mp4",
+      "title": "Renascimento" 
+    },
     { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/DEATHNOTE/002.mp4", "title": "Duelo" },
     { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/DEATHNOTE/003.mp4", "title": "Negociações" },
     { "src": "https://huggingface.co/datasets/CirosW/U2VyaWVz/resolve/main/DEATHNOTE/004.mp4", "title": "Perseguição" },
