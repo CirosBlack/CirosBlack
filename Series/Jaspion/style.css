@@ -39,11 +39,63 @@ body {
   outline: none;
 }
 
+.pause-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 21;
+  cursor: pointer;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.pause-icon.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pause-icon img {
+  width: 200px;
+  height: 200px;
+  transition: transform 0.2s ease;
+}
+
+.pause-icon:hover img {
+    transform: scale(1.1);
+}
+
+.pause-icon:focus,
+.pause-icon:active {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pause-icon img:focus,
+.pause-icon img:active {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#episodeTitle {
+  position: absolute;
+  top: 15px;
+  left: 20px;
+  z-index: 10;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
+
 .controls-overlay {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -51,6 +103,10 @@ body {
   opacity: 1;
   transition: opacity 0.4s;
   pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
 }
 
 .controls-overlay.hidden {
@@ -78,29 +134,29 @@ body {
 .left-buttons {
   display: flex;
   align-items: center;
-  gap: 1px; /* Espaço entre os botões da esquerda */
+  gap: 1px;
 }
 
 #nextBtn {
-  margin-right: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-right: 10px;
 }
 
 .middle-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-grow: 1; /* Faz a barra de progresso ocupar o espaço restante */
-  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  flex-grow: 1;
+  gap: 10px;
 }
 
 .right-buttons {
   display: flex;
   align-items: center;
-  gap: 1px; /* Espaço entre os botões da direita */
+  gap: 1px;
 }
 
 #fullscreenBtn {
-  margin-left: 10px; /* Espaço de 10px entre o botão "Próximo" e a barra de progresso */
+  margin-left: 10px;
 }
 
 .controls-container button {
@@ -114,6 +170,12 @@ body {
   border-radius: 10px;
   position: relative;
   transition: background-color 0.3s;
+}
+
+.controls-container button:focus,
+.controls-container button:active {
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .controls-container button:hover {
@@ -132,11 +194,10 @@ body {
   transform: scale(1.2);
 }
 
-/* Barra de progresso e tempo */
 .progress-wrapper {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espaço entre a barra de progresso e o tempo */
+  gap: 10px;
   flex: 1;
 }
 
@@ -146,7 +207,6 @@ body {
   height: 10px;
   background-color: #444;
   border-radius: 4px;
-  margin-right: 10px;
   cursor: pointer;
 }
 
@@ -173,16 +233,67 @@ body {
   left: 0%;
 }
 
-#timeRemaining {
+#currentTime, #timeRemaining {
   font-size: 1.0rem;
   color: #ccc;
   min-width: 45px;
-  text-align: right;
-  font-weight: bold; /* Este comando já coloca o texto em negrito */
+  text-align: center;
+  font-weight: bold;
 }
 
+.volume-container {
+  display: flex;
+  align-items: center;
+  margin-left: 15px;
+  margin-right: 25px;
+}
 
-/* Playlist container e outros estilos */
+#volumeSlider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+  margin-left: 8px;
+}
+
+#volumeSlider::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 10px;
+  background: #444;
+  border-radius: 4px;
+}
+
+#volumeSlider::-moz-range-track {
+  width: 100%;
+  height: 10px;
+  background: #444;
+  border-radius: 4px;
+}
+
+#volumeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -2.5px;
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+#volumeSlider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+#volumeBtn img {
+  width: 30px;
+  height: 30px;
+}
+
 .playlist-container {
   width: 100%;
   background-color: #111;
@@ -191,6 +302,7 @@ body {
   margin-top: 10px;
   scroll-behavior: smooth;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 #videoTitle {
@@ -242,6 +354,57 @@ body {
 
 .playlist-container.show-downloads .download-btn {
   display: inline-block;
+}
+
+#playlistBtn {
+    display: none;
+}
+
+.fullscreen-playlist-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 300px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 30;
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.fullscreen-playlist-container::-webkit-scrollbar {
+    display: none;
+}
+
+.fullscreen-playlist-container.visible {
+    transform: translateX(0);
+}
+
+.fullscreen-playlist-container h2 {
+    margin-bottom: 15px;
+}
+
+.fullscreen-playlist-container ul {
+    list-style: none;
+}
+
+.fullscreen-playlist-container li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #444;
+}
+
+.fullscreen-playlist-container li:hover {
+    background-color: #333;
+}
+
+:fullscreen #playlistBtn {
+    display: block;
 }
 
 :fullscreen .video-container {
@@ -313,14 +476,21 @@ body {
   color: #ccc;
   min-width: 45px;
   text-align: right;
-  font-weight: bold; /* Este comando já coloca o texto em negrito */
+  font-weight: bold;
 }
 
   .controls-container {
     flex-wrap: wrap;
+    justify-content: center;
   }
   .controls-container button {
     margin-top: 5px;
+  }
+  .volume-container {
+      margin-left: 5px;
+  }
+  #volumeSlider {
+      width: 50px;
   }
 }
 
@@ -337,7 +507,6 @@ body {
   border-radius: 10px;
 }
 
-/* Classe para esconder o cursor */
 .hidden-cursor {
   cursor: none;
 }
