@@ -123,6 +123,7 @@
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
     let justLoaded = false;
+    let currentErrorHandler;
 
     function resetControlsTimeout() {
       clearTimeout(controlsTimeout);
@@ -162,15 +163,38 @@
     }
 
     function loadVideoByIndex(index) {
-      justLoaded = true;
-      if (index < 0 || index >= videos.length) return;
-      currentIndex = index;
-      videoPlayer.src = videos[index].src;
-      videoTitle.textContent = videos[index].title;
-      episodeTitle.textContent = videos[index].title;
-      highlightCurrentItem();
-      scrollPlaylistToCurrent();
-      videoPlayer.play().catch(() => {});
+        justLoaded = true;
+        if (index < 0 || index >= videos.length) return;
+        currentIndex = index;
+        
+        const video = videos[index];
+        videoPlayer.src = video.src;
+
+        // Remove o manipulador de erro anterior para evitar acúmulo
+        if (currentErrorHandler) {
+            videoPlayer.removeEventListener('error', currentErrorHandler);
+        }
+
+        // Define o novo manipulador de erro
+        currentErrorHandler = () => {
+            // Verifica se existe uma fonte alternativa e se não já estamos usando ela
+            if (video.src_alt && videoPlayer.currentSrc !== video.src_alt) {
+                console.log(`Fonte primária falhou para o episódio ${index + 1}. Tentando a fonte alternativa.`);
+                videoPlayer.src = video.src_alt;
+                videoPlayer.play().catch(() => {});
+                // Remove o listener de erro após a tentativa de fallback para evitar loops
+                videoPlayer.removeEventListener('error', currentErrorHandler);
+            } else {
+                console.error(`Erro ao carregar o vídeo para o episódio ${index + 1}. Nenhuma fonte alternativa ou a alternativa também falhou.`);
+            }
+        };
+        videoPlayer.addEventListener('error', currentErrorHandler);
+
+        videoTitle.textContent = video.title;
+        episodeTitle.textContent = video.title;
+        highlightCurrentItem();
+        scrollPlaylistToCurrent();
+        videoPlayer.play().catch(() => {});
     }
 
     function highlightCurrentItem() {
