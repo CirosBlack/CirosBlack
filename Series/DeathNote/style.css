@@ -334,7 +334,7 @@ body {
   position: sticky;
   top: 0;
   background-color: #111;
-  padding: 15px 15px 25px 15px; 
+  padding: 15px 15px 20px 15px; 
   z-index: 10;
 }
 
@@ -556,3 +556,4 @@ nav a {
 @media (min-width: 640px) {
   .sm\:gap-5 { gap: 1.25rem; }
 }
+
