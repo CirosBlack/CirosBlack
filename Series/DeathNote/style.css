@@ -10,7 +10,8 @@ html, body {
   height: 100%;
   background-color: #000;
   color: #fff;
-  overflow: auto;
+  /* Alterado para 'hidden' para o layout flex funcionar corretamente */
+  overflow: hidden; 
 }
 
 body {
@@ -320,26 +321,41 @@ body {
   height: 30px;
 }
 
+/* ======== INÍCIO DAS MODIFICAÇÕES NA PLAYLIST ======== */
+
 .playlist-container {
   width: 100%;
   background-color: #111;
-  padding: 15px;
   border-radius: 5px;
   margin-top: 10px;
-  scroll-behavior: smooth;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
+  /* Novas propriedades para layout */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Delega a rolagem para o filho #playlist */
 }
 
-#videoTitle {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #fff;
+/* Novo cabeçalho fixo para a navegação */
+.playlist-header {
+  position: sticky;
+  top: 0;
+  background-color: #111;
+  /* Padding: 15px topo, 15px laterais, 25px fundo */
+  padding: 15px 15px 25px 15px; 
+  z-index: 10;
 }
 
-.playlist-container ul {
+/* #videoTitle foi removido */
+
+#playlist {
   list-style: none;
   width: 100%;
+  /* Novas propriedades para preencher espaço e rolar */
+  flex-grow: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior-y: contain;
+  /* Adiciona padding para os itens não colarem nas bordas */
+  padding: 0 15px 15px 15px;
 }
 
 .playlist-container li {
@@ -354,6 +370,8 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
+/* ======== FIM DAS MODIFICAÇÕES NA PLAYLIST ======== */
 
 .playlist-container li:hover {
   background-color: #333;
@@ -482,16 +500,15 @@ body {
     margin-top: 0;
     margin-left: 0;
     height: 100%;
-    overflow-y: auto;
+    /* overflow-y: auto; // REMOVIDO para o layout flex funcionar */
   }
 }
 
 @media (orientation: portrait) {
   .playlist-container {
     height: 100%;
-    overflow-y: auto;
+    /* overflow-y: auto; // REMOVIDO */
     margin: 0;
-    padding: 0;
     border-radius: 0;
   }
 }
@@ -520,19 +537,42 @@ body {
   }
 }
 
-.playlist-container::-webkit-scrollbar {
+#playlist::-webkit-scrollbar {
   width: 6px;
 }
 
-.playlist-container::-webkit-scrollbar-track {
-  background: #000;
+#playlist::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.playlist-container::-webkit-scrollbar-thumb {
-  background: #0000;
+#playlist::-webkit-scrollbar-thumb {
+  background: #444;
   border-radius: 10px;
 }
 
 .hidden-cursor {
   cursor: none;
+}
+
+
+/* ESTILOS PARA A NOVA BARRA DE NAVEGAÇÃO */
+nav a {
+  text-decoration: none;
+}
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-3 { gap: 0.75rem; }
+.flex-wrap { flex-wrap: wrap; }
+.text-gray-300 { color: #d1d5db; }
+.hover\:text-red-500:hover { color: #ef4444; }
+.transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+.duration-300 { transition-duration: 300ms; }
+.transform { transform: scale(1); }
+.hover\:scale-110:hover { transform: scale(1.1); }
+.inline-block { display: inline-block; }
+.text-red-500 { color: #ef4444; }
+.font-bold { font-weight: 700; }
+
+@media (min-width: 640px) {
+  .sm\:gap-5 { gap: 1.25rem; }
 }
