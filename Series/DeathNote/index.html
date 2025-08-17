@@ -82,13 +82,20 @@
   </div>
 
   <div class="playlist-container" id="playlistContainer">
-    <h2 id="videoTitle">Carregando...</h2>
+    <div class="playlist-header">
+      <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
+        <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
+        <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
+      </nav>
+    </div>
     <ul id="playlist"></ul>
   </div>
-
   <script>
     const videoPlayer = document.getElementById('videoPlayer');
-    const videoTitle = document.getElementById('videoTitle');
+    // const videoTitle = document.getElementById('videoTitle'); // REMOVIDO
     const playlist = document.getElementById('playlist');
     const prevBtn = document.getElementById('prevBtn');
     const playPauseBtn = document.getElementById('playPauseBtn');
@@ -170,19 +177,15 @@
         const video = videos[index];
         videoPlayer.src = video.src;
 
-        // Remove o manipulador de erro anterior para evitar acúmulo
         if (currentErrorHandler) {
             videoPlayer.removeEventListener('error', currentErrorHandler);
         }
 
-        // Define o novo manipulador de erro
         currentErrorHandler = () => {
-            // Verifica se existe uma fonte alternativa e se não já estamos usando ela
             if (video.src_alt && videoPlayer.currentSrc !== video.src_alt) {
                 console.log(`Fonte primária falhou para o episódio ${index + 1}. Tentando a fonte alternativa.`);
                 videoPlayer.src = video.src_alt;
                 videoPlayer.play().catch(() => {});
-                // Remove o listener de erro após a tentativa de fallback para evitar loops
                 videoPlayer.removeEventListener('error', currentErrorHandler);
             } else {
                 console.error(`Erro ao carregar o vídeo para o episódio ${index + 1}. Nenhuma fonte alternativa ou a alternativa também falhou.`);
@@ -190,7 +193,7 @@
         };
         videoPlayer.addEventListener('error', currentErrorHandler);
 
-        videoTitle.textContent = video.title;
+        // videoTitle.textContent = video.title; // REMOVIDO
         episodeTitle.textContent = video.title;
         highlightCurrentItem();
         scrollPlaylistToCurrent();
@@ -337,7 +340,7 @@
           videos = data.episodios || [];
           if (data.serie) {
             document.title = data.serie;
-            videoTitle.textContent = data.serie;
+            // videoTitle.textContent = data.serie; // REMOVIDO
           }
           generatePlaylist();
           generateFullscreenPlaylist();
