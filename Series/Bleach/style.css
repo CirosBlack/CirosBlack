@@ -308,16 +308,15 @@ body {
   position: sticky;
   top: 0;
   background-color: #111;
-  padding: 15px; /* Espaçamento unificado */
+  /* Espaçamento inferior aumentado aqui */
+  padding: 15px 15px 25px 15px; 
   z-index: 10;
 }
-
-/* REGRA DE ESTILO PARA #videoTitle FOI REMOVIDA */
 
 #playlist {
   list-style: none;
   width: 100%;
-  padding: 0 15px 15px 15px; /* Espaçamento ajustado */
+  padding: 0 15px 15px 15px;
   flex-grow: 1;
   overflow-y: auto;
   scroll-behavior: smooth;
