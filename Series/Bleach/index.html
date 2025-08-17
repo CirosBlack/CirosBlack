@@ -21,21 +21,6 @@
 </head>
 <body>
 
-  <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm shadow-lg shadow-red-500/10">
-    <div class="container mx-auto flex items-center justify-between p-4 flex-wrap">
-      <div class="text-3xl font-extrabold tracking-wider text-white">
-        CIROS<span class="text-red-500">BLACK</span>
-      </div>
-      <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
-        <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
-        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
-        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
-        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
-        <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
-      </nav>
-    </div>
-  </header>
-
   <div class="video-container" id="videoContainer">
     <video
       id="videoPlayer"
@@ -112,6 +97,13 @@
 
   <div class="playlist-container" id="playlistContainer">
     <h2 id="videoTitle">Carregando...</h2>
+    <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
+        <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
+        <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
+    </nav>
     <ul id="playlist"></ul>
   </div>
 
