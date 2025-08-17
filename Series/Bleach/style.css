@@ -10,7 +10,6 @@ html, body {
   height: 100%;
   background-color: #000;
   color: #fff;
-  /* Alterado de 'auto' para 'hidden' para evitar a rolagem da página principal */
   overflow: hidden; 
 }
 
@@ -295,50 +294,32 @@ body {
   height: 30px;
 }
 
-/* ======== INÍCIO DAS ALTERAÇÕES NA PLAYLIST ======== */
 .playlist-container {
   width: 100%;
   background-color: #111;
   margin-top: 10px;
   border-radius: 5px;
-  
-  /* Novas propriedades para criar o layout flexível */
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* A rolagem agora será na #playlist */
-  
-  /* Propriedades antigas removidas ou alteradas */
-  /* padding: 15px; -> movido para os filhos */
-  /* scroll-behavior: smooth; -> movido para #playlist */
-  /* overflow-y: auto; -> movido para #playlist */
-  /* overscroll-behavior-y: contain; -> movido para #playlist */
+  overflow: hidden;
 }
 
-/* Novo container para o cabeçalho fixo */
 .playlist-header {
   position: sticky;
   top: 0;
-  background-color: #111; /* Cor de fundo para não ficar transparente */
-  padding: 15px 15px 0 15px; /* Espaçamento interno */
-  z-index: 10; /* Garante que fique por cima da lista ao rolar */
+  background-color: #111;
+  padding: 15px; /* Espaçamento unificado */
+  z-index: 10;
 }
 
-#videoTitle {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  margin-top: 15px; /* Espaço entre a nav e o título */
-  color: #fff;
-}
+/* REGRA DE ESTILO PARA #videoTitle FOI REMOVIDA */
 
-/* A lista de episódios agora é a área rolável */
 #playlist {
   list-style: none;
   width: 100%;
-  padding: 15px;
-  
-  /* Novas propriedades */
-  flex-grow: 1; /* Faz a lista ocupar todo o espaço restante */
-  overflow-y: auto; /* Adiciona a barra de rolagem APENAS à lista */
+  padding: 0 15px 15px 15px; /* Espaçamento ajustado */
+  flex-grow: 1;
+  overflow-y: auto;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
 }
@@ -355,8 +336,6 @@ body {
   align-items: center;
   justify-content: space-between;
 }
-/* ======== FIM DAS ALTERAÇÕES NA PLAYLIST ======== */
-
 
 .playlist-container li:hover {
   background-color: #333;
@@ -485,16 +464,14 @@ body {
     margin-top: 0;
     margin-left: 0;
     height: 100%;
-    /* overflow-y: auto; -> Removido pois o flexbox controla isso agora */
   }
 }
 
 @media (orientation: portrait) {
   .playlist-container {
     height: 100%;
-    /* overflow-y: auto; -> Removido pois o flexbox controla isso agora */
     margin: 0;
-    padding: 0; /* Removido padding do container principal */
+    padding: 0;
     border-radius: 0;
   }
 }
@@ -540,8 +517,7 @@ body {
   cursor: none;
 }
 
-
-/* ======== ESTILOS PARA A NOVA BARRA DE NAVEGAÇÃO ======== */
+/* ESTILOS PARA A BARRA DE NAVEGAÇÃO */
 nav a {
   text-decoration: none;
 }
@@ -558,19 +534,7 @@ nav a {
 .inline-block { display: inline-block; }
 .text-red-500 { color: #ef4444; }
 .font-bold { font-weight: 700; }
-.bg-gray-800\/50 { background-color: rgba(31, 41, 55, 0.5); }
-.border { border-width: 1px; }
-.border-gray-700 { border-color: #374151; }
-.rounded-full { border-radius: 9999px; }
-.py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-.px-4 { padding-left: 1rem; padding-right: 1rem; }
-.text-white { color: #fff; }
-.placeholder-gray-400::placeholder { color: #9ca3af; }
-.focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
-.focus\:ring-2:focus { box-shadow: 0 0 0 2px #ef4444; }
-.w-32 { width: 8rem; }
 
 @media (min-width: 640px) {
   .sm\:gap-5 { gap: 1.25rem; }
-  .sm\:w-auto { width: auto; }
 }
