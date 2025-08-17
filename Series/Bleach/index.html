@@ -89,15 +89,15 @@
         <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
         <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
         <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
-        <input id="searchInput" type="text" placeholder="Pesquisar..." class="bg-gray-800/50 border border-gray-700 rounded-full py-2 px-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-300 w-32 sm:w-auto" />
       </nav>
-      <h2 id="videoTitle">Carregando...</h2>
     </div>
     <ul id="playlist"></ul>
   </div>
+
+
   <script>
     const videoPlayer = document.getElementById('videoPlayer');
-    const videoTitle = document.getElementById('videoTitle');
+    // const videoTitle = document.getElementById('videoTitle'); <- REMOVIDO
     const playlist = document.getElementById('playlist');
     const prevBtn = document.getElementById('prevBtn');
     const playPauseBtn = document.getElementById('playPauseBtn');
@@ -175,7 +175,7 @@
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
-      videoTitle.textContent = videos[index].title;
+      // videoTitle.textContent = videos[index].title; <- REMOVIDO
       episodeTitle.textContent = videos[index].title;
       highlightCurrentItem();
       scrollPlaylistToCurrent();
@@ -322,7 +322,7 @@
           videos = data.episodios || [];
           if (data.serie) {
             document.title = data.serie;
-            videoTitle.textContent = data.serie;
+            // videoTitle.textContent = data.serie; <- REMOVIDO
           }
           generatePlaylist();
           generateFullscreenPlaylist();
