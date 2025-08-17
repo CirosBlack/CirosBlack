@@ -5,8 +5,37 @@
   <title>Minha Série</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Adiciona um espaçamento no topo do body para não ficar atrás do header */
+    body {
+        padding-top: 70px;
+    }
+  </style>
 </head>
 <body>
+
+  <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-sm shadow-lg shadow-red-500/10">
+    <div class="container mx-auto flex items-center justify-between p-4 flex-wrap">
+      <div class="text-3xl font-extrabold tracking-wider text-white">
+        CIROS<span class="text-red-500">BLACK</span>
+      </div>
+      <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
+        <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
+        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
+        <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
+      </nav>
+    </div>
+  </header>
+
   <div class="video-container" id="videoContainer">
     <video
       id="videoPlayer"
