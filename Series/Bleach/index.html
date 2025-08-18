@@ -148,7 +148,6 @@
     let wasPausedBeforeDrag = false;
     let serieKey; 
     let lastSaveTime = 0;
-    // CORREÇÃO: Variável para diferenciar pausa do usuário vs pausa automática
     let lastPlayTimestamp = 0;
 
     // --- FUNÇÕES ---
@@ -364,12 +363,14 @@
         });
     });
 
-    resumeConfirmBtn.addEventListener('click', () => {
+    resumeConfirmBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // <<-- CORREÇÃO AQUI
         videoPlayer.play();
         resumeCard.classList.remove('visible');
     });
 
-    resumeStartOverBtn.addEventListener('click', () => {
+    resumeStartOverBtn.addEventListener('click', (event) => {
+        event.stopPropagation(); // <<-- CORREÇÃO AQUI
         localStorage.removeItem(`${serieKey}_episodeIndex`);
         localStorage.removeItem(`${serieKey}_currentTime`);
         loadVideo(0, 0, true);
@@ -395,7 +396,6 @@
     prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
     nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     
-    // CORREÇÃO: Lógica de play/pause com timestamp
     videoPlayer.addEventListener('play', () => {
       lastPlayTimestamp = Date.now();
       updatePlayPauseButton();
@@ -405,8 +405,6 @@
     videoPlayer.addEventListener('pause', () => {
       const timeSincePlay = Date.now() - lastPlayTimestamp;
       updatePlayPauseButton();
-      // Só mostra o ícone de pause se não for um "flicker" (pausa < 200ms após um play)
-      // e se não estivermos arrastando a barra de progresso.
       if (!isDragging && timeSincePlay > 200) {
         pauseIcon.classList.add('visible');
       }
