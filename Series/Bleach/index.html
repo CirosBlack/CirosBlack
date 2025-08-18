@@ -146,9 +146,10 @@
     let clickTimeout = null;
     let lastVolume = 1;
     let wasPausedBeforeDrag = false;
-    let justLoaded = false;
     let serieKey; 
     let lastSaveTime = 0;
+    // CORREÇÃO: Variável para diferenciar pausa do usuário vs pausa automática
+    let lastPlayTimestamp = 0;
 
     // --- FUNÇÕES ---
 
@@ -158,9 +159,7 @@
       localStorage.setItem(`${serieKey}_currentTime`, videoPlayer.currentTime);
     }
 
-    // FUNÇÃO CORRIGIDA
     function loadVideo(index, time = 0, shouldPlay = true) {
-      justLoaded = true;
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
@@ -173,9 +172,11 @@
               if (playPromise !== undefined) {
                   playPromise.catch(error => {
                       console.log("Autoplay foi impedido:", error);
-                      updatePlayPauseButton(); // Atualiza o botão se o play falhar
+                      updatePlayPauseButton();
                   });
               }
+          } else {
+            updatePlayPauseButton();
           }
           videoPlayer.removeEventListener('loadedmetadata', onLoaded);
       });
@@ -342,10 +343,9 @@
             resumeEpisode.textContent = videos[savedIndex].title;
             resumeTime.textContent = formatTime(savedTime);
             resumeCard.classList.add('visible');
-            // Pré-carrega o vídeo para o usuário decidir o que fazer
             loadVideo(savedIndex, savedTime, false); 
           } else {
-            loadVideo(0, 0, false); // Carrega o primeiro vídeo, mas não dá play ainda
+            loadVideo(0, 0, false);
             videoPlayer.muted = true;
             const playPromise = videoPlayer.play();
             if (playPromise !== undefined) {
@@ -365,14 +365,14 @@
     });
 
     resumeConfirmBtn.addEventListener('click', () => {
-        videoPlayer.play(); // Apenas dá o play, pois o vídeo já está carregado
+        videoPlayer.play();
         resumeCard.classList.remove('visible');
     });
 
     resumeStartOverBtn.addEventListener('click', () => {
         localStorage.removeItem(`${serieKey}_episodeIndex`);
         localStorage.removeItem(`${serieKey}_currentTime`);
-        loadVideo(0, 0, true); // Carrega o primeiro episódio e dá play
+        loadVideo(0, 0, true);
         resumeCard.classList.remove('visible');
     });
     
@@ -395,8 +395,23 @@
     prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
     nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     
-    videoPlayer.addEventListener('play', () => { updatePlayPauseButton(); pauseIcon.classList.remove('visible'); justLoaded = false; });
-    videoPlayer.addEventListener('pause', () => { updatePlayPauseButton(); if (!isDragging && !justLoaded) pauseIcon.classList.add('visible'); });
+    // CORREÇÃO: Lógica de play/pause com timestamp
+    videoPlayer.addEventListener('play', () => {
+      lastPlayTimestamp = Date.now();
+      updatePlayPauseButton();
+      pauseIcon.classList.remove('visible');
+    });
+    
+    videoPlayer.addEventListener('pause', () => {
+      const timeSincePlay = Date.now() - lastPlayTimestamp;
+      updatePlayPauseButton();
+      // Só mostra o ícone de pause se não for um "flicker" (pausa < 200ms após um play)
+      // e se não estivermos arrastando a barra de progresso.
+      if (!isDragging && timeSincePlay > 200) {
+        pauseIcon.classList.add('visible');
+      }
+    });
+    
     videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideo(currentIndex + 1); });
     
     progressContainer.addEventListener('mousedown', (e) => { isDragging = true; wasPausedBeforeDrag = videoPlayer.paused; videoPlayer.pause(); scrub(e); });
