@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 html, body {
@@ -24,7 +24,7 @@ body {
   position: relative;
   width: 100%;
   padding-top: 75%; /* 4:3 */
-  background-color: #111;
+  background-color: #000;
   overflow: hidden;
 }
 
@@ -57,8 +57,8 @@ body {
 }
 
 .pause-icon img {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   transition: transform 0.2s ease;
 }
 
@@ -66,27 +66,15 @@ body {
     transform: scale(1.1);
 }
 
-.pause-icon:focus,
-.pause-icon:active {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.pause-icon img:focus,
-.pause-icon img:active {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
 #episodeTitle {
   position: absolute;
-  top: 15px;
+  top: 20px;
   left: 20px;
   z-index: 10;
   color: #fff;
   font-size: 1.5rem;
   font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
   pointer-events: none;
 }
 
@@ -99,29 +87,20 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  align-items: center;
   opacity: 1;
   transition: opacity 0.4s;
-  pointer-events: auto;
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
+  pointer-events: none; /* Só os filhos terão eventos */
 }
 
 .controls-overlay.hidden {
   opacity: 0;
-  pointer-events: none;
 }
 
 .bottom-controls {
-  position: relative;
+  pointer-events: auto;
   width: 100%;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  padding: 5px 10px;
 }
 
 .controls-container {
@@ -131,83 +110,53 @@ body {
   width: 100%;
 }
 
-.left-buttons {
+.left-buttons, .right-buttons {
   display: flex;
   align-items: center;
-  gap: 1px;
-}
-
-#nextBtn {
-  margin-right: 10px;
+  gap: 5px;
 }
 
 .middle-controls {
   display: flex;
   align-items: center;
-  justify-content: center;
   flex-grow: 1;
-  gap: 10px;
-}
-
-.right-buttons {
-  display: flex;
-  align-items: center;
-  gap: 1px;
-}
-
-#fullscreenBtn {
-  margin-left: 10px;
+  gap: 15px;
+  padding: 0 10px;
 }
 
 .controls-container button {
   background-color: transparent;
-  color: #fff;
   border: none;
-  padding: 2px 2px;
-  margin: 0;
+  padding: 8px;
   cursor: pointer;
-  font-size: 1rem;
-  border-radius: 10px;
-  position: relative;
-  transition: background-color 0.3s;
-}
-
-.controls-container button:focus,
-.controls-container button:active {
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
 }
 
 .controls-container button:hover {
   background-color: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
 }
 
 .controls-container button img {
-  margin-bottom: 0;
-  width: 35px;
-  height: 35px;
-  transition: transform 0.2s ease;
-}
-
-.controls-container button:hover img {
-  transform: scale(1.2);
-}
-
-.progress-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
+  width: 28px;
+  height: 28px;
 }
 
 .progress-container {
   position: relative;
   flex: 1;
-  height: 10px;
-  background-color: #444;
-  border-radius: 4px;
+  height: 5px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
   cursor: pointer;
+  transition: height 0.2s;
+}
+
+.progress-container:hover {
+  height: 8px;
 }
 
 #progressBar {
@@ -217,81 +166,45 @@ body {
   height: 100%;
   width: 0%;
   background-color: red;
-  transition: width 0.1s linear;
+  border-radius: 5px;
 }
 
 #progressHandle {
   position: absolute;
   top: 50%;
-  transform: translateY(-50%);
+  transform: translateY(-50%) scale(0);
   width: 14px;
   height: 14px;
   background-color: #fff;
   border-radius: 50%;
-  pointer-events: auto;
-  cursor: pointer;
+  transition: transform 0.2s;
   left: 0%;
 }
 
+.progress-container:hover #progressHandle {
+  transform: translateY(-50%) scale(1);
+}
+
 #currentTime, #timeRemaining {
-  font-size: 1.0rem;
-  color: #ccc;
+  font-size: 0.9rem;
+  color: #fff;
   min-width: 45px;
   text-align: center;
-  font-weight: bold;
 }
 
 .volume-container {
   display: flex;
   align-items: center;
-  margin-left: 15px;
-  margin-right: 25px;
 }
 
 #volumeSlider {
-  -webkit-appearance: none;
-  appearance: none;
+  width: 0px;
+  transition: width 0.3s ease-in-out;
+}
+
+.volume-container:hover #volumeSlider {
   width: 70px;
-  background: transparent;
-  cursor: pointer;
-  outline: none;
   margin-left: 8px;
-}
-
-#volumeSlider::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 10px;
-  background: #444;
-  border-radius: 4px;
-}
-
-#volumeSlider::-moz-range-track {
-  width: 100%;
-  height: 10px;
-  background: #444;
-  border-radius: 4px;
-}
-
-#volumeSlider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  margin-top: -2.5px;
-  width: 15px;
-  height: 15px;
-  background: #fff;
-  border-radius: 50%;
-}
-
-#volumeSlider::-moz-range-thumb {
-  width: 15px;
-  height: 15px;
-  background: #fff;
-  border-radius: 50%;
-}
-
-#volumeBtn img {
-  width: 30px;
-  height: 30px;
 }
 
 .playlist-container {
@@ -305,11 +218,8 @@ body {
 }
 
 .playlist-header {
-  position: sticky;
-  top: 0;
-  background-color: #111;
-  padding: 15px 15px 20px 15px; 
-  z-index: 10;
+  background-color: #181818;
+  padding: 15px; 
 }
 
 #playlist {
@@ -318,214 +228,131 @@ body {
   padding: 0 15px 15px 15px;
   flex-grow: 1;
   overflow-y: auto;
-  scroll-behavior: smooth;
-  overscroll-behavior-y: contain;
-  scrollbar-width: none; /* Para Firefox */
-  -ms-overflow-style: none;  /* Para Internet Explorer e Edge */
+  scrollbar-width: thin;
+  scrollbar-color: #444 #111;
 }
 
-#playlist::-webkit-scrollbar {
-    display: none;
-}
+#playlist::-webkit-scrollbar { width: 8px; }
+#playlist::-webkit-scrollbar-track { background: #111; }
+#playlist::-webkit-scrollbar-thumb { background-color: #444; border-radius: 4px; }
 
 .playlist-container li {
-  padding: 10px;
-  margin-bottom: 5px;
+  padding: 12px 15px;
+  margin-top: 8px;
   background-color: #222;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: 5px;
   transition: background-color 0.3s;
-  color: #fff;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-}
-
-.playlist-container li:hover {
-  background-color: #333;
-}
-
-.playlist-container li.playing {
-  background-color: #444;
-}
-
-.download-btn {
-  display: none;
-  color: #fff;
-  text-decoration: none;
-  background-color: #444;
-  padding: 5px 10px;
-  border-radius: 3px;
-  font-size: 0.8rem;
-  transition: background-color 0.3s;
-}
-
-.download-btn:hover {
-  background-color: red;
-}
-
-.playlist-container.show-downloads .download-btn {
-  display: inline-block;
-}
-
-#playlistBtn {
-    display: none;
-}
-
-.fullscreen-playlist-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    transform: translateX(100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 30;
-    color: white;
-    padding: 20px;
-    overflow-y: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.fullscreen-playlist-container::-webkit-scrollbar {
-    display: none;
-}
-
-.fullscreen-playlist-container.visible {
-    transform: translateX(0);
-}
-
-.fullscreen-playlist-container h2 {
-    margin-bottom: 15px;
-}
-
-.fullscreen-playlist-container ul {
-    list-style: none;
-}
-
-.fullscreen-playlist-container li {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #444;
-}
-
-.fullscreen-playlist-container li:hover {
-    background-color: #333;
-}
-
-:fullscreen #playlistBtn {
-    display: block;
-}
-
-:fullscreen .video-container {
-  width: 100%;
-  height: 0;
-  padding-top: 56.25%;
-  background-color: #000;
-  position: relative;
-  display: flex;
   align-items: center;
-  justify-content: center;
 }
 
-:fullscreen .controls-overlay {
-  display: flex;
+.playlist-container li:hover { background-color: #333; }
+.playlist-container li.playing { background-color: red; }
+
+/* --- ESTILOS MODERNOS PARA O CARD --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-:fullscreen #videoPlayer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  background-color: #000;
-}
-
-.hidden-cursor {
-  cursor: none;
-}
-
-/* --- ESTILOS PARA O CARD DE CONTINUAR ASSISTINDO --- */
 .resume-card-container {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 50; /* Garante que fique sobre tudo */
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.resume-card-container.visible {
+  pointer-events: auto;
+  opacity: 1;
 }
 
 .resume-card {
-  background-color: #181818;
-  padding: 25px;
-  border-radius: 8px;
+  background: linear-gradient(145deg, #2a2a2a, #1e1e1e);
+  padding: 30px;
+  border-radius: 12px;
   text-align: center;
   color: #fff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   max-width: 90%;
-  width: 350px;
+  width: 400px;
+  opacity: 0;
+  animation: fadeIn 0.4s 0.2s ease-out forwards;
 }
 
 .resume-card h2 {
-  margin-bottom: 10px;
-  font-size: 1.5rem;
+  margin-bottom: 15px;
+  font-size: 1.6rem;
+  font-weight: 600;
 }
 
 .resume-card p {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-size: 1rem;
-  color: #ccc;
+  color: #b0b0b0;
+  line-height: 1.5;
+}
+
+.resume-card p span {
+  font-weight: bold;
+  color: #fff;
 }
 
 .resume-buttons {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   gap: 15px;
 }
 
 .resume-buttons button {
-  padding: 10px 20px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: all 0.2s ease-in-out;
+  width: 100%;
 }
 
 #resumeConfirmBtn {
   background-color: red;
   color: white;
+  box-shadow: 0 4px 15px rgba(255, 0, 0, 0.2);
 }
 
 #resumeStartOverBtn {
-  background-color: #444;
-  color: #fff;
+  background-color: transparent;
+  color: #ccc;
+  border: 2px solid #555;
 }
 
 .resume-buttons button:hover {
-  transform: scale(1.05);
+  transform: translateY(-3px);
+  filter: brightness(1.1);
 }
 
 #resumeConfirmBtn:hover {
-  background-color: #b30000;
+  box-shadow: 0 6px 20px rgba(255, 0, 0, 0.3);
 }
 
 #resumeStartOverBtn:hover {
   background-color: #555;
+  color: #fff;
 }
 
 /* --- ESTILOS PARA A BARRA DE NAVEGAÇÃO --- */
-nav a {
-  text-decoration: none;
-}
+nav a { text-decoration: none; }
 .flex { display: flex; }
 .items-center { align-items: center; }
 .gap-3 { gap: 0.75rem; }
@@ -533,7 +360,6 @@ nav a {
 .text-gray-300 { color: #d1d5db; }
 .hover\:text-red-500:hover { color: #ef4444; }
 .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
-.duration-300 { transition-duration: 300ms; }
 .transform { transform: scale(1); }
 .hover\:scale-110:hover { transform: scale(1.1); }
 .inline-block { display: inline-block; }
@@ -544,63 +370,20 @@ nav a {
 
 @media (min-width: 640px) {
   .sm\:gap-5 { gap: 1.25rem; }
+  .resume-buttons { flex-direction: row; }
 }
 
 @media (orientation: landscape) {
-  html, body {
-    overflow: hidden;
-  }
-  body {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-  .video-container {
-    width: 70%;
-    height: 100%;
-    padding-top: 0;
-  }
-  #videoPlayer {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  .playlist-container {
-    width: 30%;
-    margin-top: 0;
-    margin-left: 0;
-    height: 100%;
-  }
+  .video-container { width: 70%; height: 100%; padding-top: 0; }
+  .playlist-container { width: 30%; height: 100%; margin: 0; }
+  body { flex-direction: row; }
 }
 
 @media (orientation: portrait) {
-  .playlist-container {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    border-radius: 0;
-  }
+  .playlist-container { height: 100%; margin: 0; padding: 0; border-radius: 0; }
 }
 
 @media (max-width: 600px) {
-  #timeRemaining {
-    font-size: 0.9rem;
-    color: #ccc;
-    min-width: 45px;
-    text-align: right;
-    font-weight: bold;
-  }
-  .controls-container {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .controls-container button {
-    margin-top: 5px;
-  }
-  .volume-container {
-      margin-left: 5px;
-  }
-  #volumeSlider {
-      width: 50px;
-  }
+  .controls-container { flex-wrap: wrap; justify-content: center; }
+  .middle-controls { order: -1; width: 100%; padding: 0 0 10px 0; }
 }
