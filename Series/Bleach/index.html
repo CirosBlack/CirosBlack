@@ -444,9 +444,7 @@
       navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     }
     document.addEventListener('keydown', (event) => {
-      // Impede que o teclado funcione se o card estiver visível
       if (resumeCard.classList.contains('visible')) return;
-
       if (["ArrowLeft", "ArrowRight", " "].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
