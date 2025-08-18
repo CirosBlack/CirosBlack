@@ -512,28 +512,39 @@
 
    // SETAS
 document.addEventListener('keydown', (event) => {
-  // Impede que a página role para cima/baixo ao usar as setas
-  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+  // Impede que a página role ao usar as setas ou o espaço
+  if (["ArrowLeft", "ArrowRight", " ", "Space"].includes(event.key) || event.code === 'Space') {
     event.preventDefault();
   }
 
-  // Se a tecla pressionada for a seta para a esquerda
-  if (event.key === "ArrowLeft") {
-    // Carrega o vídeo anterior, se não for o primeiro da lista
-    if (currentIndex > 0) {
-      loadVideoByIndex(currentIndex - 1);
-    }
-  }
-  // Se a tecla pressionada for a seta para a direita
-  else if (event.key === "ArrowRight") {
-    // Carrega o próximo vídeo, se não for o último da lista
-    if (currentIndex < videos.length - 1) {
-      loadVideoByIndex(currentIndex + 1);
-    }
+  // Comandos do teclado
+  switch (event.key) {
+    case "ArrowLeft":
+      // Carrega o vídeo anterior, se não for o primeiro da lista
+      if (currentIndex > 0) {
+        loadVideoByIndex(currentIndex - 1);
+      }
+      break;
+    case "ArrowRight":
+      // Carrega o próximo vídeo, se não for o último da lista
+      if (currentIndex < videos.length - 1) {
+        loadVideoByIndex(currentIndex + 1);
+      }
+      break;
+    case ' ': // Para alguns navegadores
+    case 'Space': // Padrão para a maioria
+      // Inverte o estado do vídeo
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+      } else {
+        videoPlayer.pause();
+      }
+      break;
   }
 });
   </script>
 </body>
 </html>
+
 
 
