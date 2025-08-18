@@ -509,7 +509,31 @@
     });
     
     document.addEventListener('contextmenu', event => event.preventDefault());
+
+   // SETAS
+document.addEventListener('keydown', (event) => {
+  // Impede que a página role para cima/baixo ao usar as setas
+  if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+    event.preventDefault();
+  }
+
+  // Se a tecla pressionada for a seta para a esquerda
+  if (event.key === "ArrowLeft") {
+    // Carrega o vídeo anterior, se não for o primeiro da lista
+    if (currentIndex > 0) {
+      loadVideoByIndex(currentIndex - 1);
+    }
+  }
+  // Se a tecla pressionada for a seta para a direita
+  else if (event.key === "ArrowRight") {
+    // Carrega o próximo vídeo, se não for o último da lista
+    if (currentIndex < videos.length - 1) {
+      loadVideoByIndex(currentIndex + 1);
+    }
+  }
+});
   </script>
 </body>
 </html>
+
 
