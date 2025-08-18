@@ -320,12 +320,10 @@ body {
   overflow-y: auto;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
-  /* Propriedades para ocultar a barra de rolagem */
   scrollbar-width: none; /* Para Firefox */
   -ms-overflow-style: none;  /* Para Internet Explorer e Edge */
 }
 
-/* Regra para ocultar a barra de rolagem em navegadores WebKit (Chrome, Safari) */
 #playlist::-webkit-scrollbar {
     display: none;
 }
@@ -446,6 +444,108 @@ body {
   background-color: #000;
 }
 
+.hidden-cursor {
+  cursor: none;
+}
+
+/* --- ESTILOS PARA O CARD DE CONTINUAR ASSISTINDO --- */
+.resume-card-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50; /* Garante que fique sobre tudo */
+}
+
+.resume-card {
+  background-color: #181818;
+  padding: 25px;
+  border-radius: 8px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  max-width: 90%;
+  width: 350px;
+}
+
+.resume-card h2 {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.resume-card p {
+  margin-bottom: 20px;
+  font-size: 1rem;
+  color: #ccc;
+}
+
+.resume-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.resume-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+#resumeConfirmBtn {
+  background-color: red;
+  color: white;
+}
+
+#resumeStartOverBtn {
+  background-color: #444;
+  color: #fff;
+}
+
+.resume-buttons button:hover {
+  transform: scale(1.05);
+}
+
+#resumeConfirmBtn:hover {
+  background-color: #b30000;
+}
+
+#resumeStartOverBtn:hover {
+  background-color: #555;
+}
+
+/* --- ESTILOS PARA A BARRA DE NAVEGAÇÃO --- */
+nav a {
+  text-decoration: none;
+}
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-3 { gap: 0.75rem; }
+.flex-wrap { flex-wrap: wrap; }
+.text-gray-300 { color: #d1d5db; }
+.hover\:text-red-500:hover { color: #ef4444; }
+.transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+.duration-300 { transition-duration: 300ms; }
+.transform { transform: scale(1); }
+.hover\:scale-110:hover { transform: scale(1.1); }
+.inline-block { display: inline-block; }
+.text-red-500 { color: #ef4444; }
+.font-bold { font-weight: 700; }
+
+/* --- Media Queries --- */
+
+@media (min-width: 640px) {
+  .sm\:gap-5 { gap: 1.25rem; }
+}
+
 @media (orientation: landscape) {
   html, body {
     overflow: hidden;
@@ -484,13 +584,12 @@ body {
 
 @media (max-width: 600px) {
   #timeRemaining {
-  font-size: 0.9rem;
-  color: #ccc;
-  min-width: 45px;
-  text-align: right;
-  font-weight: bold;
-}
-
+    font-size: 0.9rem;
+    color: #ccc;
+    min-width: 45px;
+    text-align: right;
+    font-weight: bold;
+  }
   .controls-container {
     flex-wrap: wrap;
     justify-content: center;
@@ -504,32 +603,4 @@ body {
   #volumeSlider {
       width: 50px;
   }
-}
-
-/* As regras de scrollbar para .playlist-container foram removidas pois são obsoletas */
-
-.hidden-cursor {
-  cursor: none;
-}
-
-/* ESTILOS PARA A BARRA DE NAVEGAÇÃO */
-nav a {
-  text-decoration: none;
-}
-.flex { display: flex; }
-.items-center { align-items: center; }
-.gap-3 { gap: 0.75rem; }
-.flex-wrap { flex-wrap: wrap; }
-.text-gray-300 { color: #d1d5db; }
-.hover\:text-red-500:hover { color: #ef4444; }
-.transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
-.duration-300 { transition-duration: 300ms; }
-.transform { transform: scale(1); }
-.hover\:scale-110:hover { transform: scale(1.1); }
-.inline-block { display: inline-block; }
-.text-red-500 { color: #ef4444; }
-.font-bold { font-weight: 700; }
-
-@media (min-width: 640px) {
-  .sm\:gap-5 { gap: 1.25rem; }
 }
