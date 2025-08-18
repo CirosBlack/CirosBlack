@@ -158,28 +158,32 @@
       localStorage.setItem(`${serieKey}_currentTime`, videoPlayer.currentTime);
     }
 
-    function loadVideo(index, time = 0) {
+    // FUNÇÃO CORRIGIDA
+    function loadVideo(index, time = 0, shouldPlay = true) {
       justLoaded = true;
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       episodeTitle.textContent = videos[index].title;
-      
-      const playPromise = videoPlayer.play();
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log("Autoplay foi impedido:", error);
-        });
-      }
 
       videoPlayer.addEventListener('loadedmetadata', function onLoaded() {
           videoPlayer.currentTime = time;
+          if (shouldPlay) {
+              const playPromise = videoPlayer.play();
+              if (playPromise !== undefined) {
+                  playPromise.catch(error => {
+                      console.log("Autoplay foi impedido:", error);
+                      updatePlayPauseButton(); // Atualiza o botão se o play falhar
+                  });
+              }
+          }
           videoPlayer.removeEventListener('loadedmetadata', onLoaded);
       });
 
       highlightCurrentItem();
       scrollPlaylistToCurrent();
     }
+
 
     function generatePlaylist() {
       playlist.innerHTML = "";
@@ -338,8 +342,10 @@
             resumeEpisode.textContent = videos[savedIndex].title;
             resumeTime.textContent = formatTime(savedTime);
             resumeCard.classList.add('visible');
+            // Pré-carrega o vídeo para o usuário decidir o que fazer
+            loadVideo(savedIndex, savedTime, false); 
           } else {
-            loadVideo(0, 0);
+            loadVideo(0, 0, false); // Carrega o primeiro vídeo, mas não dá play ainda
             videoPlayer.muted = true;
             const playPromise = videoPlayer.play();
             if (playPromise !== undefined) {
@@ -359,16 +365,14 @@
     });
 
     resumeConfirmBtn.addEventListener('click', () => {
-        const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
-        const savedTime = parseFloat(localStorage.getItem(`${serieKey}_currentTime`)) || 0;
-        loadVideo(savedIndex, savedTime);
+        videoPlayer.play(); // Apenas dá o play, pois o vídeo já está carregado
         resumeCard.classList.remove('visible');
     });
 
     resumeStartOverBtn.addEventListener('click', () => {
         localStorage.removeItem(`${serieKey}_episodeIndex`);
         localStorage.removeItem(`${serieKey}_currentTime`);
-        loadVideo(0, 0); 
+        loadVideo(0, 0, true); // Carrega o primeiro episódio e dá play
         resumeCard.classList.remove('visible');
     });
     
