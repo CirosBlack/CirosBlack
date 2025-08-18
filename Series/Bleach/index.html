@@ -149,7 +149,6 @@
     let serieKey; 
     let lastSaveTime = 0;
     let lastPlayTimestamp = 0;
-    // Nova variável para navegação do card
     let focusedButtonIndex = 0;
 
     // --- FUNÇÕES ---
@@ -186,7 +185,6 @@
       scrollPlaylistToCurrent();
     }
     
-    // NOVA FUNÇÃO: Atualiza o foco visual dos botões do card
     function updateButtonFocus() {
         const buttons = [resumeConfirmBtn, resumeStartOverBtn];
         buttons.forEach((button, index) => {
@@ -355,7 +353,7 @@
             resumeEpisode.textContent = videos[savedIndex].title;
             resumeTime.textContent = formatTime(savedTime);
             resumeCard.classList.add('visible');
-            focusedButtonIndex = 0; // Foco inicial no primeiro botão
+            focusedButtonIndex = 0;
             updateButtonFocus();
             loadVideo(savedIndex, savedTime, false); 
           } else {
@@ -476,26 +474,20 @@
       navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     }
     
-    // ATUALIZADO: Event listener do teclado
     document.addEventListener('keydown', (event) => {
-      // Se o card estiver visível, controla apenas o card
       if (resumeCard.classList.contains('visible')) {
         event.preventDefault();
         const buttons = [resumeConfirmBtn, resumeStartOverBtn];
 
-        if (event.key === 'ArrowRight') {
-            focusedButtonIndex = (focusedButtonIndex + 1) % buttons.length;
-            updateButtonFocus();
-        } else if (event.key === 'ArrowLeft') {
-            focusedButtonIndex = (focusedButtonIndex - 1 + buttons.length) % buttons.length;
+        if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            focusedButtonIndex = (focusedButtonIndex + 1) % buttons.length; // Alterna entre 0 e 1
             updateButtonFocus();
         } else if (event.key === 'Enter') {
             buttons[focusedButtonIndex].click();
         }
-        return; // Impede que o resto do código do teclado seja executado
+        return;
       }
 
-      // Se o card NÃO estiver visível, controla o player
       if (["ArrowLeft", "ArrowRight", " "].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
