@@ -17,6 +17,17 @@
       controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
     ></video>
 
+    <div id="resumeCard" class="resume-card-container">
+      <div class="resume-card">
+        <h2>Deseja continuar assistindo?</h2>
+        <p>Você parou no Episódio <span id="resumeEpisode"></span> em <span id="resumeTime"></span>.</p>
+        <div class="resume-buttons">
+          <button id="resumeConfirmBtn">Continuar Assistindo</button>
+          <button id="resumeStartOverBtn">Assistir do Início</button>
+        </div>
+      </div>
+    </div>
+
     <div id="pauseIcon" class="pause-icon">
       <img src="https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/pausetela.png" alt="Play">
     </div>
@@ -31,7 +42,6 @@
 
     <div class="controls-overlay" id="controlsOverlay">
       <h2 id="episodeTitle"></h2>
-
       <div class="bottom-controls">
         <div class="controls-container">
           <div class="left-buttons">
@@ -76,17 +86,6 @@
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="resumeCard" class="resume-card-container" style="display: none;">
-    <div class="resume-card">
-      <h2>Deseja continuar assistindo?</h2>
-      <p>Você parou no Episódio <span id="resumeEpisode"></span> em <span id="resumeTime"></span>.</p>
-      <div class="resume-buttons">
-        <button id="resumeConfirmBtn">Continuar Assistindo</button>
-        <button id="resumeStartOverBtn">Assistir do Início</button>
       </div>
     </div>
   </div>
@@ -216,8 +215,7 @@
       const pauseIconUrl = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
       playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIconUrl}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
     }
-
-    // ... (outras funções auxiliares como highlight, scroll, scrub, etc. permanecem as mesmas) ...
+    
     function highlightCurrentItem() {
       const items = playlist.querySelectorAll('li');
       items.forEach(li => li.classList.remove('playing'));
@@ -339,21 +337,18 @@
           if (savedTime > 10) {
             resumeEpisode.textContent = videos[savedIndex].title;
             resumeTime.textContent = formatTime(savedTime);
-            resumeCard.style.display = 'flex';
+            resumeCard.classList.add('visible');
           } else {
-            // CORREÇÃO AQUI: Lógica de autoplay com som
             loadVideo(0, 0);
-            videoPlayer.muted = true; // Começa mudo
+            videoPlayer.muted = true;
             const playPromise = videoPlayer.play();
             if (playPromise !== undefined) {
                 playPromise.then(() => {
-                    // Autoplay funcionou, agora reativamos o som
                     videoPlayer.muted = false;
                     videoPlayer.volume = 1.0;
                     updateVolumeUI();
                 }).catch(error => {
                     console.log("Autoplay com som falhou, usuário precisará interagir.");
-                    // O vídeo pode ter pausado, então atualizamos o botão
                     updatePlayPauseButton();
                 });
             }
@@ -367,14 +362,14 @@
         const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
         const savedTime = parseFloat(localStorage.getItem(`${serieKey}_currentTime`)) || 0;
         loadVideo(savedIndex, savedTime);
-        resumeCard.style.display = 'none';
+        resumeCard.classList.remove('visible');
     });
 
     resumeStartOverBtn.addEventListener('click', () => {
-        const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
-        localStorage.setItem(`${serieKey}_currentTime`, 0);
-        loadVideo(savedIndex, 0);
-        resumeCard.style.display = 'none';
+        localStorage.removeItem(`${serieKey}_episodeIndex`);
+        localStorage.removeItem(`${serieKey}_currentTime`);
+        loadVideo(0, 0); 
+        resumeCard.classList.remove('visible');
     });
     
     videoPlayer.addEventListener('timeupdate', () => {
@@ -399,8 +394,7 @@
     videoPlayer.addEventListener('play', () => { updatePlayPauseButton(); pauseIcon.classList.remove('visible'); justLoaded = false; });
     videoPlayer.addEventListener('pause', () => { updatePlayPauseButton(); if (!isDragging && !justLoaded) pauseIcon.classList.add('visible'); });
     videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideo(currentIndex + 1); });
-
-    // ... (outros event listeners como progress bar, volume, fullscreen etc. permanecem os mesmos) ...
+    
     progressContainer.addEventListener('mousedown', (e) => { isDragging = true; wasPausedBeforeDrag = videoPlayer.paused; videoPlayer.pause(); scrub(e); });
     document.addEventListener('mousemove', (e) => { if (isDragging) scrub(e); });
     document.addEventListener('mouseup', () => { if (isDragging) { isDragging = false; if (!wasPausedBeforeDrag) videoPlayer.play(); } });
@@ -450,6 +444,9 @@
       navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     }
     document.addEventListener('keydown', (event) => {
+      // Impede que o teclado funcione se o card estiver visível
+      if (resumeCard.classList.contains('visible')) return;
+
       if (["ArrowLeft", "ArrowRight", " "].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
