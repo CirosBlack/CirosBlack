@@ -81,6 +81,17 @@
     </div>
   </div>
 
+  <div id="resumeCard" class="resume-card-container" style="display: none;">
+    <div class="resume-card">
+      <h2>Deseja continuar assistindo?</h2>
+      <p>Você parou no Episódio <span id="resumeEpisode"></span> em <span id="resumeTime"></span>.</p>
+      <div class="resume-buttons">
+        <button id="resumeConfirmBtn">Continuar Assistindo</button>
+        <button id="resumeStartOverBtn">Assistir do Início</button>
+      </div>
+    </div>
+  </div>
+
   <div class="playlist-container" id="playlistContainer">
     <div class="playlist-header">
       <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
@@ -122,6 +133,12 @@
     const skipIntroBtn = document.getElementById('skipIntroBtn');
     const nextEpisodeBtn = document.getElementById('nextEpisodeBtn');
     const pauseIcon = document.getElementById('pauseIcon');
+    // Novos elementos do Card
+    const resumeCard = document.getElementById('resumeCard');
+    const resumeEpisode = document.getElementById('resumeEpisode');
+    const resumeTime = document.getElementById('resumeTime');
+    const resumeConfirmBtn = document.getElementById('resumeConfirmBtn');
+    const resumeStartOverBtn = document.getElementById('resumeStartOverBtn');
 
     // Variáveis de estado
     let videos = [];
@@ -134,26 +151,32 @@
     let wasPausedBeforeDrag = false;
     let justLoaded = false;
     
-    // Novas variáveis para salvar progresso
+    // Variáveis para salvar progresso
     let serieKey; 
     let lastSaveTime = 0;
 
     // --- FUNÇÕES PRINCIPAIS ---
 
     function saveProgress() {
-      if (!serieKey || isNaN(videoPlayer.currentTime) || videoPlayer.currentTime === 0) {
+      if (!serieKey || isNaN(videoPlayer.currentTime) || videoPlayer.currentTime < 10) {
         return; 
       }
       localStorage.setItem(`${serieKey}_episodeIndex`, currentIndex);
       localStorage.setItem(`${serieKey}_currentTime`, videoPlayer.currentTime);
     }
 
-    function loadVideoByIndex(index) {
+    function loadVideo(index, time = 0) {
       justLoaded = true;
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
       episodeTitle.textContent = videos[index].title;
+
+      videoPlayer.addEventListener('loadedmetadata', function onLoaded() {
+          videoPlayer.currentTime = time;
+          videoPlayer.removeEventListener('loadedmetadata', onLoaded);
+      });
+
       highlightCurrentItem();
       scrollPlaylistToCurrent();
       videoPlayer.play().catch(() => {});
@@ -303,7 +326,7 @@
         .then(res => res.json())
         .then(data => {
           videos = data.episodios || [];
-          serieKey = data.serie; // Define a chave única para o localStorage
+          serieKey = data.serie; 
           document.title = serieKey;
 
           generatePlaylist();
@@ -311,27 +334,35 @@
 
           const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
           const savedTime = parseFloat(localStorage.getItem(`${serieKey}_currentTime`)) || 0;
-          
-          loadVideoByIndex(savedIndex);
 
-          videoPlayer.addEventListener('loadedmetadata', function setSavedTime() {
-            if (savedTime > 0) {
-              videoPlayer.currentTime = savedTime;
-            }
-            videoPlayer.removeEventListener('loadedmetadata', setSavedTime);
-          });
+          // Se houver progresso salvo (mais de 10s), mostra o card
+          if (savedTime > 10) {
+            resumeEpisode.textContent = videos[savedIndex].title;
+            resumeTime.textContent = formatTime(savedTime);
+            resumeCard.style.display = 'flex';
+          } else {
+            // Caso contrário, carrega o primeiro episódio do início
+            loadVideo(0, 0);
+          }
           
           updateVolumeUI();
-
-          videoPlayer.muted = true;
-          videoPlayer.play().then(() => {
-            videoPlayer.muted = false;
-            videoPlayer.volume = 1.0;
-            updateVolumeUI();
-          }).catch(() => {
-            console.log('Reprodução automática bloqueada pelo navegador.');
-          });
         });
+    });
+
+    // Botões do Card de Confirmação
+    resumeConfirmBtn.addEventListener('click', () => {
+        const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
+        const savedTime = parseFloat(localStorage.getItem(`${serieKey}_currentTime`)) || 0;
+        loadVideo(savedIndex, savedTime);
+        resumeCard.style.display = 'none';
+    });
+
+    resumeStartOverBtn.addEventListener('click', () => {
+        const savedIndex = parseInt(localStorage.getItem(`${serieKey}_episodeIndex`)) || 0;
+        // Limpa apenas o tempo salvo, mantendo o episódio
+        localStorage.setItem(`${serieKey}_currentTime`, 0);
+        loadVideo(savedIndex, 0);
+        resumeCard.style.display = 'none';
     });
     
     // Salvar progresso
@@ -353,11 +384,11 @@
     });
     
     prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
+      if (currentIndex > 0) loadVideo(currentIndex - 1);
     });
 
     nextBtn.addEventListener('click', () => {
-      if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
+      if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1);
     });
     
     videoPlayer.addEventListener('play', () => {
@@ -374,7 +405,7 @@
     
     videoPlayer.addEventListener('ended', () => {
       if (currentIndex + 1 < videos.length) {
-        loadVideoByIndex(currentIndex + 1);
+        loadVideo(currentIndex + 1);
       }
     });
 
@@ -394,7 +425,6 @@
             if (!wasPausedBeforeDrag) videoPlayer.play();
         }
     });
-    // Touch events para barra de progresso
     progressContainer.addEventListener('touchstart', (e) => {
         isDragging = true;
         wasPausedBeforeDrag = videoPlayer.paused;
@@ -427,42 +457,28 @@
 
     pipBtn.addEventListener('click', () => {
       if (videoPlayer !== document.pictureInPictureElement) {
-        videoPlayer.requestPictureInPicture().catch(error => {
-          console.error("Erro ao ativar o PiP:", error);
-        });
+        videoPlayer.requestPictureInPicture().catch(error => console.error("Erro PiP:", error));
       } else {
-        document.exitPictureInPicture().catch(error => {
-          console.error("Erro ao sair do PiP:", error);
-        });
+        document.exitPictureInPicture().catch(error => console.error("Erro PiP:", error));
       }
     });
 
-    skipIntroBtn.addEventListener('click', () => {
-        videoPlayer.currentTime = 81;
-    });
-
-    nextEpisodeBtn.addEventListener('click', () => {
-        if (currentIndex < videos.length - 1) {
-            loadVideoByIndex(currentIndex + 1);
-        }
-    });
-    
-    pauseIcon.addEventListener('click', () => {
-      videoPlayer.play();
-    });
+    skipIntroBtn.addEventListener('click', () => { videoPlayer.currentTime = 81; });
+    nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
+    pauseIcon.addEventListener('click', () => { videoPlayer.play(); });
     
     // Playlist
     playlist.addEventListener('click', (e) => {
       const li = e.target.closest('li');
       if (li && li.dataset.index) {
-        loadVideoByIndex(parseInt(li.dataset.index));
+        loadVideo(parseInt(li.dataset.index));
       }
     });
     
     fullscreenPlaylist.addEventListener('click', (e) => {
         const li = e.target.closest('li');
         if (li && li.dataset.index) {
-            loadVideoByIndex(parseInt(li.dataset.index, 10));
+            loadVideo(parseInt(li.dataset.index, 10));
             fullscreenPlaylistContainer.classList.remove('visible');
         }
     });
@@ -482,28 +498,20 @@
 
     videoContainer.addEventListener('click', (e) => {
       if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn') || e.target.closest('#pauseIcon')) {
-        resetControlsTimeout();
-        return;
+        resetControlsTimeout(); return;
       }
       if (clickTimeout !== null) {
-        clearTimeout(clickTimeout);
-        clickTimeout = null;
-        if (!document.fullscreenElement) {
-          videoContainer.requestFullscreen?.() || videoContainer.webkitRequestFullscreen?.();
-        } else {
-          document.exitFullscreen?.() || document.webkitExitFullscreen?.();
-        }
+        clearTimeout(clickTimeout); clickTimeout = null;
+        if (!document.fullscreenElement) videoContainer.requestFullscreen?.()
+        else document.exitFullscreen?.()
       } else {
         clickTimeout = setTimeout(() => {
           if (!videoPlayer.paused) {
             const rect = videoContainer.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
+            const clickX = e.clientX - rect.left; const clickY = e.clientY - rect.top;
             const areaSideLength = Math.sqrt(0.20);
-            const xStart = rect.width * (1 - areaSideLength) / 2;
-            const xEnd = rect.width - xStart;
-            const yStart = rect.height * (1 - areaSideLength) / 2;
-            const yEnd = rect.height - yStart;
+            const xStart = rect.width * (1 - areaSideLength) / 2; const xEnd = rect.width - xStart;
+            const yStart = rect.height * (1 - areaSideLength) / 2; const yEnd = rect.height - yStart;
             if (clickX >= xStart && clickX <= xEnd && clickY >= yStart && clickY <= yEnd) {
               videoPlayer.pause();
             }
@@ -514,31 +522,19 @@
     });
 
     // --- CONTROLES GLOBAIS ---
-
-    // Media Session API para controles de mídia do sistema (funciona em PiP)
     if ('mediaSession' in navigator) {
-      navigator.mediaSession.setActionHandler('previoustrack', () => {
-        if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
-      });
-      navigator.mediaSession.setActionHandler('nexttrack', () => {
-        if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
-      });
+      navigator.mediaSession.setActionHandler('previoustrack', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
+      navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     }
 
-    // Controles de Teclado (só funcionam com a janela em foco)
     document.addEventListener('keydown', (event) => {
       if (["ArrowLeft", "ArrowRight", " "].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
       switch (event.key) {
-        case "ArrowLeft":
-          if (currentIndex > 0) loadVideoByIndex(currentIndex - 1);
-          break;
-        case "ArrowRight":
-          if (currentIndex < videos.length - 1) loadVideoByIndex(currentIndex + 1);
-          break;
-        case ' ':
-        case 'Space':
+        case "ArrowLeft": if (currentIndex > 0) loadVideo(currentIndex - 1); break;
+        case "ArrowRight": if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); break;
+        case ' ': case 'Space':
           if (videoPlayer.paused) videoPlayer.play();
           else videoPlayer.pause();
           break;
