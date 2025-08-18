@@ -83,11 +83,11 @@
   <div class="playlist-container" id="playlistContainer">
     <div class="playlist-header">
       <nav class="flex items-center gap-3 sm:gap-5 flex-wrap">
-        <a href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block">Início</a>
-        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Animes</a>
-        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Filmes</a>
-        <a href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Séries</a>
-        <a href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block">Cursos</a>
+        <a data-href="https://cirosblack.github.io/public/" class="text-gray-300 hover:text-red-500 transition-all duration-300 transform hover:scale-110 inline-block" style="cursor: pointer;">Início</a>
+        <a data-href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block" style="cursor: pointer;">Animes</a>
+        <a data-href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block" style="cursor: pointer;">Filmes</a>
+        <a data-href="#" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block" style="cursor: pointer;">Séries</a>
+        <a data-href="https://cirosblack.github.io/public/Cursos" class="text-red-500 font-bold transition-all duration-300 transform hover:scale-110 inline-block" style="cursor: pointer;">Cursos</a>
       </nav>
     </div>
     <ul id="playlist"></ul>
@@ -517,7 +517,17 @@
     });
     
     document.addEventListener('contextmenu', event => event.preventDefault());
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('nav a').forEach(link => {
+        link.addEventListener('click', () => {
+          const href = link.getAttribute('data-href');
+          if (href && href !== '#') {
+            window.location.href = href;
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
-
