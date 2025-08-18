@@ -210,6 +210,18 @@ body {
   cursor: pointer;
 }
 
+.buffer-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: #cccccc;
+  border-radius: 4px;
+  transition: width 0.2s linear;
+  z-index: 1;
+}
+
 #progressBar {
   position: absolute;
   top: 0;
@@ -218,6 +230,8 @@ body {
   width: 0%;
   background-color: red;
   transition: width 0.1s linear;
+  z-index: 2;
+  border-radius: 4px;
 }
 
 #progressHandle {
@@ -231,6 +245,7 @@ body {
   pointer-events: auto;
   cursor: pointer;
   left: 0%;
+  z-index: 3;
 }
 
 #currentTime, #timeRemaining {
@@ -320,12 +335,10 @@ body {
   overflow-y: auto;
   scroll-behavior: smooth;
   overscroll-behavior-y: contain;
-  /* Propriedades para ocultar a barra de rolagem */
-  scrollbar-width: none; /* Para Firefox */
-  -ms-overflow-style: none;  /* Para Internet Explorer e Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-/* Regra para ocultar a barra de rolagem em navegadores WebKit (Chrome, Safari) */
 #playlist::-webkit-scrollbar {
     display: none;
 }
@@ -505,8 +518,6 @@ body {
       width: 50px;
   }
 }
-
-/* As regras de scrollbar para .playlist-container foram removidas pois são obsoletas */
 
 .hidden-cursor {
   cursor: none;
