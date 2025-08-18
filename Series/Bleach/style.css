@@ -427,7 +427,7 @@ body {
   cursor: none;
 }
 
-/* --- ESTILOS PARA O CARD DE CONTINUAR ASSISTINDO (VERSÃO RESTAURADA) --- */
+/* --- ESTILOS PARA O CARD DE CONTINUAR ASSISTINDO --- */
 .resume-card-container {
   position: absolute;
   top: 0;
@@ -484,7 +484,8 @@ body {
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  outline: none;
 }
 
 #resumeConfirmBtn {
@@ -507,6 +508,12 @@ body {
 
 #resumeStartOverBtn:hover {
   background-color: #555;
+}
+
+/* NOVO: Estilo para o botão focado pelo teclado */
+.resume-buttons button.focused {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
 }
 
 
