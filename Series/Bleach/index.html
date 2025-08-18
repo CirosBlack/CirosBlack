@@ -57,6 +57,7 @@
             <span id="currentTime">00:00</span>
             <div class="progress-wrapper">
               <div class="progress-container" id="progressContainer">
+                <div class="buffer-bar" id="bufferBar"></div>
                 <div class="progress-bar" id="progressBar"></div>
                 <div class="progress-handle" id="progressHandle"></div>
               </div>
@@ -97,7 +98,6 @@
 
   <script>
     const videoPlayer = document.getElementById('videoPlayer');
-    // const videoTitle = document.getElementById('videoTitle'); <- REMOVIDO
     const playlist = document.getElementById('playlist');
     const prevBtn = document.getElementById('prevBtn');
     const playPauseBtn = document.getElementById('playPauseBtn');
@@ -108,6 +108,7 @@
     const playlistContainer = document.getElementById('playlistContainer');
     const progressContainer = document.getElementById('progressContainer');
     const progressBar = document.getElementById('progressBar');
+    const bufferBar = document.getElementById('bufferBar');
     const progressHandle = document.getElementById('progressHandle');
     const timeRemaining = document.getElementById('timeRemaining');
     const currentTime = document.getElementById('currentTime');
@@ -175,7 +176,6 @@
       if (index < 0 || index >= videos.length) return;
       currentIndex = index;
       videoPlayer.src = videos[index].src;
-      // videoTitle.textContent = videos[index].title; <- REMOVIDO
       episodeTitle.textContent = videos[index].title;
       highlightCurrentItem();
       scrollPlaylistToCurrent();
@@ -206,6 +206,18 @@
       const s = String(Math.floor(seconds % 60)).padStart(2, '0');
       return `${m}:${s}`;
     }
+    
+    function updateBuffer() {
+      if (videoPlayer.duration > 0) {
+        for (let i = 0; i < videoPlayer.buffered.length; i++) {
+          if (videoPlayer.buffered.start(i) <= videoPlayer.currentTime && videoPlayer.currentTime <= videoPlayer.buffered.end(i)) {
+            const bufferAmount = (videoPlayer.buffered.end(i) / videoPlayer.duration) * 100;
+            bufferBar.style.width = `${bufferAmount}%`;
+            break;
+          }
+        }
+      }
+    }
 
     function updateProgress() {
       const duration = videoPlayer.duration || 0;
@@ -215,6 +227,8 @@
       progressHandle.style.left = `calc(${percent}% - 7px)`;
       timeRemaining.textContent = formatTime(duration - current);
       currentTime.textContent = formatTime(current);
+
+      updateBuffer();
 
       if (current > 0 && current < 81) {
         skipIntroBtn.style.display = 'block';
@@ -322,7 +336,6 @@
           videos = data.episodios || [];
           if (data.serie) {
             document.title = data.serie;
-            // videoTitle.textContent = data.serie; <- REMOVIDO
           }
           generatePlaylist();
           generateFullscreenPlaylist();
@@ -429,6 +442,7 @@
       videoPlayer.play();
     });
 
+    videoPlayer.addEventListener('progress', updateBuffer);
     videoPlayer.addEventListener('play', () => {
         updatePlayPauseButton();
         pauseIcon.classList.remove('visible');
@@ -487,7 +501,7 @@
             const clickX = e.clientX - rect.left;
             const clickY = e.clientY - rect.top;
 
-            const areaSideLength = Math.sqrt(0.20); // approx 0.447
+            const areaSideLength = Math.sqrt(0.20);
             const xStart = rect.width * (1 - areaSideLength) / 2;
             const xEnd = rect.width - xStart;
             const yStart = rect.height * (1 - areaSideLength) / 2;
