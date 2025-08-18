@@ -484,8 +484,9 @@ body {
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;
-  transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
+  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s ease-in-out; /* ATUALIZADO */
   outline: none;
+  box-shadow: 0 0 0 0px rgba(255, 255, 255, 0.7); /* Estado inicial da animação */
 }
 
 #resumeConfirmBtn {
@@ -510,7 +511,7 @@ body {
   background-color: #555;
 }
 
-/* NOVO: Estilo para o botão focado pelo teclado */
+/* ATUALIZADO: Estilo para o botão focado pelo teclado com animação */
 .resume-buttons button.focused {
   transform: scale(1.05);
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
