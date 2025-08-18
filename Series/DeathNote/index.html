@@ -547,6 +547,39 @@
         });
       });
     });
+
+    document.addEventListener('keydown', (event) => {
+  // Impede que a página role ao usar as setas ou o espaço
+  if (["ArrowLeft", "ArrowRight", " ", "Space"].includes(event.key) || event.code === 'Space') {
+    event.preventDefault();
+  }
+
+  // Comandos do teclado
+  switch (event.key) {
+    case "ArrowLeft":
+      // Carrega o vídeo anterior, se não for o primeiro da lista
+      if (currentIndex > 0) {
+        loadVideoByIndex(currentIndex - 1);
+      }
+      break;
+    case "ArrowRight":
+      // Carrega o próximo vídeo, se não for o último da lista
+      if (currentIndex < videos.length - 1) {
+        loadVideoByIndex(currentIndex + 1);
+      }
+      break;
+    case ' ': // Para alguns navegadores
+    case 'Space': // Padrão para a maioria
+      // Inverte o estado do vídeo
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+      } else {
+        videoPlayer.pause();
+      }
+      break;
+  }
+});
   </script>
 </body>
 </html>
+
