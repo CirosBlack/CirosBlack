@@ -149,6 +149,8 @@
     let serieKey; 
     let lastSaveTime = 0;
     let lastPlayTimestamp = 0;
+    // Nova variável para navegação do card
+    let focusedButtonIndex = 0;
 
     // --- FUNÇÕES ---
 
@@ -183,7 +185,18 @@
       highlightCurrentItem();
       scrollPlaylistToCurrent();
     }
-
+    
+    // NOVA FUNÇÃO: Atualiza o foco visual dos botões do card
+    function updateButtonFocus() {
+        const buttons = [resumeConfirmBtn, resumeStartOverBtn];
+        buttons.forEach((button, index) => {
+            if (index === focusedButtonIndex) {
+                button.classList.add('focused');
+            } else {
+                button.classList.remove('focused');
+            }
+        });
+    }
 
     function generatePlaylist() {
       playlist.innerHTML = "";
@@ -342,6 +355,8 @@
             resumeEpisode.textContent = videos[savedIndex].title;
             resumeTime.textContent = formatTime(savedTime);
             resumeCard.classList.add('visible');
+            focusedButtonIndex = 0; // Foco inicial no primeiro botão
+            updateButtonFocus();
             loadVideo(savedIndex, savedTime, false); 
           } else {
             loadVideo(0, 0, false);
@@ -364,13 +379,13 @@
     });
 
     resumeConfirmBtn.addEventListener('click', (event) => {
-        event.stopPropagation(); // <<-- CORREÇÃO AQUI
+        event.stopPropagation();
         videoPlayer.play();
         resumeCard.classList.remove('visible');
     });
 
     resumeStartOverBtn.addEventListener('click', (event) => {
-        event.stopPropagation(); // <<-- CORREÇÃO AQUI
+        event.stopPropagation();
         localStorage.removeItem(`${serieKey}_episodeIndex`);
         localStorage.removeItem(`${serieKey}_currentTime`);
         loadVideo(0, 0, true);
@@ -460,8 +475,27 @@
       navigator.mediaSession.setActionHandler('previoustrack', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
       navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
     }
+    
+    // ATUALIZADO: Event listener do teclado
     document.addEventListener('keydown', (event) => {
-      if (resumeCard.classList.contains('visible')) return;
+      // Se o card estiver visível, controla apenas o card
+      if (resumeCard.classList.contains('visible')) {
+        event.preventDefault();
+        const buttons = [resumeConfirmBtn, resumeStartOverBtn];
+
+        if (event.key === 'ArrowRight') {
+            focusedButtonIndex = (focusedButtonIndex + 1) % buttons.length;
+            updateButtonFocus();
+        } else if (event.key === 'ArrowLeft') {
+            focusedButtonIndex = (focusedButtonIndex - 1 + buttons.length) % buttons.length;
+            updateButtonFocus();
+        } else if (event.key === 'Enter') {
+            buttons[focusedButtonIndex].click();
+        }
+        return; // Impede que o resto do código do teclado seja executado
+      }
+
+      // Se o card NÃO estiver visível, controla o player
       if (["ArrowLeft", "ArrowRight", " "].includes(event.key) || event.code === 'Space') {
         event.preventDefault();
       }
@@ -474,6 +508,7 @@
           break;
       }
     });
+    
     document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
