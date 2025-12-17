@@ -105,7 +105,7 @@
 
 
   <script>
-  // Elementos do DOM existentes
+  // Elementos do DOM
 const videoPlayer = document.getElementById('videoPlayer');
 const playlist = document.getElementById('playlist');
 const prevBtn = document.getElementById('prevBtn');
@@ -137,7 +137,7 @@ const resumeTime = document.getElementById('resumeTime');
 const resumeConfirmBtn = document.getElementById('resumeConfirmBtn');
 const resumeStartOverBtn = document.getElementById('resumeStartOverBtn');
 
-// --- NOVO ELEMENTO PARA ÁUDIO EXTERNO ---
+// --- ELEMENTO DE ÁUDIO EXTERNO ---
 const externalAudio = new Audio();
 externalAudio.id = "externalAudio";
 document.body.appendChild(externalAudio);
@@ -168,13 +168,15 @@ function loadVideo(index, time = 0, shouldPlay = true) {
   if (index < 0 || index >= videos.length) return;
   currentIndex = index;
   
-  // Configuração das fontes
+  // Configuração do Vídeo
   videoPlayer.src = videos[index].src;
-  videoPlayer.muted = true; // Silencia o vídeo original
+  videoPlayer.muted = true; // Silencia o vídeo original para usar o dublado externo
   
-  // Define o caminho do áudio (ex: dados/001.mp3 baseado no nome do mp4)
-  const audioFileName = videos[index].src.split('/').pop().replace('.mp4', '.mp3');
-  externalAudio.src = `dados/${audioFileName}`;
+  // Configuração do Áudio Externo (Hugging Face)
+  const videoFileName = videos[index].src.split('/').pop(); 
+  const audioFileName = videoFileName.replace('.mp4', '.mp3');
+  const baseAudioUrl = "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/";
+  externalAudio.src = baseAudioUrl + audioFileName;
   
   episodeTitle.textContent = videos[index].title;
 
@@ -183,17 +185,10 @@ function loadVideo(index, time = 0, shouldPlay = true) {
       externalAudio.currentTime = time;
       
       if (shouldPlay) {
-          const playPromise = videoPlayer.play();
+          videoPlayer.play();
           externalAudio.play();
-          if (playPromise !== undefined) {
-              playPromise.catch(error => {
-                  console.log("Autoplay impedido:", error);
-                  updatePlayPauseButton();
-              });
-          }
-      } else {
-        updatePlayPauseButton();
       }
+      updatePlayPauseButton();
       videoPlayer.removeEventListener('loadedmetadata', onLoaded);
   });
 
@@ -201,21 +196,21 @@ function loadVideo(index, time = 0, shouldPlay = true) {
   scrollPlaylistToCurrent();
 }
 
-// Sincronização em tempo real (Corrige atrasos de rede/processamento)
+// Sincronização Ativa (Corrige "drifts" entre áudio e vídeo a cada 500ms)
 setInterval(() => {
-  if (!videoPlayer.paused && Math.abs(videoPlayer.currentTime - externalAudio.currentTime) > 0.15) {
-    externalAudio.currentTime = videoPlayer.currentTime;
+  if (!videoPlayer.paused) {
+    const diff = Math.abs(videoPlayer.currentTime - externalAudio.currentTime);
+    if (diff > 0.15) {
+      externalAudio.currentTime = videoPlayer.currentTime;
+    }
   }
 }, 500);
 
 function updateButtonFocus() {
     const buttons = [resumeConfirmBtn, resumeStartOverBtn];
     buttons.forEach((button, index) => {
-        if (index === focusedButtonIndex) {
-            button.classList.add('focused');
-        } else {
-            button.classList.remove('focused');
-        }
+        if (index === focusedButtonIndex) button.classList.add('focused');
+        else button.classList.remove('focused');
     });
 }
 
@@ -241,7 +236,7 @@ function generateFullscreenPlaylist() {
         fullscreenPlaylist.appendChild(li);
     });
 }
-
+    
 function formatTime(seconds) {
   const m = String(Math.floor(seconds / 60)).padStart(2, '0');
   const s = String(Math.floor(seconds % 60)).padStart(2, '0');
@@ -253,24 +248,17 @@ function updatePlayPauseButton() {
   const pauseIconUrl = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
   playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIconUrl}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
 }
-
+    
 function highlightCurrentItem() {
-  const items = playlist.querySelectorAll('li');
-  items.forEach(li => li.classList.remove('playing'));
-  const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-  if (current) current.classList.add('playing');
-
-  const fullscreenItems = fullscreenPlaylist.querySelectorAll('li');
-  fullscreenItems.forEach(li => li.classList.remove('playing'));
-  const fullscreenCurrent = fullscreenPlaylist.querySelector(`li[data-index="${currentIndex}"]`);
-  if (fullscreenCurrent) fullscreenCurrent.classList.add('playing');
+  const allLi = document.querySelectorAll('li[data-index]');
+  allLi.forEach(li => li.classList.remove('playing'));
+  const currentItems = document.querySelectorAll(`li[data-index="${currentIndex}"]`);
+  currentItems.forEach(li => li.classList.add('playing'));
 }
 
 function scrollPlaylistToCurrent() {
   const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-  if (currentItem) {
-    currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+  if (currentItem) currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function updateProgress() {
@@ -282,28 +270,18 @@ function updateProgress() {
   timeRemaining.textContent = formatTime(duration - current);
   currentTime.textContent = formatTime(current);
 
-  if (current > 0 && current < 81) {
-    skipIntroBtn.style.display = 'block';
-  } else {
-    skipIntroBtn.style.display = 'none';
-  }
-
-  if (current >= 1292) {
-    nextEpisodeBtn.style.display = 'block';
-  } else {
-    nextEpisodeBtn.style.display = 'none';
-  }
+  skipIntroBtn.style.display = (current > 0 && current < 81) ? 'block' : 'none';
+  nextEpisodeBtn.style.display = (current >= 1292) ? 'block' : 'none';
 }
 
 function scrub(e) {
   const rect = progressContainer.getBoundingClientRect();
-  const clientX = e.clientX || e.touches[0].clientX;
+  const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
   const offsetX = clientX - rect.left;
-  let ratio = offsetX / rect.width;
-  ratio = Math.min(Math.max(ratio, 0), 1);
+  let ratio = Math.min(Math.max(offsetX / rect.width, 0), 1);
   const newTime = ratio * videoPlayer.duration;
   videoPlayer.currentTime = newTime;
-  externalAudio.currentTime = newTime; // Sincroniza áudio no scrub
+  externalAudio.currentTime = newTime;
   updateProgress();
 }
 
@@ -320,34 +298,25 @@ function toggleMute() {
 
 function handleVolumeChange() {
     externalAudio.volume = volumeSlider.value;
-    if (externalAudio.volume > 0) {
-        externalAudio.muted = false;
-    }
+    if (externalAudio.volume > 0) externalAudio.muted = false;
 }
 
 function updateVolumeUI() {
     const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/mudo.png";
     const volumeIcon = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png";
-
-    if (externalAudio.muted || externalAudio.volume === 0) {
-        volumeSlider.value = 0;
-        volumeBtn.innerHTML = `<img src="${volumeIconMute}" alt="Mudo">`;
-    } else {
-        volumeSlider.value = externalAudio.volume;
-        volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
-    }
+    const isMuted = externalAudio.muted || externalAudio.volume === 0;
+    volumeSlider.value = isMuted ? 0 : externalAudio.volume;
+    volumeBtn.innerHTML = `<img src="${isMuted ? volumeIconMute : volumeIcon}" alt="Volume">`;
 }
-
+    
 function showControlsAndReset() {
   controlsOverlay.classList.remove('hidden');
   resetControlsTimeout();
   videoContainer.classList.remove('hidden-cursor');
   clearTimeout(mouseTimeout);
-  mouseTimeout = setTimeout(() => {
-    videoContainer.classList.add('hidden-cursor');
-  }, 3000);
+  mouseTimeout = setTimeout(() => videoContainer.classList.add('hidden-cursor'), 3000);
 }
-
+    
 function resetControlsTimeout() {
   clearTimeout(controlsTimeout);
   controlsTimeout = setTimeout(() => {
@@ -365,7 +334,6 @@ window.addEventListener('load', () => {
       videos = data.episodios || [];
       serieKey = data.serie; 
       document.title = serieKey;
-
       generatePlaylist();
       generateFullscreenPlaylist();
 
@@ -376,32 +344,30 @@ window.addEventListener('load', () => {
         resumeEpisode.textContent = videos[savedIndex].title;
         resumeTime.textContent = formatTime(savedTime);
         resumeCard.classList.add('visible');
-        focusedButtonIndex = 0;
         updateButtonFocus();
         loadVideo(savedIndex, savedTime, false); 
       } else {
         loadVideo(0, 0, false);
       }
-      
       updateVolumeUI();
     });
 });
 
-resumeConfirmBtn.addEventListener('click', (event) => {
-    event.stopPropagation();
+resumeConfirmBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     videoPlayer.play();
     externalAudio.play();
     resumeCard.classList.remove('visible');
 });
 
-resumeStartOverBtn.addEventListener('click', (event) => {
-    event.stopPropagation();
+resumeStartOverBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
     localStorage.removeItem(`${serieKey}_episodeIndex`);
     localStorage.removeItem(`${serieKey}_currentTime`);
     loadVideo(0, 0, true);
     resumeCard.classList.remove('visible');
 });
-
+    
 videoPlayer.addEventListener('timeupdate', () => {
   updateProgress();
   const now = Date.now();
@@ -411,107 +377,76 @@ videoPlayer.addEventListener('timeupdate', () => {
   }
 });
 
-window.addEventListener('beforeunload', saveProgress);
-
 playPauseBtn.addEventListener('click', () => {
-  if (videoPlayer.paused) {
-    videoPlayer.play();
-    externalAudio.play();
-  } else {
-    videoPlayer.pause();
-    externalAudio.pause();
-  }
+  if (videoPlayer.paused) { videoPlayer.play(); externalAudio.play(); }
+  else { videoPlayer.pause(); externalAudio.pause(); }
 });
-
-prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
-nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
-
+    
 videoPlayer.addEventListener('play', () => {
-  lastPlayTimestamp = Date.now();
+  externalAudio.play();
   updatePlayPauseButton();
   pauseIcon.classList.remove('visible');
-  externalAudio.play();
 });
-
+    
 videoPlayer.addEventListener('pause', () => {
-  const timeSincePlay = Date.now() - lastPlayTimestamp;
-  updatePlayPauseButton();
-  if (!isDragging && timeSincePlay > 200) {
-    pauseIcon.classList.add('visible');
-  }
   externalAudio.pause();
+  updatePlayPauseButton();
+  if (!isDragging) pauseIcon.classList.add('visible');
 });
 
 videoPlayer.addEventListener('seeking', () => {
-    externalAudio.currentTime = videoPlayer.currentTime;
+  externalAudio.currentTime = videoPlayer.currentTime;
 });
-
+    
 videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideo(currentIndex + 1); });
-
+    
 progressContainer.addEventListener('mousedown', (e) => { 
-    isDragging = true; 
-    wasPausedBeforeDrag = videoPlayer.paused; 
-    videoPlayer.pause(); 
-    externalAudio.pause();
-    scrub(e); 
+  isDragging = true; 
+  wasPausedBeforeDrag = videoPlayer.paused; 
+  videoPlayer.pause(); 
+  externalAudio.pause();
+  scrub(e); 
 });
 
 document.addEventListener('mouseup', () => { 
-    if (isDragging) { 
-        isDragging = false; 
-        if (!wasPausedBeforeDrag) {
-            videoPlayer.play(); 
-            externalAudio.play();
-        }
-    } 
+  if (isDragging) { 
+    isDragging = false; 
+    if (!wasPausedBeforeDrag) { videoPlayer.play(); externalAudio.play(); } 
+  } 
 });
 
 volumeBtn.addEventListener('click', toggleMute);
 volumeSlider.addEventListener('input', handleVolumeChange);
 externalAudio.addEventListener('volumechange', updateVolumeUI);
-
-fullscreenBtn.addEventListener('click', () => { if (!document.fullscreenElement) videoContainer.requestFullscreen().catch(() => {}); else document.exitFullscreen().catch(() => {}); });
-skipIntroBtn.addEventListener('click', () => { 
-    videoPlayer.currentTime = 81; 
-    externalAudio.currentTime = 81;
-});
+skipIntroBtn.addEventListener('click', () => { videoPlayer.currentTime = 81; externalAudio.currentTime = 81; });
 nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
-pauseIcon.addEventListener('click', () => { 
-    videoPlayer.play(); 
-    externalAudio.play();
-});
+pauseIcon.addEventListener('click', () => { videoPlayer.play(); externalAudio.play(); });
 
 playlist.addEventListener('click', (e) => { 
-    const li = e.target.closest('li'); 
-    if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); 
+  const li = e.target.closest('li'); 
+  if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); 
 });
 
 document.addEventListener('keydown', (event) => {
   if (resumeCard.classList.contains('visible')) {
-    event.preventDefault();
-    const buttons = [resumeConfirmBtn, resumeStartOverBtn];
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-        focusedButtonIndex = (focusedButtonIndex + 1) % buttons.length;
+        focusedButtonIndex = (focusedButtonIndex + 1) % 2;
         updateButtonFocus();
     } else if (event.key === 'Enter') {
+        const buttons = [resumeConfirmBtn, resumeStartOverBtn];
         buttons[focusedButtonIndex].click();
     }
     return;
   }
-
   switch (event.key) {
     case "ArrowLeft": if (currentIndex > 0) loadVideo(currentIndex - 1); break;
     case "ArrowRight": if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); break;
-    case ' ': case 'Space':
-      if (videoPlayer.paused) { videoPlayer.play(); externalAudio.play(); }
-      else { videoPlayer.pause(); externalAudio.pause(); }
-      break;
+    case ' ': if (videoPlayer.paused) { videoPlayer.play(); externalAudio.play(); } else { videoPlayer.pause(); externalAudio.pause(); } break;
   }
 });
-
-document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
+
 
 
