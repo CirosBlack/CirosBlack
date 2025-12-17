@@ -1,7 +1,7 @@
 {
   "serie": "YuYuHakusho",
   "episodios": [
-    { "src": "https://huggingface.co/datasets/QW5pbWVz/eXV5dWhha3VzaG8/resolve/main/001.mp4", "audioSrc": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/001.mp3", "title": "A Morte" },
+    { "src": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/001.mp4", "audioSrc": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/001.mp3", "title": "A Morte" },
     { "src": "https://huggingface.co/datasets/QW5pbWVz/eXV5dWhha3VzaG8/resolve/main/002.mp4", "audioSrc": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/002.mp3", "title": "No mundo Espiritual - Teste da Ressurreição" },
     { "src": "https://huggingface.co/datasets/QW5pbWVz/eXV5dWhha3VzaG8/resolve/main/003.mp4", "audioSrc": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/003.mp3", "title": "A Promessa de um Homem" },
     { "src": "https://huggingface.co/datasets/QW5pbWVz/eXV5dWhha3VzaG8/resolve/main/004.mp4", "audioSrc": "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/004.mp3", "title": "O Fogo Ardente" },
