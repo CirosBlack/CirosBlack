@@ -249,6 +249,13 @@ function generatePlaylist() {
       <span class="episode-title">${video.title}</span>
       <a href="${video.src}?download=true" class="download-btn" download>Download</a>
     `;
+    
+    // CORREÇÃO: Impede que o clique no link de download dispare o loadVideo do <li>
+    const downloadBtn = li.querySelector('.download-btn');
+    downloadBtn.addEventListener('click', (e) => {
+      e.stopPropagation(); 
+    });
+
     playlist.appendChild(li);
   });
 }
@@ -566,6 +573,7 @@ document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
+
 
 
 
