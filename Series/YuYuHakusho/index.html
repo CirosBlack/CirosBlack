@@ -105,7 +105,7 @@
 
 
   <script>
-  // Elementos do DOM
+ // Elementos do DOM
 const videoPlayer = document.getElementById('videoPlayer');
 const playlist = document.getElementById('playlist');
 const prevBtn = document.getElementById('prevBtn');
@@ -250,7 +250,7 @@ function generatePlaylist() {
       <a href="${video.src}?download=true" class="download-btn" download>Download</a>
     `;
     
-    // CORREÇÃO: Impede que o clique no link de download dispare o loadVideo do <li>
+    // ATUALIZAÇÃO: Impede que o clique no link de download dispare o loadVideo do elemento li
     const downloadBtn = li.querySelector('.download-btn');
     downloadBtn.addEventListener('click', (e) => {
       e.stopPropagation(); 
@@ -506,7 +506,14 @@ skipIntroBtn.addEventListener('click', () => {
 });
 nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
 pauseIcon.addEventListener('click', () => { playAll(); });
-playlist.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); });
+
+// ATUALIZAÇÃO: Verificação adicional para ignorar o clique no botão de download dentro da playlist
+playlist.addEventListener('click', (e) => { 
+  if (e.target.classList.contains('download-btn')) return;
+  const li = e.target.closest('li'); 
+  if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); 
+});
+
 fullscreenPlaylist.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) { loadVideo(parseInt(li.dataset.index, 10)); fullscreenPlaylistContainer.classList.remove('visible'); } });
 playlistBtn.addEventListener('click', () => { fullscreenPlaylistContainer.classList.toggle('visible'); resetControlsTimeout(); });
 toggleDownloadsBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show-downloads'); });
@@ -573,6 +580,7 @@ document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
+
 
 
 
