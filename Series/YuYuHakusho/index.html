@@ -137,11 +137,6 @@ const resumeTime = document.getElementById('resumeTime');
 const resumeConfirmBtn = document.getElementById('resumeConfirmBtn');
 const resumeStartOverBtn = document.getElementById('resumeStartOverBtn');
 
-// --- ELEMENTO DE ÁUDIO EXTERNO ---
-const externalAudio = new Audio();
-externalAudio.id = "externalAudio";
-document.body.appendChild(externalAudio);
-
 // Variáveis de estado
 let videos = [];
 let currentIndex = 0;
@@ -156,6 +151,9 @@ let lastSaveTime = 0;
 let lastPlayTimestamp = 0;
 let focusedButtonIndex = 0;
 
+// NOVO: Elemento de áudio externo
+let externalAudio = new Audio();
+
 // --- FUNÇÕES ---
 
 function saveProgress() {
@@ -168,27 +166,30 @@ function loadVideo(index, time = 0, shouldPlay = true) {
   if (index < 0 || index >= videos.length) return;
   currentIndex = index;
   
-  // Configuração do Vídeo
-  videoPlayer.src = videos[index].src;
-  videoPlayer.muted = true; // Silencia o vídeo original para usar o dublado externo
-  
-  // Configuração do Áudio Externo (Hugging Face)
-  const videoFileName = videos[index].src.split('/').pop(); 
-  const audioFileName = videoFileName.replace('.mp4', '.mp3');
-  const baseAudioUrl = "https://huggingface.co/datasets/Q2lybw/QW5pbWVz/resolve/main/WXVZdUhha3VzaG8/audio/";
-  externalAudio.src = baseAudioUrl + audioFileName;
-  
-  episodeTitle.textContent = videos[index].title;
+  const currentVideo = videos[index];
+  videoPlayer.src = currentVideo.src;
+  episodeTitle.textContent = currentVideo.title;
+
+  // Lógica de Áudio Externo
+  if (currentVideo.audioSrc) {
+    externalAudio.src = currentVideo.audioSrc;
+    externalAudio.load();
+    videoPlayer.muted = true; // Muta o vídeo original se houver áudio externo
+  } else {
+    externalAudio.pause();
+    externalAudio.src = "";
+    videoPlayer.muted = false;
+  }
 
   videoPlayer.addEventListener('loadedmetadata', function onLoaded() {
       videoPlayer.currentTime = time;
-      externalAudio.currentTime = time;
-      
+      if (currentVideo.audioSrc) externalAudio.currentTime = time;
+
       if (shouldPlay) {
-          videoPlayer.play();
-          externalAudio.play();
+          playAll();
+      } else {
+        updatePlayPauseButton();
       }
-      updatePlayPauseButton();
       videoPlayer.removeEventListener('loadedmetadata', onLoaded);
   });
 
@@ -196,21 +197,46 @@ function loadVideo(index, time = 0, shouldPlay = true) {
   scrollPlaylistToCurrent();
 }
 
-// Sincronização Ativa (Corrige "drifts" entre áudio e vídeo a cada 500ms)
-setInterval(() => {
-  if (!videoPlayer.paused) {
-    const diff = Math.abs(videoPlayer.currentTime - externalAudio.currentTime);
-    if (diff > 0.15) {
-      externalAudio.currentTime = videoPlayer.currentTime;
+// Funções de sincronização de Play/Pause
+function playAll() {
+    const playPromise = videoPlayer.play();
+    if (playPromise !== undefined) {
+        playPromise.then(() => {
+            if (externalAudio.src) externalAudio.play();
+        }).catch(error => console.log("Erro ao reproduzir:", error));
     }
-  }
-}, 500);
+}
+
+function pauseAll() {
+    videoPlayer.pause();
+    if (externalAudio.src) externalAudio.pause();
+}
+
+// Sincronização em tempo real (Garante que o áudio não saia de fase)
+videoPlayer.addEventListener('timeupdate', () => {
+    if (externalAudio.src && !externalAudio.paused) {
+        const diff = Math.abs(videoPlayer.currentTime - externalAudio.currentTime);
+        if (diff > 0.15) { // Se a diferença for maior que 150ms, resincroniza
+            externalAudio.currentTime = videoPlayer.currentTime;
+        }
+    }
+    
+    updateProgress();
+    const now = Date.now();
+    if (now - lastSaveTime > 5000) {
+      saveProgress();
+      lastSaveTime = now;
+    }
+});
 
 function updateButtonFocus() {
     const buttons = [resumeConfirmBtn, resumeStartOverBtn];
     buttons.forEach((button, index) => {
-        if (index === focusedButtonIndex) button.classList.add('focused');
-        else button.classList.remove('focused');
+        if (index === focusedButtonIndex) {
+            button.classList.add('focused');
+        } else {
+            button.classList.remove('focused');
+        }
     });
 }
 
@@ -236,7 +262,7 @@ function generateFullscreenPlaylist() {
         fullscreenPlaylist.appendChild(li);
     });
 }
-    
+
 function formatTime(seconds) {
   const m = String(Math.floor(seconds / 60)).padStart(2, '0');
   const s = String(Math.floor(seconds % 60)).padStart(2, '0');
@@ -248,17 +274,24 @@ function updatePlayPauseButton() {
   const pauseIconUrl = "https://raw.githubusercontent.com/CirosBlack/YuYuHakusho/refs/heads/main/Pause.png";
   playPauseBtn.innerHTML = `<img src="${videoPlayer.paused ? playIcon : pauseIconUrl}" alt="${videoPlayer.paused ? 'Play' : 'Pause'}" />`;
 }
-    
+
 function highlightCurrentItem() {
-  const allLi = document.querySelectorAll('li[data-index]');
-  allLi.forEach(li => li.classList.remove('playing'));
-  const currentItems = document.querySelectorAll(`li[data-index="${currentIndex}"]`);
-  currentItems.forEach(li => li.classList.add('playing'));
+  const items = playlist.querySelectorAll('li');
+  items.forEach(li => li.classList.remove('playing'));
+  const current = playlist.querySelector(`li[data-index="${currentIndex}"]`);
+  if (current) current.classList.add('playing');
+
+  const fullscreenItems = fullscreenPlaylist.querySelectorAll('li');
+  fullscreenItems.forEach(li => li.classList.remove('playing'));
+  const fullscreenCurrent = fullscreenPlaylist.querySelector(`li[data-index="${currentIndex}"]`);
+  if (fullscreenCurrent) fullscreenCurrent.classList.add('playing');
 }
 
 function scrollPlaylistToCurrent() {
   const currentItem = playlist.querySelector(`li[data-index="${currentIndex}"]`);
-  if (currentItem) currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (currentItem) {
+    currentItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 function updateProgress() {
@@ -270,53 +303,87 @@ function updateProgress() {
   timeRemaining.textContent = formatTime(duration - current);
   currentTime.textContent = formatTime(current);
 
-  skipIntroBtn.style.display = (current > 0 && current < 81) ? 'block' : 'none';
-  nextEpisodeBtn.style.display = (current >= 1292) ? 'block' : 'none';
+  if (current > 0 && current < 81) {
+    skipIntroBtn.style.display = 'block';
+  } else {
+    skipIntroBtn.style.display = 'none';
+  }
+
+  if (current >= 1292) {
+    nextEpisodeBtn.style.display = 'block';
+  } else {
+    nextEpisodeBtn.style.display = 'none';
+  }
 }
 
 function scrub(e) {
   const rect = progressContainer.getBoundingClientRect();
-  const clientX = e.clientX || (e.touches ? e.touches[0].clientX : 0);
+  const clientX = e.clientX || e.touches[0].clientX;
   const offsetX = clientX - rect.left;
-  let ratio = Math.min(Math.max(offsetX / rect.width, 0), 1);
+  let ratio = offsetX / rect.width;
+  ratio = Math.min(Math.max(ratio, 0), 1);
   const newTime = ratio * videoPlayer.duration;
+  
   videoPlayer.currentTime = newTime;
-  externalAudio.currentTime = newTime;
+  if (externalAudio.src) externalAudio.currentTime = newTime;
+  
   updateProgress();
 }
 
 function toggleMute() {
-    if (externalAudio.muted || externalAudio.volume === 0) {
-        externalAudio.muted = false;
-        externalAudio.volume = lastVolume;
+    const isMuted = (videoPlayer.muted && (externalAudio.src ? externalAudio.muted : true)) || videoPlayer.volume === 0;
+    
+    if (isMuted) {
+        videoPlayer.muted = externalAudio.src ? true : false; // Vídeo continua mudo se houver áudio ext
+        if (externalAudio.src) externalAudio.muted = false;
+        videoPlayer.volume = lastVolume;
+        if (externalAudio.src) externalAudio.volume = lastVolume;
     } else {
-        lastVolume = externalAudio.volume;
-        externalAudio.muted = true;
-        externalAudio.volume = 0;
+        lastVolume = externalAudio.src ? externalAudio.volume : videoPlayer.volume;
+        videoPlayer.muted = true;
+        if (externalAudio.src) externalAudio.muted = true;
+        videoPlayer.volume = 0;
+        if (externalAudio.src) externalAudio.volume = 0;
     }
 }
 
 function handleVolumeChange() {
-    externalAudio.volume = volumeSlider.value;
-    if (externalAudio.volume > 0) externalAudio.muted = false;
+    const vol = volumeSlider.value;
+    videoPlayer.volume = vol;
+    if (externalAudio.src) {
+        externalAudio.volume = vol;
+        if (vol > 0) externalAudio.muted = false;
+    }
+    if (vol > 0 && !externalAudio.src) {
+        videoPlayer.muted = false;
+    }
 }
 
 function updateVolumeUI() {
     const volumeIconMute = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/mudo.png";
     const volumeIcon = "https://raw.githubusercontent.com/CirosBlack/public/refs/heads/main/capas/volume.png";
-    const isMuted = externalAudio.muted || externalAudio.volume === 0;
-    volumeSlider.value = isMuted ? 0 : externalAudio.volume;
-    volumeBtn.innerHTML = `<img src="${isMuted ? volumeIconMute : volumeIcon}" alt="Volume">`;
+    const isMuted = externalAudio.src ? externalAudio.muted : videoPlayer.muted;
+    const currentVol = externalAudio.src ? externalAudio.volume : videoPlayer.volume;
+
+    if (isMuted || currentVol === 0) {
+        volumeSlider.value = 0;
+        volumeBtn.innerHTML = `<img src="${volumeIconMute}" alt="Mudo">`;
+    } else {
+        volumeSlider.value = currentVol;
+        volumeBtn.innerHTML = `<img src="${volumeIcon}" alt="Volume">`;
+    }
 }
-    
+
 function showControlsAndReset() {
   controlsOverlay.classList.remove('hidden');
   resetControlsTimeout();
   videoContainer.classList.remove('hidden-cursor');
   clearTimeout(mouseTimeout);
-  mouseTimeout = setTimeout(() => videoContainer.classList.add('hidden-cursor'), 3000);
+  mouseTimeout = setTimeout(() => {
+    videoContainer.classList.add('hidden-cursor');
+  }, 3000);
 }
-    
+
 function resetControlsTimeout() {
   clearTimeout(controlsTimeout);
   controlsTimeout = setTimeout(() => {
@@ -324,6 +391,7 @@ function resetControlsTimeout() {
     fullscreenPlaylistContainer.classList.remove('visible');
   }, 3000);
 }
+
 
 // --- EVENT LISTENERS ---
 
@@ -334,6 +402,7 @@ window.addEventListener('load', () => {
       videos = data.episodios || [];
       serieKey = data.serie; 
       document.title = serieKey;
+
       generatePlaylist();
       generateFullscreenPlaylist();
 
@@ -344,109 +413,160 @@ window.addEventListener('load', () => {
         resumeEpisode.textContent = videos[savedIndex].title;
         resumeTime.textContent = formatTime(savedTime);
         resumeCard.classList.add('visible');
+        focusedButtonIndex = 0;
         updateButtonFocus();
         loadVideo(savedIndex, savedTime, false); 
       } else {
         loadVideo(0, 0, false);
+        // Autoplay logic
+        const playPromise = videoPlayer.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                if (externalAudio.src) externalAudio.play();
+                updateVolumeUI();
+            }).catch(() => updatePlayPauseButton());
+        }
       }
       updateVolumeUI();
     });
 });
 
-resumeConfirmBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    videoPlayer.play();
-    externalAudio.play();
+resumeConfirmBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    playAll();
     resumeCard.classList.remove('visible');
 });
 
-resumeStartOverBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
+resumeStartOverBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
     localStorage.removeItem(`${serieKey}_episodeIndex`);
     localStorage.removeItem(`${serieKey}_currentTime`);
     loadVideo(0, 0, true);
     resumeCard.classList.remove('visible');
 });
-    
-videoPlayer.addEventListener('timeupdate', () => {
-  updateProgress();
-  const now = Date.now();
-  if (now - lastSaveTime > 5000) {
-    saveProgress();
-    lastSaveTime = now;
+
+window.addEventListener('beforeunload', saveProgress);
+
+playPauseBtn.addEventListener('click', () => {
+  if (videoPlayer.paused) playAll();
+  else pauseAll();
+});
+
+prevBtn.addEventListener('click', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
+nextBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
+
+videoPlayer.addEventListener('play', () => {
+  lastPlayTimestamp = Date.now();
+  updatePlayPauseButton();
+  pauseIcon.classList.remove('visible');
+  if (externalAudio.src && externalAudio.paused) externalAudio.play();
+});
+
+videoPlayer.addEventListener('pause', () => {
+  const timeSincePlay = Date.now() - lastPlayTimestamp;
+  updatePlayPauseButton();
+  if (externalAudio.src && !externalAudio.paused) externalAudio.pause();
+  if (!isDragging && timeSincePlay > 200) {
+    pauseIcon.classList.add('visible');
   }
 });
 
-playPauseBtn.addEventListener('click', () => {
-  if (videoPlayer.paused) { videoPlayer.play(); externalAudio.play(); }
-  else { videoPlayer.pause(); externalAudio.pause(); }
-});
-    
-videoPlayer.addEventListener('play', () => {
-  externalAudio.play();
-  updatePlayPauseButton();
-  pauseIcon.classList.remove('visible');
-});
-    
-videoPlayer.addEventListener('pause', () => {
-  externalAudio.pause();
-  updatePlayPauseButton();
-  if (!isDragging) pauseIcon.classList.add('visible');
-});
-
-videoPlayer.addEventListener('seeking', () => {
-  externalAudio.currentTime = videoPlayer.currentTime;
-});
-    
 videoPlayer.addEventListener('ended', () => { if (currentIndex + 1 < videos.length) loadVideo(currentIndex + 1); });
-    
+
+// Dragging / Seeking
 progressContainer.addEventListener('mousedown', (e) => { 
-  isDragging = true; 
-  wasPausedBeforeDrag = videoPlayer.paused; 
-  videoPlayer.pause(); 
-  externalAudio.pause();
-  scrub(e); 
+    isDragging = true; 
+    wasPausedBeforeDrag = videoPlayer.paused; 
+    pauseAll(); 
+    scrub(e); 
 });
-
 document.addEventListener('mouseup', () => { 
-  if (isDragging) { 
-    isDragging = false; 
-    if (!wasPausedBeforeDrag) { videoPlayer.play(); externalAudio.play(); } 
-  } 
+    if (isDragging) { 
+        isDragging = false; 
+        if (!wasPausedBeforeDrag) playAll(); 
+    } 
 });
 
+// Eventos de volume e interface
 volumeBtn.addEventListener('click', toggleMute);
 volumeSlider.addEventListener('input', handleVolumeChange);
-externalAudio.addEventListener('volumechange', updateVolumeUI);
-skipIntroBtn.addEventListener('click', () => { videoPlayer.currentTime = 81; externalAudio.currentTime = 81; });
-nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
-pauseIcon.addEventListener('click', () => { videoPlayer.play(); externalAudio.play(); });
-
-playlist.addEventListener('click', (e) => { 
-  const li = e.target.closest('li'); 
-  if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); 
+videoPlayer.addEventListener('volumechange', updateVolumeUI);
+fullscreenBtn.addEventListener('click', () => { if (!document.fullscreenElement) videoContainer.requestFullscreen().catch(() => {}); else document.exitFullscreen().catch(() => {}); });
+pipBtn.addEventListener('click', () => { if (videoPlayer !== document.pictureInPictureElement) videoPlayer.requestPictureInPicture().catch(error => console.error("Erro PiP:", error)); else document.exitPictureInPicture().catch(error => console.error("Erro PiP:", error)); });
+skipIntroBtn.addEventListener('click', () => { 
+    videoPlayer.currentTime = 81; 
+    if (externalAudio.src) externalAudio.currentTime = 81;
 });
+nextEpisodeBtn.addEventListener('click', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
+pauseIcon.addEventListener('click', () => { playAll(); });
+playlist.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) loadVideo(parseInt(li.dataset.index)); });
+fullscreenPlaylist.addEventListener('click', (e) => { const li = e.target.closest('li'); if (li && li.dataset.index) { loadVideo(parseInt(li.dataset.index, 10)); fullscreenPlaylistContainer.classList.remove('visible'); } });
+playlistBtn.addEventListener('click', () => { fullscreenPlaylistContainer.classList.toggle('visible'); resetControlsTimeout(); });
+toggleDownloadsBtn.addEventListener('click', () => { playlistContainer.classList.toggle('show-downloads'); });
+videoContainer.addEventListener('mousemove', showControlsAndReset);
+videoContainer.addEventListener('touchstart', showControlsAndReset);
+
+// Click no container para pause/fullscreen
+videoContainer.addEventListener('click', (e) => {
+  if (e.target.closest('.bottom-controls') || e.target.closest('.fullscreen-playlist-container') || e.target.closest('#skipIntroBtn') || e.target.closest('#nextEpisodeBtn') || e.target.closest('#pauseIcon')) {
+    resetControlsTimeout(); return;
+  }
+  if (clickTimeout !== null) {
+    clearTimeout(clickTimeout); clickTimeout = null;
+    if (!document.fullscreenElement) videoContainer.requestFullscreen?.()
+    else document.exitFullscreen?.()
+  } else {
+    clickTimeout = setTimeout(() => {
+      if (!videoPlayer.paused) {
+        const rect = videoContainer.getBoundingClientRect();
+        const clickX = e.clientX - rect.left; const clickY = e.clientY - rect.top;
+        const areaSideLength = Math.sqrt(0.20);
+        const xStart = rect.width * (1 - areaSideLength) / 2; const xEnd = rect.width - xStart;
+        const yStart = rect.height * (1 - areaSideLength) / 2; const yEnd = rect.height - yStart;
+        if (clickX >= xStart && clickX <= xEnd && clickY >= yStart && clickY <= yEnd) pauseAll();
+      }
+      clickTimeout = null;
+    }, 250);
+  }
+});
+
+// --- CONTROLES GLOBAIS ---
+if ('mediaSession' in navigator) {
+  navigator.mediaSession.setActionHandler('previoustrack', () => { if (currentIndex > 0) loadVideo(currentIndex - 1); });
+  navigator.mediaSession.setActionHandler('nexttrack', () => { if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); });
+}
 
 document.addEventListener('keydown', (event) => {
   if (resumeCard.classList.contains('visible')) {
+    event.preventDefault();
+    const buttons = [resumeConfirmBtn, resumeStartOverBtn];
     if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
-        focusedButtonIndex = (focusedButtonIndex + 1) % 2;
+        focusedButtonIndex = (focusedButtonIndex + 1) % buttons.length;
         updateButtonFocus();
     } else if (event.key === 'Enter') {
-        const buttons = [resumeConfirmBtn, resumeStartOverBtn];
         buttons[focusedButtonIndex].click();
     }
     return;
   }
+
+  if (["ArrowLeft", "ArrowRight", " "].includes(event.key) || event.code === 'Space') {
+    event.preventDefault();
+  }
   switch (event.key) {
     case "ArrowLeft": if (currentIndex > 0) loadVideo(currentIndex - 1); break;
     case "ArrowRight": if (currentIndex < videos.length - 1) loadVideo(currentIndex + 1); break;
-    case ' ': if (videoPlayer.paused) { videoPlayer.play(); externalAudio.play(); } else { videoPlayer.pause(); externalAudio.pause(); } break;
+    case ' ': case 'Space':
+      if (videoPlayer.paused) playAll();
+      else pauseAll();
+      break;
   }
 });
+
+document.addEventListener('contextmenu', event => event.preventDefault());
   </script>
 </body>
 </html>
+
 
 
 
